@@ -86,6 +86,19 @@ export type {
   MonteCarloResult,
   Quantiles,
 } from './risk/monteCarlo.js';
+export {
+  conditional_v1,
+  contractor_v1,
+  formatMoneyMln,
+  formatMonth,
+  formatWeeks,
+  hybrid_v1,
+  inhouse_v1,
+  parity_v1,
+} from './decision/templates.js';
+export type { TemplateInput, TemplateScenario } from './decision/templates.js';
+export { HYBRID_TCO_TOLERANCE, buildVerdict } from './decision/verdict.js';
+export type { VerdictInput, VerdictScenarioInput } from './decision/verdict.js';
 export { D1_FLOWS, d1Task } from './fixtures/d1.js';
 export { computeCalcD1, formatCalcTable, runCalc } from './cli/calc.js';
 export type { CalcEffort, CalcResult, CalcScenario, CalcStageRow } from './cli/calc.js';
