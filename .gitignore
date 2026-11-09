@@ -1,0 +1,67 @@
+# === Локальное состояние агентов и инструментов ===
+.omo/
+.codegraph
+.codegraph/
+
+# === Зависимости ===
+node_modules/
+.pnpm-store/
+.yarn/cache/
+.yarn/install-state.gz
+
+# === Сборка и артефакты ===
+dist/
+build/
+out/
+.turbo/
+.next/
+.nuxt/
+.svelte-kit/
+coverage/
+.vitest/
+test-results/
+playwright-report/
+blob-report/
+*.tsbuildinfo
+
+# === Переменные окружения и секреты ===
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets.json
+
+# === Python (если появятся скрипты) ===
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# === Логи и временные файлы ===
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.tmp
+*.temp
+.cache/
+.temp/
+
+# === ОС и редакторы ===
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# === Прочее ===
+*.local
+*.bak
+*.orig

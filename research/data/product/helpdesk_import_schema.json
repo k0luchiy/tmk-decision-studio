@@ -1,0 +1,238 @@
+{
+ "schema_version": "1.0",
+ "file": "helpdesk_import_schema.json",
+ "generated": "2026-11-09",
+ "source_file": "Выгрузка полей.xlsx",
+ "source_type": "field template with 4 sample rows (NOT a dataset)",
+ "source_sheet": "Лист1",
+ "source_dimensions": "A1:P5 (header + 4 data rows, 16 columns)",
+ "purpose": "Машиночитаемое описание выгрузки HelpDesk и правил её приведения к модели оценки: Задача → работа (активность) → трудоёмкость → стоимость.",
+ "entity_model": {
+  "task": {
+   "key": "CR (Изменение.Номер) или IM (Номер)",
+   "note": "В выборке 1 CR = 1 IM = 1 активность. В полной выгрузке ожидается 1 CR = N активностей."
+  },
+  "work_item": {
+   "key": "Тип активности ЗНИ",
+   "note": "Единица декомпозиции. Именно её надо оценивать и суммировать до задачи."
+  },
+  "effort": {
+   "planned": "Плановая трудоемкость (часов)",
+   "actual": "Фактическая трудоемкость (часов)",
+   "quoted": "Заквотированное время, часы"
+  },
+  "cost": {
+   "formula": "cost = hours × average_hourly_rate",
+   "default_rate_rub_per_hour": 3400,
+   "rate_source": "research/20_helpdesk_export_analysis.md §8; computed from data/product/rate_cards.json",
+   "note": "HelpDesk не считает стоимость (подтверждено экспертом). Ставка — параметр модели с провенансом, а не константа в коде."
+  }
+ },
+ "columns": [
+  {
+   "index": 1,
+   "name": "Номер",
+   "type": "string",
+   "semantic": "ticket_id",
+   "example": "IM00575862",
+   "required": true,
+   "confidence": "high",
+   "notes": "Префикс IM — заявка/инцидент (гипотеза, подтвердить). Уникален в выборке (4/4)."
+  },
+  {
+   "index": 2,
+   "name": "Изменение.Номер",
+   "type": "string",
+   "semantic": "change_id",
+   "example": "CR00029124",
+   "required": true,
+   "confidence": "high",
+   "notes": "CR = Change Request. В выборке 4/4 заполнено, 1:1 с Номер."
+  },
+  {
+   "index": 3,
+   "name": "Вид",
+   "type": "string",
+   "semantic": "ticket_kind",
+   "example": "—",
+   "required": false,
+   "confidence": "low",
+   "notes": "Пусто во всех 4 строках. Вероятно, инцидент/запрос/изменение. Требует справочника."
+  },
+  {
+   "index": 4,
+   "name": "Заголовок",
+   "type": "string",
+   "semantic": "subject",
+   "example": "CR00029124: Разработка ФС. Заполнение вкладки \"Дополнительный реквизит\"",
+   "required": true,
+   "confidence": "high",
+   "notes": "Часто содержит префикс CR и тип работы. Пригоден для NLP-классификации архетипа."
+  },
+  {
+   "index": 5,
+   "name": "Специалист",
+   "type": "string",
+   "semantic": "assignee",
+   "example": "Специалист 1",
+   "required": false,
+   "confidence": "medium",
+   "notes": "В выборке обезличен. Для калибровки нужен грейд, а не ФИО."
+  },
+  {
+   "index": 6,
+   "name": "Рабочая группа",
+   "type": "string",
+   "semantic": "team",
+   "example": "Л3. ДИАЙПИ. 1С Производство",
+   "required": true,
+   "confidence": "high",
+   "notes": "Формат: <линия>.<организация>.<платформа/домен>. 'Л3' — третья линия поддержки (гипотеза, согласуется с их моделью 1/2/3 линии)."
+  },
+  {
+   "index": 7,
+   "name": "Состояние",
+   "type": "string",
+   "semantic": "state",
+   "example": "Завершена",
+   "required": true,
+   "confidence": "high",
+   "notes": "В выборке только 'Завершена'. Нужен полный справочник состояний для расчёта WIP и lead time."
+  },
+  {
+   "index": 8,
+   "name": "Тип активности ЗНИ",
+   "type": "string",
+   "semantic": "work_type",
+   "example": "Разработка ФС",
+   "required": true,
+   "confidence": "medium",
+   "notes": "Ключевое поле декомпозиции. Наблюдённые значения: 'Разработка ФС', 'Реализация изменения', 'Оценка трудоёмкости'. ЗНИ — вероятно 'задание на изменение' (подтвердить)."
+  },
+  {
+   "index": 9,
+   "name": "Дата создания",
+   "type": "datetime",
+   "semantic": "created_at",
+   "example": "2026-07-23 09:33:24",
+   "required": true,
+   "confidence": "high",
+   "notes": "Хранится как настоящая дата, формат dd.mm.yyyy hh:mm."
+  },
+  {
+   "index": 10,
+   "name": "Описание",
+   "type": "string",
+   "semantic": "description",
+   "example": "Разработка ФС",
+   "required": false,
+   "confidence": "low",
+   "notes": "Часто пусто или дублирует тип активности. Как источник признаков слабое."
+  },
+  {
+   "index": 11,
+   "name": "Плановая дата завершения",
+   "type": "datetime",
+   "semantic": "due_at",
+   "example": "2026-07-31 14:00:00",
+   "required": false,
+   "confidence": "medium",
+   "notes": "По данным ведёт себя как дедлайн/SLA, а не как прогноз: во всех 4 строках позже факта на 0.02–36.19 дня."
+  },
+  {
+   "index": 12,
+   "name": "Фактическое завершение",
+   "type": "datetime",
+   "semantic": "finished_at",
+   "example": "2026-07-28 10:18:46",
+   "required": true,
+   "confidence": "high",
+   "notes": "Совпадает с 'Дата изменения' во всех 4 строках — запись закрывается в момент завершения."
+  },
+  {
+   "index": 13,
+   "name": "Дата изменения",
+   "type": "datetime",
+   "semantic": "updated_at",
+   "example": "2026-07-28 10:18:46",
+   "required": false,
+   "confidence": "high",
+   "notes": "Техническое поле; дублирует finished_at."
+  },
+  {
+   "index": 14,
+   "name": "Фактическая трудоемкость (часов)",
+   "type": "number (float)",
+   "semantic": "effort_actual_h",
+   "example": 6.0,
+   "required": true,
+   "confidence": "high",
+   "notes": "Формат 0.00. Наблюдённые значения: 6 / 10 / 1.33 / 0. Основа для калибровки."
+  },
+  {
+   "index": 15,
+   "name": "Плановая трудоемкость (часов)",
+   "type": "number (int)",
+   "semantic": "effort_plan_h",
+   "example": 6,
+   "required": true,
+   "confidence": "high",
+   "notes": "Формат 0.00, но значения целые — оценка ведётся в целых часах."
+  },
+  {
+   "index": 16,
+   "name": "Заквотированное время, часы",
+   "type": "number (int)",
+   "semantic": "effort_quoted_h",
+   "example": 6,
+   "required": true,
+   "confidence": "medium",
+   "notes": "Целочисленный формат: квотирование округляется до часа. Вероятно, согласованное/выставляемое заказчику время. Основа для расчёта стоимости."
+  }
+ ],
+ "derived_fields": [
+  {
+   "name": "lead_time_days",
+   "formula": "(finished_at − created_at) / 86400",
+   "note": "Календарное время выполнения, не трудоёмкость."
+  },
+  {
+   "name": "plan_vs_actual_pct",
+   "formula": "(effort_actual_h / effort_plan_h − 1) × 100",
+   "note": "Точность оценки. Осторожно при effort_plan_h = 0."
+  },
+  {
+   "name": "quoted_share_pct",
+   "formula": "effort_quoted_h / effort_actual_h × 100",
+   "note": "Доля работы, предъявленной заказчику."
+  },
+  {
+   "name": "cost_rub",
+   "formula": "effort_quoted_h (или effort_actual_h) × average_hourly_rate",
+   "note": "Две базы: выставленная стоимость vs себестоимость."
+  },
+  {
+   "name": "schedule_slack_days",
+   "formula": "(due_at − finished_at) / 86400",
+   "note": "Запас до дедлайна; подтверждает, что due_at — SLA."
+  }
+ ],
+ "import_rules": [
+  "Все даты парсить как локальное время (Asia/Yekaterinburg, UTC+5); в файле нет таймзоны.",
+  "Часы приводить к float; не округлять до целых при импорте.",
+  "Пустые 'Вид' и 'Описание' не считать ошибкой — это норма выборки.",
+  "Строки с effort_plan_h = 0 исключать из метрик точности, но сохранять в объёме.",
+  "Один CR может иметь N активностей; агрегировать снизу вверх: task.effort = Σ activity.effort.",
+  "Не смешивать quoted и actual: quoted — предъявление, actual — себестоимость.",
+  "Дубликаты определять по (Номер, Тип активности ЗНИ, Специалист, Дата создания)."
+ ],
+ "data_quality_flags": [
+  "Выборка 4 строки — статистика невозможна.",
+  "Нет декомпозиции: 1 активность на 1 CR.",
+  "Поле 'Вид' пусто во всех строках.",
+  "Тип активности может наследоваться от CR, а не отражать фактическую работу (кейс: заголовок 'Встречи' при типе 'Реализация изменения').",
+  "Оценка трудоёмкости учитывается как 0 часов — стоимость самой оценки невидима.",
+  "Нет стоимости, ставок, SLA-нормативов, признака rework, связи с проектом/системой.",
+  "Плановая дата завершения ведёт себя как дедлайн, а не как прогноз."
+ ]
+}
