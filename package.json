@@ -16,7 +16,8 @@
     "data:manifest": "node scripts/build-manifest.mjs",
     "data:check": "node scripts/check-data.mjs",
     "calc": "node scripts/calc.mjs",
-    "helpdesk:check": "node scripts/check-helpdesk.mjs"
+    "helpdesk:check": "node scripts/check-helpdesk.mjs",
+    "intake:eval": "node scripts/intake-eval.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

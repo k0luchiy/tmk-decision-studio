@@ -1,0 +1,122 @@
+[
+  {
+    "id": "d1",
+    "text": "Интеграция 1С:ERP с WMS, 6 интеграционных потоков, срок 3 месяца",
+    "labels": {
+      "workType": "integration",
+      "securityKii": false,
+      "mobile": false,
+      "flows": 6,
+      "durationMonths": 3
+    }
+  },
+  {
+    "id": "d2",
+    "text": "Разработка мобильного приложения: создание нового backend и frontend, Android, 12 экранов, срок 4 месяца",
+    "labels": {
+      "workType": "development",
+      "securityKii": false,
+      "mobile": true,
+      "durationMonths": 4
+    }
+  },
+  {
+    "id": "d3",
+    "text": "Сопровождение и поддержка учётной системы, 24/7, SLA 99,9%, срок 12 месяцев",
+    "labels": {
+      "workType": "support",
+      "securityKii": false,
+      "mobile": false,
+      "durationMonths": 12
+    }
+  },
+  {
+    "id": "d4-sap",
+    "text": "Интеграция SAP S/4HANA с 1С через ESB, 4 интеграционных потока, срок 5 месяцев",
+    "labels": {
+      "workType": "integration",
+      "securityKii": false,
+      "mobile": false,
+      "flows": 4,
+      "durationMonths": 5
+    }
+  },
+  {
+    "id": "d5-migration",
+    "text": "Миграция 1С:УПП на 1С:ERP, перенос 500 ГБ данных, срок 6 месяцев",
+    "labels": {
+      "workType": "migration",
+      "securityKii": false,
+      "mobile": false,
+      "durationMonths": 6
+    }
+  },
+  {
+    "id": "d6-security",
+    "text": "Защита информационной системы, требования КИИ и 187-ФЗ, 8 АРМ, срок 3 месяца",
+    "labels": {
+      "workType": "security",
+      "securityKii": true,
+      "mobile": false,
+      "durationMonths": 3
+    }
+  },
+  {
+    "id": "d7-bi",
+    "text": "BI-дашборд для отдела продаж, 10 отчётов, 2 месяца",
+    "labels": {
+      "workType": "bi",
+      "securityKii": false,
+      "mobile": false,
+      "durationMonths": 2
+    }
+  },
+  {
+    "id": "d8-mes",
+    "text": "Внедрение MES на производстве, интеграция с SCADA, 5 операторных станций, срок 4 месяца",
+    "labels": {
+      "workType": "mes",
+      "securityKii": false,
+      "mobile": false,
+      "durationMonths": 4
+    }
+  },
+  {
+    "id": "d9-rpa",
+    "text": "Роботизация процесса обработки заявок, RPA-бот, 3 процесса, срок 2 месяца",
+    "labels": {
+      "workType": "rpa",
+      "securityKii": false,
+      "mobile": false,
+      "durationMonths": 2
+    }
+  },
+  {
+    "id": "d10-non-it",
+    "text": "Сварить кофе для команды, купить печенье",
+    "labels": {
+      "workType": "unknown",
+      "securityKii": false,
+      "mobile": false
+    }
+  },
+  {
+    "id": "d11-vague",
+    "text": "Нужно что-то автоматизировать, разберитесь сами",
+    "labels": {
+      "workType": "unknown",
+      "securityKii": false,
+      "mobile": false
+    }
+  },
+  {
+    "id": "d12-infra",
+    "text": "Настроить инфраструктуру Kubernetes, 3 сервера, срок 2 месяца",
+    "labels": {
+      "workType": "infrastructure",
+      "securityKii": false,
+      "mobile": false,
+      "durationMonths": 2
+    }
+  }
+]
