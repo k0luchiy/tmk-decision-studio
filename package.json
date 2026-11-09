@@ -7,13 +7,16 @@
   "license": "MIT",
   "workspaces": [
     "shared/*",
-    "frontend",
     "backend"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "lint": "eslint shared scripts",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "concurrently -k -n api,web \"npm:dev:api\" \"npm:dev:frontend\"",
+    "build:frontend": "npm --prefix frontend run build",
     "format:check": "prettier --check \"shared/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
     "data:manifest": "node scripts/build-manifest.mjs",
     "data:check": "node scripts/check-data.mjs",
@@ -26,6 +29,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.10.2",
+    "concurrently": "^10.0.7",
     "esbuild": "^0.21.5",
     "eslint": "^10.14.0",
     "prettier": "^3.9.10",
