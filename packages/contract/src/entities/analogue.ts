@@ -61,7 +61,7 @@ const FormulaNodeBaseSchema = z.object({
   kind: FormulaNodeKindSchema,
   valueRub: MoneyRub.optional(),
   formula: z.string().optional(),
-  refs: z.array(z.string()).optional(),
+  inputs: z.array(z.string()),
 });
 
 export type FormulaNode = z.infer<typeof FormulaNodeBaseSchema> & {

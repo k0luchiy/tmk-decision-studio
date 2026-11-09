@@ -12,6 +12,22 @@ const validCostLine = {
   status: 'fact' as const,
 };
 
+const validGrid = {
+  p10Hours: 700,
+  p50Hours: 900,
+  p80Hours: 1100,
+  p90Hours: 1300,
+  byStage: [
+    {
+      stage: 3,
+      hours: 900,
+      byRole: [{ roleId: 'backend', grade: 'middle' as const, hours: 900 }],
+    },
+  ],
+  byRole: [{ roleId: 'backend', grade: 'middle' as const, hours: 900 }],
+  totalHours: 900,
+};
+
 const validEstimate = {
   id: 'est-d1-001',
   taskId: 'task-d1',
@@ -21,7 +37,13 @@ const validEstimate = {
   inputHash: 'sha256:def456',
   seed: 42,
   methodWeights: { a: 0.5, b: 0.2, c: 0.3 },
-  effort: { p10Hours: 700, p50Hours: 900, p80Hours: 1100, p90Hours: 1300 },
+  effort: {
+    p10Hours: 700,
+    p50Hours: 900,
+    p80Hours: 1100,
+    p90Hours: 1300,
+    grid: validGrid,
+  },
   duration: {
     p10Weeks: 10,
     p50Weeks: 13,
@@ -59,6 +81,23 @@ const validEstimate = {
   risks: [],
   analogues: [],
   warnings: [],
+  formulaTree: {
+    id: 'cost_p50',
+    label: 'Стоимость реализации (P50)',
+    kind: 'total' as const,
+    valueRub: 5000000,
+    formula: 'sum(lines)',
+    inputs: [],
+    children: [
+      {
+        id: 'cl-labor-1',
+        label: 'Трудозатраты',
+        kind: 'line' as const,
+        valueRub: 120000,
+        inputs: ['rate-ru-middle'],
+      },
+    ],
+  },
   createdAt: '2026-11-09T12:00:00Z',
 };
 

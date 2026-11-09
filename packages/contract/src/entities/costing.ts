@@ -48,7 +48,7 @@ export const CostSchema = z
 export type Cost = z.infer<typeof CostSchema>;
 
 export const TcoRowSchema = z.object({
-  year: z.number().int().positive(),
+  year: z.number().int().min(0),
   costRub: MoneyRub,
   cumulativeRub: MoneyRub,
 });

@@ -74,12 +74,27 @@ export type WorkItem = z.infer<typeof WorkItemSchema>;
 /* Effort                                                                     */
 /* -------------------------------------------------------------------------- */
 
+const StageRoleHoursSchema = z.object({
+  roleId: z.string(),
+  grade: Grade,
+  hours: Hours,
+});
+
 export const EffortGridSchema = z
   .object({
     p10Hours: Hours,
     p50Hours: Hours,
     p80Hours: Hours,
     p90Hours: Hours,
+    byStage: z.array(
+      z.object({
+        stage: z.number().int().min(1).max(7),
+        hours: Hours,
+        byRole: z.array(StageRoleHoursSchema),
+      }),
+    ),
+    byRole: z.array(StageRoleHoursSchema),
+    totalHours: Hours,
   })
   .refine(
     (grid) =>

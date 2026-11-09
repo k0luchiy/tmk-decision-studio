@@ -12,6 +12,11 @@ function parseEstimate(raw: unknown): Estimate {
   return result.data;
 }
 
+function countFormulaNodes(node: Estimate['formulaTree']): number {
+  const children = node.children ?? [];
+  return 1 + children.reduce((sum, child) => sum + countFormulaNodes(child), 0);
+}
+
 function expectEstimateInvariants(estimate: Estimate): void {
   // cost.lines must add up to the P50 total (tolerance ±1 ₽ for rounding).
   const linesSum = estimate.cost.lines.reduce((sum, line) => sum + line.valueRub, 0);
@@ -92,6 +97,34 @@ describe('D1 mock: three scenarios', () => {
   it('satisfies sums, TCO cumulativity, confidence weights and break-even per scenario', () => {
     for (const raw of d1ScenariosJson) {
       expectEstimateInvariants(parseEstimate(raw));
+    }
+  });
+});
+
+describe('D1 mock: effort grid, TCO year 0, formula tree', () => {
+  it('parses formulaTree and contains at least 3 nodes', () => {
+    expect(EstimateSchema.safeParse(d1EstimateJson).success).toBe(true);
+    const estimate = parseEstimate(d1EstimateJson);
+    expect(countFormulaNodes(estimate.formulaTree)).toBeGreaterThanOrEqual(3);
+  });
+
+  it('effort.grid.byStage hours sum to effort.grid.totalHours', () => {
+    const scenarios = [d1EstimateJson, ...d1ScenariosJson].map((raw) =>
+      parseEstimate(raw),
+    );
+    for (const estimate of scenarios) {
+      const stageSum = estimate.effort.grid.byStage.reduce(
+        (sum, stage) => sum + stage.hours,
+        0,
+      );
+      expect(stageSum).toBeCloseTo(estimate.effort.grid.totalHours, 6);
+    }
+  });
+
+  it('tco starts at year 0 (implementation)', () => {
+    expect(parseEstimate(d1EstimateJson).tco[0]?.year).toBe(0);
+    for (const raw of d1ScenariosJson) {
+      expect(parseEstimate(raw).tco[0]?.year).toBe(0);
     }
   });
 });

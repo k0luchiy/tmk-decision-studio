@@ -16,70 +16,138 @@
     "p50Hours": 930,
     "p80Hours": 1010,
     "p90Hours": 1080,
-    "byStage": [
-      {
-        "stage": "analysis",
-        "label": "Анализ",
-        "hours": 120
-      },
-      {
-        "stage": "design",
-        "label": "Проектирование",
-        "hours": 150
-      },
-      {
-        "stage": "development",
-        "label": "Разработка",
-        "hours": 380
-      },
-      {
-        "stage": "testing",
-        "label": "Тестирование",
-        "hours": 150
-      },
-      {
-        "stage": "rollout",
-        "label": "Ввод в эксплуатацию",
-        "hours": 80
-      },
-      {
-        "stage": "acceptance",
-        "label": "Приёмка",
-        "hours": 50
-      }
-    ],
-    "byRole": [
-      {
-        "roleId": "analyst",
-        "label": "Аналитик",
-        "hours": 120
-      },
-      {
-        "roleId": "1c_developer",
-        "label": "1С-разработчик",
-        "hours": 380
-      },
-      {
-        "roleId": "backend",
-        "label": "Backend-разработчик",
-        "hours": 150
-      },
-      {
-        "roleId": "qa_auto",
-        "label": "QA-автоматизатор",
-        "hours": 120
-      },
-      {
-        "roleId": "pm",
-        "label": "Проектный менеджер",
-        "hours": 80
-      },
-      {
-        "roleId": "architect",
-        "label": "Архитектор",
-        "hours": 80
-      }
-    ]
+    "grid": {
+      "p10Hours": 800,
+      "p50Hours": 930,
+      "p80Hours": 1010,
+      "p90Hours": 1080,
+      "byStage": [
+        {
+          "stage": 1,
+          "hours": 120,
+          "byRole": [
+            {
+              "roleId": "analyst",
+              "grade": "middle",
+              "hours": 80
+            },
+            {
+              "roleId": "pm",
+              "grade": "lead",
+              "hours": 40
+            }
+          ]
+        },
+        {
+          "stage": 2,
+          "hours": 150,
+          "byRole": [
+            {
+              "roleId": "architect",
+              "grade": "senior",
+              "hours": 80
+            },
+            {
+              "roleId": "analyst",
+              "grade": "middle",
+              "hours": 40
+            },
+            {
+              "roleId": "pm",
+              "grade": "lead",
+              "hours": 30
+            }
+          ]
+        },
+        {
+          "stage": 3,
+          "hours": 380,
+          "byRole": [
+            {
+              "roleId": "1c_developer",
+              "grade": "middle",
+              "hours": 380
+            }
+          ]
+        },
+        {
+          "stage": 4,
+          "hours": 150,
+          "byRole": [
+            {
+              "roleId": "qa_auto",
+              "grade": "middle",
+              "hours": 120
+            },
+            {
+              "roleId": "backend",
+              "grade": "middle",
+              "hours": 30
+            }
+          ]
+        },
+        {
+          "stage": 5,
+          "hours": 80,
+          "byRole": [
+            {
+              "roleId": "backend",
+              "grade": "middle",
+              "hours": 80
+            }
+          ]
+        },
+        {
+          "stage": 6,
+          "hours": 50,
+          "byRole": [
+            {
+              "roleId": "backend",
+              "grade": "middle",
+              "hours": 40
+            },
+            {
+              "roleId": "pm",
+              "grade": "lead",
+              "hours": 10
+            }
+          ]
+        }
+      ],
+      "byRole": [
+        {
+          "roleId": "analyst",
+          "grade": "middle",
+          "hours": 120
+        },
+        {
+          "roleId": "1c_developer",
+          "grade": "middle",
+          "hours": 380
+        },
+        {
+          "roleId": "backend",
+          "grade": "middle",
+          "hours": 150
+        },
+        {
+          "roleId": "qa_auto",
+          "grade": "middle",
+          "hours": 120
+        },
+        {
+          "roleId": "pm",
+          "grade": "lead",
+          "hours": 80
+        },
+        {
+          "roleId": "architect",
+          "grade": "senior",
+          "hours": 80
+        }
+      ],
+      "totalHours": 930
+    }
   },
   "duration": {
     "p10Weeks": 12,
@@ -192,22 +260,22 @@
   },
   "tco": [
     {
-      "year": 1,
+      "year": 0,
       "costRub": 4804230,
       "cumulativeRub": 4804230
     },
     {
-      "year": 2,
+      "year": 1,
       "costRub": 522276,
       "cumulativeRub": 5326506
     },
     {
-      "year": 3,
+      "year": 2,
       "costRub": 522276,
       "cumulativeRub": 5848782
     },
     {
-      "year": 4,
+      "year": 3,
       "costRub": 522276,
       "cumulativeRub": 6371058
     }
@@ -452,10 +520,6 @@
         "inputs": [
           "effort.p50Hours",
           "rate-inhouse-middle"
-        ],
-        "refs": [
-          "effort.p50Hours",
-          "rate-inhouse-middle"
         ]
       },
       {
@@ -465,10 +529,6 @@
         "valueRub": 1344000,
         "formula": "320 × 4200",
         "inputs": [
-          "effort.p50Hours",
-          "rate-contractor-middle"
-        ],
-        "refs": [
           "effort.p50Hours",
           "rate-contractor-middle"
         ]
@@ -481,9 +541,6 @@
         "formula": "1.5 оклада + 60 дней поиска",
         "inputs": [
           "assumption.hiring"
-        ],
-        "refs": [
-          "assumption.hiring"
         ]
       },
       {
@@ -493,9 +550,6 @@
         "valueRub": 201500,
         "formula": "0.65 × 310000",
         "inputs": [
-          "assumption.rampup"
-        ],
-        "refs": [
           "assumption.rampup"
         ]
       },
@@ -507,9 +561,6 @@
         "formula": "0.10 × inhouse labor",
         "inputs": [
           "cl-hybrid-inhouse-labor"
-        ],
-        "refs": [
-          "cl-hybrid-inhouse-labor"
         ]
       },
       {
@@ -520,9 +571,6 @@
         "formula": "0.15 × contractor labor",
         "inputs": [
           "cl-hybrid-contractor-labor"
-        ],
-        "refs": [
-          "cl-hybrid-contractor-labor"
         ]
       },
       {
@@ -532,9 +580,6 @@
         "valueRub": 67200,
         "formula": "0.05 × contractor labor",
         "inputs": [
-          "cl-hybrid-contractor-labor"
-        ],
-        "refs": [
           "cl-hybrid-contractor-labor"
         ]
       }

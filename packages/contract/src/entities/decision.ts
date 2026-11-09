@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { IsoDate, MoneyRub, WarningSchema, Weeks } from '../primitives.js';
+import { Hours, IsoDate, MoneyRub, WarningSchema, Weeks } from '../primitives.js';
 import { EffortGridSchema } from './task.js';
 import {
   AssumptionSchema,
@@ -7,7 +7,7 @@ import {
   RiskSchema,
   TcoRowSchema,
 } from './costing.js';
-import { AnalogueSchema } from './analogue.js';
+import { AnalogueSchema, FormulaNodeSchema } from './analogue.js';
 
 /* -------------------------------------------------------------------------- */
 /* Duration                                                                   */
@@ -113,6 +113,14 @@ const MethodWeightsSchema = z
     message: 'methodWeights a + b + c must equal 1',
   });
 
+const EffortSchema = z.object({
+  p10Hours: Hours,
+  p50Hours: Hours,
+  p80Hours: Hours,
+  p90Hours: Hours,
+  grid: EffortGridSchema,
+});
+
 export const EstimateSchema = z.object({
   id: z.string(),
   taskId: z.string(),
@@ -122,7 +130,7 @@ export const EstimateSchema = z.object({
   inputHash: z.string(),
   seed: z.number().int(),
   methodWeights: MethodWeightsSchema,
-  effort: EffortGridSchema,
+  effort: EffortSchema,
   duration: DurationSchema,
   cost: CostSchema,
   tco: z.array(TcoRowSchema),
@@ -133,6 +141,7 @@ export const EstimateSchema = z.object({
   risks: z.array(RiskSchema),
   analogues: z.array(AnalogueSchema),
   warnings: z.array(WarningSchema),
+  formulaTree: FormulaNodeSchema,
   createdAt: IsoDate,
 });
 export type Estimate = z.infer<typeof EstimateSchema>;
