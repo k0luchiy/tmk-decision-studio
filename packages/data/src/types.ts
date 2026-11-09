@@ -378,3 +378,5 @@ export interface LoadedDatasets {
   contracts: TmkContract[];
   manifest: DatasetManifest | null;
 }
+
+export type Datasets = LoadedDatasets;
