@@ -30,3 +30,15 @@ export {
   DEFAULT_WEIGHTS,
 } from './sizing/combine.js';
 export type { CombineMethodsInput, CombineMethodsResult, MethodWeights } from './sizing/combine.js';
+export {
+  DEFAULT_UTILIZATION,
+  HIRING_MONTHS,
+  MissingRateError,
+  MONTHS_PER_YEAR,
+  PRODUCTIVE_HOURS_PER_MONTH,
+  RAMPUP_MONTHS,
+  RAMPUP_PRODUCTIVITY,
+  TURNOVER_REPLACEMENT_SHARE,
+  costInhouse,
+} from './cost/inhouse.js';
+export type { EffortByRole, InhouseInput, InhouseOptions } from './cost/inhouse.js';
