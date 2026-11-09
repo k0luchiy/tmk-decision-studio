@@ -107,6 +107,8 @@ export {
   confidence,
 } from './decision/confidence.js';
 export type { AccuracyClass, ConfidenceInput, ConfidenceWeights } from './decision/confidence.js';
+export { buildFormulaTree, leaves, walk } from './decision/formulaTree.js';
+export type { FormulaTreeInput, ProvenanceFormulaNode } from './decision/formulaTree.js';
 export { D1_FLOWS, d1Task } from './fixtures/d1.js';
 export { computeCalcD1, formatCalcTable, runCalc } from './cli/calc.js';
 export type { CalcEffort, CalcResult, CalcScenario, CalcStageRow } from './cli/calc.js';
