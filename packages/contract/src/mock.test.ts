@@ -109,14 +109,9 @@ describe('D1 mock: effort grid, TCO year 0, formula tree', () => {
   });
 
   it('effort.grid.byStage hours sum to effort.grid.totalHours', () => {
-    const scenarios = [d1EstimateJson, ...d1ScenariosJson].map((raw) =>
-      parseEstimate(raw),
-    );
+    const scenarios = [d1EstimateJson, ...d1ScenariosJson].map((raw) => parseEstimate(raw));
     for (const estimate of scenarios) {
-      const stageSum = estimate.effort.grid.byStage.reduce(
-        (sum, stage) => sum + stage.hours,
-        0,
-      );
+      const stageSum = estimate.effort.grid.byStage.reduce((sum, stage) => sum + stage.hours, 0);
       expect(stageSum).toBeCloseTo(estimate.effort.grid.totalHours, 6);
     }
   });

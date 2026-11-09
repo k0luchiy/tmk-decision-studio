@@ -175,10 +175,7 @@
         "group": "labor",
         "label": "Трудозатраты in-house (610 ч × 3 830 ₽/ч, 4 из 6 потоков)",
         "formula": "610 × 3830",
-        "inputRefs": [
-          "effort.p50Hours",
-          "rate-inhouse-middle"
-        ],
+        "inputRefs": ["effort.p50Hours", "rate-inhouse-middle"],
         "valueRub": 2336300,
         "status": "fact",
         "sourceId": "src-rate-cards"
@@ -188,10 +185,7 @@
         "group": "labor",
         "label": "Трудозатраты подрядчика (320 ч × 4 200 ₽/ч, 2 из 6 потоков ≈ 35 %)",
         "formula": "320 × 4200",
-        "inputRefs": [
-          "effort.p50Hours",
-          "rate-contractor-middle"
-        ],
+        "inputRefs": ["effort.p50Hours", "rate-contractor-middle"],
         "valueRub": 1344000,
         "status": "offer",
         "sourceId": "src-contractor-rate-cards"
@@ -201,9 +195,7 @@
         "group": "hiring",
         "label": "Найм 1С-разработчика",
         "formula": "1.5 оклада + 60 дней поиска",
-        "inputRefs": [
-          "assumption.hiring"
-        ],
+        "inputRefs": ["assumption.hiring"],
         "valueRub": 420000,
         "status": "assumption",
         "sourceId": "src-hiring"
@@ -213,9 +205,7 @@
         "group": "rampup",
         "label": "Ramp-up внутренней части (65 %)",
         "formula": "0.65 × 310000",
-        "inputRefs": [
-          "assumption.rampup"
-        ],
+        "inputRefs": ["assumption.rampup"],
         "valueRub": 201500,
         "status": "assumption",
         "sourceId": "src-rampup"
@@ -225,9 +215,7 @@
         "group": "coordination",
         "label": "Координация in-house (10 % от труда команды)",
         "formula": "0.10 × inhouse labor",
-        "inputRefs": [
-          "cl-hybrid-inhouse-labor"
-        ],
+        "inputRefs": ["cl-hybrid-inhouse-labor"],
         "valueRub": 233630,
         "status": "assumption",
         "sourceId": "src-coordination"
@@ -237,9 +225,7 @@
         "group": "coordination",
         "label": "Координация подрядчика (15 %)",
         "formula": "0.15 × contractor labor",
-        "inputRefs": [
-          "cl-hybrid-contractor-labor"
-        ],
+        "inputRefs": ["cl-hybrid-contractor-labor"],
         "valueRub": 201600,
         "status": "assumption",
         "sourceId": "src-coordination"
@@ -249,9 +235,7 @@
         "group": "extra",
         "label": "Приёмка и передача знаний по 2 потокам (5 %)",
         "formula": "0.05 × contractor labor",
-        "inputRefs": [
-          "cl-hybrid-contractor-labor"
-        ],
+        "inputRefs": ["cl-hybrid-contractor-labor"],
         "valueRub": 67200,
         "status": "assumption",
         "sourceId": "src-acceptance"
@@ -496,11 +480,7 @@
       "code": "analogue_basis",
       "message": "НМЦК, не победная цена; НДС не расщеплён",
       "severity": "info",
-      "refs": [
-        "an_tmk_1c_1",
-        "an_tmk_1c_2",
-        "an_pub_1c_1"
-      ]
+      "refs": ["an_tmk_1c_1", "an_tmk_1c_2", "an_pub_1c_1"]
     }
   ],
   "formulaTree": {
@@ -517,10 +497,7 @@
         "kind": "line",
         "valueRub": 2336300,
         "formula": "610 × 3830",
-        "inputs": [
-          "effort.p50Hours",
-          "rate-inhouse-middle"
-        ]
+        "inputs": ["effort.p50Hours", "rate-inhouse-middle"]
       },
       {
         "id": "cl-hybrid-contractor-labor",
@@ -528,10 +505,7 @@
         "kind": "line",
         "valueRub": 1344000,
         "formula": "320 × 4200",
-        "inputs": [
-          "effort.p50Hours",
-          "rate-contractor-middle"
-        ]
+        "inputs": ["effort.p50Hours", "rate-contractor-middle"]
       },
       {
         "id": "cl-hybrid-hiring",
@@ -539,9 +513,7 @@
         "kind": "line",
         "valueRub": 420000,
         "formula": "1.5 оклада + 60 дней поиска",
-        "inputs": [
-          "assumption.hiring"
-        ]
+        "inputs": ["assumption.hiring"]
       },
       {
         "id": "cl-hybrid-rampup",
@@ -549,9 +521,7 @@
         "kind": "line",
         "valueRub": 201500,
         "formula": "0.65 × 310000",
-        "inputs": [
-          "assumption.rampup"
-        ]
+        "inputs": ["assumption.rampup"]
       },
       {
         "id": "cl-hybrid-inhouse-coordination",
@@ -559,9 +529,7 @@
         "kind": "line",
         "valueRub": 233630,
         "formula": "0.10 × inhouse labor",
-        "inputs": [
-          "cl-hybrid-inhouse-labor"
-        ]
+        "inputs": ["cl-hybrid-inhouse-labor"]
       },
       {
         "id": "cl-hybrid-contractor-coordination",
@@ -569,9 +537,7 @@
         "kind": "line",
         "valueRub": 201600,
         "formula": "0.15 × contractor labor",
-        "inputs": [
-          "cl-hybrid-contractor-labor"
-        ]
+        "inputs": ["cl-hybrid-contractor-labor"]
       },
       {
         "id": "cl-hybrid-contractor-acceptance",
@@ -579,9 +545,7 @@
         "kind": "line",
         "valueRub": 67200,
         "formula": "0.05 × contractor labor",
-        "inputs": [
-          "cl-hybrid-contractor-labor"
-        ]
+        "inputs": ["cl-hybrid-contractor-labor"]
       }
     ]
   },

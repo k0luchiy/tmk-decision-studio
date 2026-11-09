@@ -58,14 +58,11 @@ export const WorkItemSchema = z
   })
   .refine(
     (item) =>
-      item.optimisticHours <= item.mostLikelyHours &&
-      item.mostLikelyHours <= item.pessimisticHours,
+      item.optimisticHours <= item.mostLikelyHours && item.mostLikelyHours <= item.pessimisticHours,
     { message: 'Require optimisticHours <= mostLikelyHours <= pessimisticHours' },
   )
   .refine(
-    (item) =>
-      Math.abs(item.roleMix.reduce((sum, role) => sum + role.share, 0) - 100) <
-      1e-6,
+    (item) => Math.abs(item.roleMix.reduce((sum, role) => sum + role.share, 0) - 100) < 1e-6,
     { message: 'roleMix shares must sum to 100' },
   );
 export type WorkItem = z.infer<typeof WorkItemSchema>;

@@ -10,13 +10,17 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run --passWithNoTests",
-    "lint": "echo \"lint: not configured yet (see plan task 5)\"",
-    "format:check": "echo \"format:check: not configured yet (see plan task 5)\""
+    "test": "vitest run",
+    "lint": "eslint packages scripts examples 2>/dev/null || eslint packages",
+    "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\""
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.10.2",
+    "eslint": "^10.14.0",
+    "prettier": "^3.9.10",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^2.1.8"
   }
 }

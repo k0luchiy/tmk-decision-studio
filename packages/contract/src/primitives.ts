@@ -5,10 +5,9 @@ import { z } from 'zod';
  * Kept permissive on shape, strict on parseability, so both plain dates and
  * timestamps produced by the engine pass.
  */
-export const IsoDate = z.string().refine(
-  (value) => !Number.isNaN(Date.parse(value)),
-  { message: 'Expected an ISO-8601 date or date-time string' },
-);
+export const IsoDate = z.string().refine((value) => !Number.isNaN(Date.parse(value)), {
+  message: 'Expected an ISO-8601 date or date-time string',
+});
 export type IsoDate = z.infer<typeof IsoDate>;
 
 /** Money amount in Russian roubles. Never negative. */

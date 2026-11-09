@@ -40,9 +40,7 @@ export const CostSchema = z
   })
   .refine(
     (cost) =>
-      cost.p10Rub <= cost.p50Rub &&
-      cost.p50Rub <= cost.p80Rub &&
-      cost.p80Rub <= cost.p90Rub,
+      cost.p10Rub <= cost.p50Rub && cost.p50Rub <= cost.p80Rub && cost.p80Rub <= cost.p90Rub,
     { message: 'Require p10Rub <= p50Rub <= p80Rub <= p90Rub' },
   );
 export type Cost = z.infer<typeof CostSchema>;

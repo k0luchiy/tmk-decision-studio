@@ -1,0 +1,9 @@
+node_modules
+dist
+out
+coverage
+.omo
+.codegraph
+research
+docs
+package-lock.json

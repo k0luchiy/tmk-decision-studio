@@ -19,10 +19,7 @@ export const AnalogueSchema = z.object({
     basis: z.string(),
   }),
   vatFlag: z.boolean(),
-  scopeVector: z.record(
-    z.string(),
-    z.union([z.number(), z.boolean(), z.string()]),
-  ),
+  scopeVector: z.record(z.string(), z.union([z.number(), z.boolean(), z.string()])),
   normalization: z.object({
     kScope: z.number().finite(),
     kComplexity: z.number().finite(),
@@ -68,8 +65,7 @@ export type FormulaNode = z.infer<typeof FormulaNodeBaseSchema> & {
   children?: FormulaNode[];
 };
 
-export const FormulaNodeSchema: z.ZodType<FormulaNode> =
-  FormulaNodeBaseSchema.extend({
-    children: z.lazy(() => z.array(FormulaNodeSchema)).optional(),
-  });
+export const FormulaNodeSchema: z.ZodType<FormulaNode> = FormulaNodeBaseSchema.extend({
+  children: z.lazy(() => z.array(FormulaNodeSchema)).optional(),
+});
 export type FormulaNodeInferred = z.infer<typeof FormulaNodeSchema>;
