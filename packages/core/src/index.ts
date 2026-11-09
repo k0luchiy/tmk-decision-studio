@@ -54,6 +54,17 @@ export type { CostExtra } from './cost/extras.js';
 export { P10_Z, P80_Z, allocateCostByStage, toStageGrid } from './cost/stageGrid.js';
 export type { StageCost } from './cost/stageGrid.js';
 export {
+  BREAKEVEN_MONTHS,
+  DEFAULT_CONTRACTOR_STAGES,
+  DEFAULT_SUPPORT_RATE_CONTRACTOR,
+  DEFAULT_SUPPORT_RATE_INHOUSE,
+  DEFAULT_YEARS,
+  RISK_PREMIUM_PCT,
+  breakevenMonth,
+  buildScenarios,
+} from './scenarios/scenarios.js';
+export type { CashFlowProfile, ScenarioInput, ScenarioResult } from './scenarios/scenarios.js';
+export {
   RU_HOLIDAYS_2026_2027,
   addWorkingDays,
   formatCalendarDate,
