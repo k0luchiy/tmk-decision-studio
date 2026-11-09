@@ -16,20 +16,6 @@ export const ExtractedParamSchema = z.object({
 });
 export type ExtractedParam = z.infer<typeof ExtractedParamSchema>;
 
-export const TaskSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  descriptionRaw: z.string(),
-  briefVersion: z.string(),
-  createdAt: IsoDate,
-  externalId: z.string().optional(),
-  changeId: z.string().optional(),
-  teamLine: z.string().optional(),
-  platform: z.string().optional(),
-  params: z.array(ExtractedParamSchema).optional(),
-});
-export type Task = z.infer<typeof TaskSchema>;
-
 /* -------------------------------------------------------------------------- */
 /* Decomposition                                                              */
 /* -------------------------------------------------------------------------- */
@@ -38,6 +24,13 @@ const RoleMixEntrySchema = z.object({
   roleId: z.string(),
   share: z.number().min(0).max(100),
   grade: Grade,
+});
+
+/** HelpDesk slice: planned / actual / quoted hours for a single activity. */
+const WorkItemEffortSchema = z.object({
+  planHours: Hours,
+  actualHours: Hours,
+  quotedHours: Hours,
 });
 
 export const WorkItemSchema = z
@@ -55,6 +48,7 @@ export const WorkItemSchema = z
     roleMix: z.array(RoleMixEntrySchema),
     sourceRefs: z.array(z.string()),
     assumption: z.boolean(),
+    effort: WorkItemEffortSchema.optional(),
   })
   .refine(
     (item) =>
@@ -66,6 +60,21 @@ export const WorkItemSchema = z
     { message: 'roleMix shares must sum to 100' },
   );
 export type WorkItem = z.infer<typeof WorkItemSchema>;
+
+export const TaskSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  descriptionRaw: z.string(),
+  briefVersion: z.string(),
+  createdAt: IsoDate,
+  externalId: z.string().optional(),
+  changeId: z.string().optional(),
+  teamLine: z.string().optional(),
+  platform: z.string().optional(),
+  params: z.array(ExtractedParamSchema).optional(),
+  workItems: z.array(WorkItemSchema).optional(),
+});
+export type Task = z.infer<typeof TaskSchema>;
 
 /* -------------------------------------------------------------------------- */
 /* Effort                                                                     */

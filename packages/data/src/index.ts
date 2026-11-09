@@ -1,5 +1,6 @@
 export * from './errors.js';
 export * from './files.js';
+export * from './helpdesk.js';
 export * from './loaders.js';
 export * from './manifest.js';
 export * from './quality.js';

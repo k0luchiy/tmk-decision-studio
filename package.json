@@ -14,7 +14,8 @@
     "lint": "eslint packages scripts examples 2>/dev/null || eslint packages",
     "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
     "data:manifest": "node scripts/build-manifest.mjs",
-    "data:check": "node scripts/check-data.mjs"
+    "data:check": "node scripts/check-data.mjs",
+    "helpdesk:check": "node scripts/check-helpdesk.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
