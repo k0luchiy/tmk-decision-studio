@@ -5,39 +5,21 @@
  * suite runs offline and deterministically.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { estimateTask } from '@app/core';
 import { buildApp } from './app.js';
-import { loadDatasets, repoRoot } from './datasets.js';
+import {
+  confirmedParams,
+  createEstimate,
+  loadD1Text,
+  type EstimateDto,
+  type IntakeDto,
+  type ParamDto,
+} from './app.test-helpers.js';
+import { loadDatasets } from './datasets.js';
 import { saveEstimate, type StoredEstimate } from './store.js';
 import { buildTask } from './task.js';
-
-interface Brief {
-  id: string;
-  text: string;
-}
-
-interface ParamDto {
-  key: string;
-  value: string | number | boolean;
-  status: string;
-  [extra: string]: unknown;
-}
-
-interface IntakeDto {
-  status: string;
-  params: ParamDto[];
-  clarification: string[];
-}
-
-interface EstimateDto {
-  id: string;
-  estimates: Record<'inhouse' | 'contractor' | 'hybrid', { scenario: string }>;
-  effortGrid: { totalHours: number };
-}
 
 let app: FastifyInstance;
 let d1Text: string;
@@ -45,38 +27,19 @@ let d1Text: string;
 beforeAll(async () => {
   app = buildApp();
   await app.ready();
-  const raw = readFileSync(path.join(repoRoot, 'data', 'eval', 'briefs.json'), 'utf8');
-  const briefs = JSON.parse(raw) as Brief[];
-  const first = briefs[0];
-  if (first === undefined) {
-    throw new Error('data/eval/briefs.json is empty');
-  }
-  d1Text = first.text;
+  d1Text = loadD1Text();
 });
 
 afterAll(async () => {
   await app.close();
 });
 
-async function confirmedParams(): Promise<ParamDto[]> {
-  const response = await app.inject({
-    method: 'POST',
-    url: '/api/intake',
-    payload: { brief: d1Text, mode: 'cache' },
-  });
-  const body = response.json() as IntakeDto;
-  return body.params.map((param) => ({ ...param, status: 'confirmed' }));
+function confirmed(): Promise<ParamDto[]> {
+  return confirmedParams(app, d1Text);
 }
 
-async function createEstimate(): Promise<EstimateDto> {
-  const params = await confirmedParams();
-  const response = await app.inject({
-    method: 'POST',
-    url: '/api/estimates',
-    payload: { brief: d1Text, params, seed: 42 },
-  });
-  expect(response.statusCode).toBe(201);
-  return response.json() as EstimateDto;
+function estimate(): Promise<EstimateDto> {
+  return createEstimate(app, d1Text);
 }
 
 describe('health / meta / datasets', () => {
@@ -133,7 +96,7 @@ describe('intake', () => {
   });
 
   it('POST /api/intake/confirm marks every parameter confirmed', async () => {
-    const params = await confirmedParams();
+    const params = await confirmed();
     const response = await app.inject({
       method: 'POST',
       url: '/api/intake/confirm',
@@ -148,7 +111,7 @@ describe('intake', () => {
 
 describe('estimates', () => {
   it('POST /api/estimates returns 201 with three scenarios', async () => {
-    const body = await createEstimate();
+    const body = await estimate();
     expect(body.id).toMatch(/^est_/);
     for (const key of ['inhouse', 'contractor', 'hybrid'] as const) {
       expect(body.estimates[key].scenario).toBe(key);
@@ -157,7 +120,7 @@ describe('estimates', () => {
   });
 
   it('GET /api/estimates/:id returns the stored snapshot', async () => {
-    const created = await createEstimate();
+    const created = await estimate();
     const response = await app.inject({ method: 'GET', url: `/api/estimates/${created.id}` });
     expect(response.statusCode).toBe(200);
     expect((response.json() as EstimateDto).id).toBe(created.id);
@@ -176,11 +139,57 @@ describe('estimates', () => {
     const body = response.json() as { error: { code: string } };
     expect(body.error.code).toBe('needs_review');
   });
+
+  it('POST /api/estimates applies UI options and changes the numbers', async () => {
+    const params = await confirmed();
+    const send = (options?: Record<string, unknown>) =>
+      app.inject({
+        method: 'POST',
+        url: '/api/estimates',
+        payload: { brief: d1Text, params, seed: 42, options },
+      });
+    const base = (await send()).json() as EstimateDto;
+    const option = (
+      await send({
+        teamRate: 9000,
+        reservePct: 0.1,
+        oversightPct: 0.2,
+        contractorStages: [3, 4],
+        stageHours: { '3': 400 },
+      })
+    ).json() as EstimateDto;
+
+    expect(option.estimates.inhouse.cost.p50Rub).not.toBe(base.estimates.inhouse.cost.p50Rub);
+    expect(option.estimates.contractor.cost.p50Rub).not.toBe(base.estimates.contractor.cost.p50Rub);
+    expect(option.effortGrid.totalHours).not.toBe(base.effortGrid.totalHours);
+  });
+
+  it('POST /api/estimates rejects an invalid reservePct with 422', async () => {
+    const params = await confirmed();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/estimates',
+      payload: { brief: d1Text, params, seed: 42, options: { reservePct: 0.8 } },
+    });
+    expect(response.statusCode).toBe(422);
+    expect((response.json() as { error: { code: string } }).error.code).toBe('validation_error');
+  });
+
+  it('POST /api/estimates rejects unknown option fields with 422', async () => {
+    const params = await confirmed();
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/estimates',
+      payload: { brief: d1Text, params, seed: 42, options: { unknownOption: true } },
+    });
+    expect(response.statusCode).toBe(422);
+    expect((response.json() as { error: { code: string } }).error.code).toBe('validation_error');
+  });
 });
 
 describe('export', () => {
   it('POST /api/estimates/:id/export renders a PDF', async () => {
-    const created = await createEstimate();
+    const created = await estimate();
     const response = await app.inject({
       method: 'POST',
       url: `/api/estimates/${created.id}/export`,
@@ -196,7 +205,7 @@ describe('export', () => {
     const datasetVersion = datasets.manifest?.datasetVersion;
     expect(datasetVersion).toBeDefined();
 
-    const params = await confirmedParams();
+    const params = await confirmed();
     const task = buildTask(d1Text, params);
     const result = estimateTask({ task, datasets, seed: 42, datasetVersion: datasetVersion ?? '' });
     const stored: StoredEstimate = {

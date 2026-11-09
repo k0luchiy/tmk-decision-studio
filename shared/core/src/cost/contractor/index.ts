@@ -75,8 +75,8 @@ export function costContractor(input: ContractorInput): CostLine[] {
   const riskLoadPct =
     opts.riskLoadPct ?? (model === 'fixed_price' ? DEFAULT_FIXED_PRICE_RISK_PCT : 0);
 
-  assertPercentage('opts.coordinationPct', coordinationPct);
-  assertPercentage('opts.acceptancePct', acceptancePct);
+  assertPercentage('opts.coordinationPct', coordinationPct, 0.5);
+  assertPercentage('opts.acceptancePct', acceptancePct, 0.5);
   assertPercentage('opts.riskLoadPct', riskLoadPct);
 
   const buckets = collectBuckets(input, geo);

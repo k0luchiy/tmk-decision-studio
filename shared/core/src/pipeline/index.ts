@@ -13,6 +13,7 @@
  * or `Math.random()` is used except in the export layer.
  */
 
+import type { CostLine, Estimate } from '@app/contract';
 import { costContractor, type ContractModel } from '../cost/contractor.js';
 import { PRODUCTIVE_HOURS_PER_MONTH, costInhouse, type EffortByRole } from '../cost/inhouse.js';
 import { toStageGrid } from '../cost/stageGrid.js';
@@ -37,6 +38,7 @@ import {
   hashInput,
   pickHiringRole,
   resolveUnitsCount,
+  scaleWorkItemsByStage,
 } from './inputs.js';
 import { HYBRID_CONTRACTOR_STAGES, TURNOVER_RATE } from './types.js';
 import type {
@@ -79,13 +81,17 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
   );
   const baseGrid = toStageGrid(baseItems);
 
-  const { effortGrid, combined, analogueEstimateResult } = combineEffort({
+  const { effortGrid: combinedGrid, workItems, combined, analogueEstimateResult } = combineEffort({
     task,
     datasets,
     workType,
     baseItems,
     baseGrid,
   });
+  const effortGrid =
+    options.stageHours === undefined
+      ? combinedGrid
+      : toStageGrid(scaleWorkItemsByStage(workItems, options.stageHours));
 
   const effortByRole: EffortByRole[] = effortGrid.byRole.map((entry) => ({
     roleId: entry.roleId,
@@ -103,19 +109,28 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
       utilization,
       turnoverRate: TURNOVER_RATE,
       months,
+      ...(options.teamRate === undefined ? {} : { hourlyRateOverride: options.teamRate }),
     },
   });
   const contractorLines = costContractor({
     effortByRole,
     bands: datasets.contractorRates.bands,
-    opts: { geo: 'RU', model, vat: options.vat === true },
+    opts: {
+      geo: 'RU',
+      model,
+      vat: options.vat === true,
+      ...(options.oversightPct === undefined ? {} : { acceptancePct: options.oversightPct }),
+    },
   });
 
+  const contractorStages = [...(options.contractorStages ?? HYBRID_CONTRACTOR_STAGES)];
+  const byStage = effortGrid.byStage.map((entry) => ({ stage: entry.stage, hours: entry.hours }));
   const scenarioResult = buildScenarios({
     inhouseLines,
     contractorLines,
-    byStage: effortGrid.byStage.map((entry) => ({ stage: entry.stage, hours: entry.hours })),
-    contractorStages: [...HYBRID_CONTRACTOR_STAGES],
+    byStage,
+    contractorStages,
+    ...(options.reservePct === undefined ? {} : { reservePct: options.reservePct }),
   });
 
   const scheduleResult = schedule({
@@ -124,12 +139,12 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
       grade: entry.grade,
       hours: entry.hours,
     })),
-    byStage: effortGrid.byStage.map((entry) => ({ stage: entry.stage, hours: entry.hours })),
+    byStage,
     utilization,
   });
   const duration = scheduleResult.duration;
 
-  const share = hybridShare(effortGrid.byStage);
+  const share = hybridShare(effortGrid.byStage, contractorStages);
   const hybridLines = blendLines(inhouseLines, contractorLines, share);
 
   const inhouseCost = simulateCost(
@@ -191,54 +206,37 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     methodWeights: { ...DEFAULT_WEIGHTS },
   };
 
-  const inhouse = makeEstimate(
-    'inhouse',
-    task,
-    inhouseLines,
-    scenarioResult.inhouse,
-    inhouseCost,
-    effortGrid,
-    duration,
-    verdict,
-    confidenceScore,
-    assumptions,
-    risks,
-    analogueRows,
-    warnings,
-    meta,
-  );
-  const contractor = makeEstimate(
+  const buildEstimate = (
+    code: 'inhouse' | 'contractor' | 'hybrid',
+    lines: CostLine[],
+    scenario: ScenarioResult,
+    cost: Quantiles,
+  ): Estimate =>
+    makeEstimate(
+      code,
+      task,
+      lines,
+      scenario,
+      cost,
+      effortGrid,
+      duration,
+      verdict,
+      confidenceScore,
+      assumptions,
+      risks,
+      analogueRows,
+      warnings,
+      meta,
+    );
+
+  const inhouse = buildEstimate('inhouse', inhouseLines, scenarioResult.inhouse, inhouseCost);
+  const contractor = buildEstimate(
     'contractor',
-    task,
     contractorLines,
     scenarioResult.contractor,
     contractorCost,
-    effortGrid,
-    duration,
-    verdict,
-    confidenceScore,
-    assumptions,
-    risks,
-    analogueRows,
-    warnings,
-    meta,
   );
-  const hybrid = makeEstimate(
-    'hybrid',
-    task,
-    hybridLines,
-    scenarioResult.hybrid,
-    hybridCost,
-    effortGrid,
-    duration,
-    verdict,
-    confidenceScore,
-    assumptions,
-    risks,
-    analogueRows,
-    warnings,
-    meta,
-  );
+  const hybrid = buildEstimate('hybrid', hybridLines, scenarioResult.hybrid, hybridCost);
 
   return {
     estimates: { inhouse, contractor, hybrid },

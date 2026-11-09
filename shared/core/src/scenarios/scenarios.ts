@@ -51,6 +51,8 @@ export interface ScenarioInput {
   byStage: { stage: number; hours: number }[];
   /** Stages the contractor performs in the hybrid scenario. Default `[3]`. */
   contractorStages?: number[];
+  /** Risk reserve in `[0, 0.5]`; scales implementation and P80 by `1 + reservePct`. */
+  reservePct?: number;
   /** Annual in-house support share of labour. Default `0.12`. */
   supportRateInhouse?: number;
   /** Annual contractor support share of labour. Default `0.18`. */
@@ -200,30 +202,32 @@ export function buildScenarios(input: ScenarioInput): {
   assertFiniteNonNegative('supportRateInhouse', supportRateInhouse);
   assertFiniteNonNegative('supportRateContractor', supportRateContractor);
 
+  const reservePct = input.reservePct ?? 0;
+  assertFiniteNonNegative('reservePct', reservePct);
+  if (reservePct > 0.5) throw new RangeError(`reservePct must be in [0, 0.5], got ${reservePct}`);
+  const reserveFactor = 1 + reservePct;
+
   const contractorStages = input.contractorStages ?? [...DEFAULT_CONTRACTOR_STAGES];
 
-  const inhouseImpl = sumValues(input.inhouseLines);
-  const contractorImpl = sumValues(input.contractorLines);
+  const inhouseBase = sumValues(input.inhouseLines);
+  const contractorBase = sumValues(input.contractorLines);
   const inhouseLabor = sumLabor(input.inhouseLines);
   const contractorLabor = sumLabor(input.contractorLines);
 
   const share = hybridShare(input.byStage, contractorStages);
-  const hybridImpl = contractorImpl * share + inhouseImpl * (1 - share);
+  const inhouseImpl = inhouseBase * reserveFactor;
+  const contractorImpl = contractorBase * reserveFactor;
+  const hybridImpl = (contractorBase * share + inhouseBase * (1 - share)) * reserveFactor;
   const hybridLabor = contractorLabor * share + inhouseLabor * (1 - share);
 
-  const inhouseProfile: CashFlowProfile = {
-    implementationRub: inhouseImpl,
-    annualSupportRub: inhouseLabor * supportRateInhouse,
-  };
-  const contractorProfile: CashFlowProfile = {
-    implementationRub: contractorImpl,
-    annualSupportRub: contractorLabor * supportRateContractor,
-  };
+  const profile = (implementationRub: number, annualSupportRub: number): CashFlowProfile => ({
+    implementationRub,
+    annualSupportRub,
+  });
+  const inhouseProfile = profile(inhouseImpl, inhouseLabor * supportRateInhouse);
+  const contractorProfile = profile(contractorImpl, contractorLabor * supportRateContractor);
   // Hybrid support is delivered internally (§6), so it uses the in-house rate.
-  const hybridProfile: CashFlowProfile = {
-    implementationRub: hybridImpl,
-    annualSupportRub: hybridLabor * supportRateInhouse,
-  };
+  const hybridProfile = profile(hybridImpl, hybridLabor * supportRateInhouse);
 
   const inhouse = makeResult('inhouse', inhouseImpl, inhouseProfile.annualSupportRub, years);
   const contractor = makeResult(

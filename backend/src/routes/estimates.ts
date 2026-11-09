@@ -26,12 +26,19 @@ const ParamSchema = z
   })
   .passthrough();
 
-const OptionsSchema = z.object({
-  hiring: z.boolean().optional(),
-  utilization: z.number().gt(0).lte(1).optional(),
-  model: z.enum(['t_and_m', 'fixed_price', 'dedicated_team']).optional(),
-  vat: z.boolean().optional(),
-});
+const OptionsSchema = z
+  .object({
+    hiring: z.boolean().optional(),
+    utilization: z.number().gt(0).lte(1).optional(),
+    model: z.enum(['t_and_m', 'fixed_price', 'dedicated_team']).optional(),
+    vat: z.boolean().optional(),
+    teamRate: z.number().min(100).max(100_000).optional(),
+    reservePct: z.number().min(0).max(0.5).optional(),
+    oversightPct: z.number().min(0).max(0.5).optional(),
+    contractorStages: z.array(z.number().int().min(1).max(7)).optional(),
+    stageHours: z.record(z.string().regex(/^\d+$/), z.number().gt(0)).optional(),
+  })
+  .strict();
 
 const EstimateBodySchema = z.object({
   brief: z.string().min(1).optional(),

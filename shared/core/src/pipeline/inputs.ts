@@ -112,6 +112,51 @@ export function scaleWorkItems(items: WorkItem[], scale: number): WorkItem[] {
 }
 
 /**
+ * Rescales the work items of each targeted stage so its expected hours equal
+ * `target[stage]`. Stages absent from `target` are left untouched; stages with
+ * no current expected hours are skipped to keep the result finite.
+ *
+ * @throws {RangeError} when a target value is not a finite number > 0.
+ */
+export function scaleWorkItemsByStage(
+  items: WorkItem[],
+  target: Record<number, number>,
+): WorkItem[] {
+  const targets = new Map<number, number>();
+  for (const [key, value] of Object.entries(target)) {
+    if (!Number.isFinite(value) || value <= 0) {
+      throw new RangeError(`stageHours.${key} must be a finite number > 0, got ${value}`);
+    }
+    targets.set(Number(key), value);
+  }
+  if (targets.size === 0) return items;
+
+  const current = new Map<number, number>();
+  for (const item of items) {
+    current.set(item.stage, (current.get(item.stage) ?? 0) + item.expectedHours);
+  }
+
+  const factors = new Map<number, number>();
+  for (const [stage, targetHours] of targets) {
+    const currentHours = current.get(stage) ?? 0;
+    factors.set(stage, currentHours > 0 ? targetHours / currentHours : 1);
+  }
+
+  return items.map((item) => {
+    const factor = factors.get(item.stage);
+    if (factor === undefined || Math.abs(factor - 1) < 1e-9) return item;
+    return {
+      ...item,
+      optimisticHours: item.optimisticHours * factor,
+      mostLikelyHours: item.mostLikelyHours * factor,
+      pessimisticHours: item.pessimisticHours * factor,
+      expectedHours: item.expectedHours * factor,
+      sigmaHours: item.sigmaHours * factor,
+    };
+  });
+}
+
+/**
  * Folds the WBS into the final effort grid by blending three methods —
  * A (WBS), B (FP-lite) and C (analogue converted at the blended rate).
  */
@@ -123,6 +168,7 @@ export function combineEffort(input: {
   baseGrid: EffortGrid;
 }): {
   effortGrid: EffortGrid;
+  workItems: WorkItem[];
   combined: CombineMethodsResult;
   analogueEstimateResult: AnalogueEstimateResult | undefined;
 } {
@@ -164,7 +210,7 @@ export function combineEffort(input: {
   const workItems = scaleWorkItems(baseItems, scale);
   const effortGrid = toStageGrid(workItems);
 
-  return { effortGrid, combined, analogueEstimateResult };
+  return { effortGrid, workItems, combined, analogueEstimateResult };
 }
 
 function stableStringify(value: unknown): string {

@@ -16,9 +16,10 @@ export function assertFinitePositive(name: string, value: number): void {
   }
 }
 
-export function assertPercentage(name: string, value: number): void {
-  if (!Number.isFinite(value) || value < 0) {
-    throw new RangeError(`${name} must be a finite percentage >= 0, got ${value}`);
+export function assertPercentage(name: string, value: number, max?: number): void {
+  if (!Number.isFinite(value) || value < 0 || (max !== undefined && value > max)) {
+    const bound = max === undefined ? '>= 0' : `in [0, ${max}]`;
+    throw new RangeError(`${name} must be a finite percentage ${bound}, got ${value}`);
   }
 }
 

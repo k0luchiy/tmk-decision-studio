@@ -29,10 +29,13 @@ import { buildFormulaTree } from '../decision/formulaTree.js';
 import { HYBRID_CONTRACTOR_STAGES, SIMULATION_CORRELATION, SIMULATION_ITERATIONS } from './types.js';
 
 /** Stage-hours share owned by the contractor in the hybrid scenario. */
-export function hybridShare(byStage: EffortGrid['byStage']): number {
+export function hybridShare(
+  byStage: EffortGrid['byStage'],
+  stages: readonly number[] = HYBRID_CONTRACTOR_STAGES,
+): number {
   let total = 0;
   let selected = 0;
-  const owned = new Set(HYBRID_CONTRACTOR_STAGES);
+  const owned = new Set(stages);
   for (const row of byStage) {
     total += row.hours;
     if (owned.has(row.stage)) selected += row.hours;

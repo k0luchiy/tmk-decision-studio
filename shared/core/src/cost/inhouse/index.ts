@@ -74,18 +74,27 @@ export function costInhouse(input: InhouseInput): CostLine[] {
     assertFiniteNonNegative('opts.turnoverRate', opts.turnoverRate);
   }
 
+  const hourlyRateOverride = opts.hourlyRateOverride;
+  if (hourlyRateOverride !== undefined) {
+    assertFinitePositive('opts.hourlyRateOverride', hourlyRateOverride);
+  }
+
   const buckets = collectBuckets(input);
   const lines: CostLine[] = buckets.map((bucket) => {
     const { roleId, grade, hours, role, gradeRow } = bucket;
-    const rate = gradeRow.fully_loaded_hour;
+    const isOverride = hourlyRateOverride !== undefined;
+    const rate = hourlyRateOverride ?? gradeRow.fully_loaded_hour;
+    const sourceId = isOverride ? 'override:team_rate' : rateRef(roleId, grade);
     return {
       id: `labor:${roleId}:${grade}`,
       group: 'labor',
       label: `Труд in-house: ${role.role_ru} (${gradeRow.grade_label})`,
-      formula: `${formatNumber(hours)} h × ${formatNumber(rate)} ₽/ч`,
-      inputRefs: [rateRef(roleId, grade)],
+      formula: isOverride
+        ? `${formatNumber(hours)} h × ${formatNumber(rate)} ₽/ч (override)`
+        : `${formatNumber(hours)} h × ${formatNumber(rate)} ₽/ч`,
+      inputRefs: [sourceId],
       valueRub: hours * rate,
-      sourceId: rateRef(roleId, grade),
+      sourceId,
       status: 'fact',
     };
   });

@@ -34,6 +34,8 @@ export interface InhouseOptions {
   months?: number;
   /** Annual turnover rate, e.g. `0.13`; adds a `turnover` line. */
   turnoverRate?: number;
+  /** Price labour lines at this rate, RUB/hour, instead of the rate card. */
+  hourlyRateOverride?: number;
 }
 
 export interface InhouseInput {

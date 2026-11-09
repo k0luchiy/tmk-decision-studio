@@ -28,6 +28,16 @@ export interface EstimateTaskOptions {
   model?: ContractModel;
   /** Add a 20 % VAT line to contractor costs. Default `false`. */
   vat?: boolean;
+  /** Override the average in-house rate, RUB/hour, for labour lines. */
+  teamRate?: number;
+  /** Risk reserve in `[0, 0.5]`; scales implementation cost by `1 + reservePct`. */
+  reservePct?: number;
+  /** Customer oversight/acceptance in `[0, 0.5]`; replaces contractor acceptance. */
+  oversightPct?: number;
+  /** Stages handed to the contractor in the hybrid scenario. Default `[3]`. */
+  contractorStages?: number[];
+  /** Target hours per stage 1..7; overrides the WBS after triangulation. */
+  stageHours?: Record<number, number>;
 }
 
 /** Input of {@link estimateTask}. */
