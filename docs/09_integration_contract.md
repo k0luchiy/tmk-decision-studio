@@ -168,63 +168,160 @@ const scenarios: Estimate[] = EstimateSchema.array().parse(d1ScenariosJson);
 | `warnings[].severity` | `'info' \| 'warning' \| 'error'?` | Цвет полосы: info/warn/error | Не оранжевый; warn — жёлтый |
 | `warnings[].code`, `refs` | `string`, `string[]?` | Служебные, подсветка связанных элементов | — |
 
-## 3. Планируемые функции (статус `planned`)
+## 3. Реализованные функции (статус `implemented`)
 
-Ниже — контракт на будущие PR. **Сейчас функции не реализованы и не экспортируются
-пакетом `@app/contract`.** Фронт не должен на них рассчитывать до появления
-реализации; до тех пор используется мок из §1.
+Ниже — фактический публичный API. Все функции реализованы, покрыты тестами и
+экспортируются пакетами. `@app/*` — workspace-пакеты из `packages/*`; в корневом
+`tsconfig.json` они разрешаются через `paths`, в runtime — через symlink из
+`node_modules/@app`. Фронт не дублирует эти расчёты (см. §4.1).
+
+### 3.1. `@app/core` — `packages/core/src/index.ts`
+
+| Функция | Сигнатура | Файл |
+|---|---|---|
+| `buildWbs` | `(task: Task, archetypes: Archetype[], params?: { unitsCount?: number; stageShares?: typeof STAGE_SHARES }) => WorkItem[]` | `packages/core/src/sizing/wbs.ts` |
+| `combineMethods` | `(input: CombineMethodsInput) => CombineMethodsResult` | `packages/core/src/sizing/combine.ts` |
+| `costInhouse` | `(input: InhouseInput) => CostLine[]` | `packages/core/src/cost/inhouse.ts` |
+| `costContractor` | `(input: ContractorInput) => CostLine[]` | `packages/core/src/cost/contractor.ts` |
+| `buildScenarios` | `(input: ScenarioInput) => { inhouse: ScenarioResult; contractor: ScenarioResult; hybrid: ScenarioResult }` | `packages/core/src/scenarios/scenarios.ts` |
+| `buildVerdict` | `(input: VerdictInput) => Verdict` | `packages/core/src/decision/verdict.ts` |
+| `confidence` | `(input: ConfidenceInput) => ConfidenceScore` | `packages/core/src/decision/confidence.ts` |
+| `buildFormulaTree` | `(input: FormulaTreeInput) => FormulaNode` | `packages/core/src/decision/formulaTree.ts` |
+| `simulate` | `(input: MonteCarloInput) => MonteCarloResult` | `packages/core/src/risk/monteCarlo.ts` |
+| `schedule` | `(input: ScheduleInput) => ScheduleResult` | `packages/core/src/schedule/schedule.ts` |
+| `estimateTask` | `(input: EstimateTaskInput) => EstimateTaskResult` | `packages/core/src/pipeline.ts` |
 
 ```ts
-// planned — не реализовано
-type Precision = 'order' | 'budget' | 'detailed';
-
-interface EstimateOptions {
-  scenario?: 'inhouse' | 'contractor' | 'hybrid' | 'peak';
-  precision?: Precision;
-  seed?: number;
-  datasetVersion?: string;
-  overrides?: Record<string, string | number | boolean>;
+// packages/core/src/pipeline.ts — единственная точка входа полного расчёта
+interface EstimateTaskOptions {
+  hiring?: boolean;
+  utilization?: number;              // (0, 1], default 0.7
+  model?: 't_and_m' | 'fixed_price'; // default 't_and_m'
+  vat?: boolean;                     // default false
 }
 
-function estimateTask(task: Task, options?: EstimateOptions): Estimate;
-
-function getD1Mock(): Estimate[];
-
-type ExportFormat = 'pdf' | 'xlsx' | 'json';
-
-interface ExportBundle {
-  format: ExportFormat;
-  fileName: string;
-  mimeType: string;
-  bytes: Uint8Array;
-  datasetVersion: string;
-  seed: number;
-  createdAt: string;
+interface EstimateTaskInput {
+  task: Task;
+  datasets: Datasets;                // из @app/data
+  seed: number;                      // целое, фиксирует Монте-Карло
+  datasetVersion: string;            // из data/manifest.json
+  options?: EstimateTaskOptions;
 }
 
-function buildExportBundle(estimate: Estimate, format: ExportFormat): ExportBundle;
-
-type ParseMode = 'rules' | 'jev' | 'auto';
-
-interface ParseBriefResult {
-  params: ExtractedParam[];
-  mode: 'rules' | 'jev';
-  modelVersion?: string;
-  warnings: Warning[];
+interface EstimateTaskResult {
+  estimates: { inhouse: Estimate; contractor: Estimate; hybrid: Estimate };
+  verdict: Verdict;
+  confidence: ConfidenceScore;
+  effortGrid: EffortGrid;
+  formulaTree: FormulaNode;
 }
 
-function parseBrief(text: string, mode: ParseMode): Promise<ParseBriefResult>;
+function estimateTask(input: EstimateTaskInput): EstimateTaskResult;
 ```
 
-| Функция | Сигнатура | Назначение | Ошибки |
-|---|---|---|---|
-| `estimateTask` | `(task: Task, options?: EstimateOptions) => Estimate` | Полный детерминированный расчёт: WBS → effort → duration → cost → TCO → verdict → confidence → formulaTree. Вход/выход валидируются схемами. | `ZodError` при невалидном `Task`; доменная ошибка при невозможном расчёте |
-| `getD1Mock` | `() => Estimate[]` | Возвращает распарсенные схемой три сценария D1 из `d1.scenarios.json` для UI-разработки и e2e. | `ZodError`, если мок разошёлся со схемой |
-| `buildExportBundle` | `(estimate: Estimate, format: ExportFormat) => ExportBundle` | Собирает PDF/XLSX/JSON-снимок с `datasetVersion`, `seed`, `createdAt` и источниками. Не пересчитывает оценку. | Ошибка формата/рендера |
-| `parseBrief` | `(text: string, mode: ParseMode) => Promise<ParseBriefResult>` | Извлекает `ExtractedParam[]` из текста брифа: правила, Jev или авто-выбор. | Ошибка сети/таймаут Jev; деградация к `rules` с предупреждением |
+`estimateTask` детерминирован: `inputHash = sha256({task, seed, datasetVersion,
+options})`, `methodWeights = { a: 0.5, b: 0.2, c: 0.3 }` (методы A/B/C из
+`sizing/combine.ts`), `currency: 'RUB'`. Все три `Estimate` проходят
+`EstimateSchema.parse` перед возвратом. Квантили стоимости — из `simulate`
+(seed входа), квантили трудоёмкости — из `toStageGrid` (`p50 ± z·σ`), срок — из
+`schedule`. `estimateTask` использует `node:crypto`, поэтому вызывается на
+сервере/в CLI, а не в браузерном бандле.
 
-Все функции планируются чистыми (кроме `parseBrief`, у которой есть I/O к Jev), с
-детерминированным seed и без `Date.now()`/`Math.random()` внутри ядра.
+### 3.2. `@app/intake` — `packages/intake/src/index.ts`
+
+| Функция | Сигнатура | Файл |
+|---|---|---|
+| `classifyBrief` | `(brief: string, opts?: ClassifyBriefOptions) => Promise<ClassifyBriefResult>` | `packages/intake/src/pipeline.ts` |
+| `evaluateIntake` | `(briefs: EvalBrief[], classifyFn: EvalClassifier) => Promise<EvalReport>` | `packages/intake/src/eval.ts` |
+| `confirmParam` / `allConfirmed` | `(params, key, value?) => MergedParam[]` / `(params) => boolean` | `packages/intake/src/merge.ts` |
+
+```ts
+type IntakeMode = 'off' | 'cache' | 'live';
+interface ClassifyBriefOptions { mode?: IntakeMode; cacheFile?: string; apiKey?: string; timeoutMs?: number }
+interface ClassifyBriefResult { params: MergedParam[]; status: 'rules' | 'jev-cache' | 'jev-live' }
+```
+
+`classifyBrief` возвращает `params` со `status: 'auto'`. До подтверждения
+(`confirmParam`) экспорт заблокирован (`ExportError('needs_review')`).
+
+### 3.3. `@app/export` — `packages/export/src/index.ts`
+
+| Функция | Сигнатура | Файл |
+|---|---|---|
+| `buildExportBundle` | `(input: BuildExportBundleInput) => Promise<ExportBundle>` | `packages/export/src/bundle.ts` |
+| `toSnapshot` / `fromSnapshot` | `(input: ToSnapshotInput) => ExportSnapshot` / `(json: unknown) => ExportSnapshot` | `packages/export/src/snapshot.ts` |
+| `toXlsx` / `toPdf` | `(estimate: Estimate) => Buffer` / `(estimate: Estimate) => Promise<Buffer>` | `packages/export/src/xlsx.ts`, `pdf.ts` |
+
+```ts
+type ExportFormat = 'json' | 'xlsx' | 'pdf';
+interface BuildExportBundleInput {
+  estimate: Estimate;
+  params: { status: string }[];   // все должны быть 'confirmed'
+  datasetVersion: string;
+  seed: number;
+  format: ExportFormat;
+}
+interface ExportBundle { filename: string; mime: string; data: Buffer }
+```
+
+`buildExportBundle` не пересчитывает оценку: он сериализует готовый `Estimate`
+вместе с `datasetVersion`, `seed` и списком источников. JSON-имя содержит
+`snapshotHash` (SHA-256 канонического JSON).
+
+### 3.4. Как подключить в React/Vite
+
+`@app/core`, `@app/intake` и `@app/export` — это Node-пакеты: они читают
+датасеты, хешируют входы и рендерят PDF/XLSX. В React/Vite они используются на
+**серверной стороне** (Vite SSR, API-роут, CLI-скрипт), а клиент получает уже
+готовый `Estimate` и рисует его.
+
+```ts
+// server/estimate.ts — Node-сторона
+import { estimateTask } from '@app/core';
+import { classifyBrief } from '@app/intake';
+import { buildExportBundle } from '@app/export';
+import { loadDatasets } from '@app/data';
+
+const datasets = await loadDatasets();
+const { params } = await classifyBrief(brief, { mode: 'cache' });
+
+const result = estimateTask({
+  task,
+  datasets,
+  seed: 42,
+  datasetVersion: datasets.manifest?.datasetVersion ?? 'unknown',
+  options: { model: 'fixed_price', hiring: true },
+});
+
+const bundle = await buildExportBundle({
+  estimate: result.estimates.inhouse,
+  params: params.map(() => ({ status: 'confirmed' })), // после ревью
+  datasetVersion: result.estimates.inhouse.datasetVersion,
+  seed: result.estimates.inhouse.seed,
+  format: 'json',
+});
+```
+
+```tsx
+// src/EstimateView.tsx — клиент Vite/React
+import { EstimateSchema, type Estimate } from '@app/contract';
+
+export async function loadEstimate(id: string): Promise<Estimate> {
+  const raw: unknown = await fetch(`/api/estimates/${id}`).then((response) => response.json());
+  return EstimateSchema.parse(raw); // единственный допустимый вход
+}
+```
+
+`vite.config.ts`: workspace-пакеты должны резолвиться как обычно
+(`resolve.preserveSymlinks: true`, если symlink не разворачиваются). Клиент не
+импортирует `estimateTask`: `node:crypto` и файловые загрузчики не предназначены
+для браузера.
+
+> **Фронт не считает сам.** Запрещено складывать `cost.lines`, умножать часы на
+> ставки, выводить P80 из P50/P90, строить TCO или пересчитывать
+> `confidence.score`. Все числа приходят готовыми из `Estimate`; UI только
+> форматирует их. Если нужна новая цифра — она добавляется в ядро и контракт, а
+> не вычисляется в компоненте.
 
 ## 4. Правила интеграции
 
