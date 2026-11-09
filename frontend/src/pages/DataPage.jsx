@@ -66,7 +66,7 @@ export default function DataPage() {
     <div className="page-stack">
       <div className="page-heading">
         <div>
-          <div className="eyebrow">DATA GOVERNANCE · 03</div>
+          <div className="eyebrow">TMK DECISION STUDIO · DATA GOVERNANCE</div>
           <h1>Данные и источники</h1>
           <p>Реестр наборов, импорт HelpDesk и контроль качества. Версии фиксируются для воспроизводимости оценки.</p>
         </div>
@@ -87,7 +87,7 @@ export default function DataPage() {
       <div className="data-kpis">
         <div><span>ДАТАСЕТОВ</span><b>{String(count).padStart(2, '0')}</b><small>активных наборов</small></div>
         <div><span>ЗАПИСЕЙ</span><b>{manifest?.totalRows ?? '—'}</b><small>в рабочем контуре</small></div>
-        <div><span>ВЕРСИЯ</span><b className="mono">{manifest?.versionShort ?? '—'}</b><small>datasetVersion</small></div>
+        <div><span>ВЕРСИЯ</span><b className="mono">{manifest?.versionShort ?? '—'}</b><small>TMK Decision Studio · datasetVersion</small></div>
         <div><span>ОБНОВЛЕНО</span><b>{manifest?.date ?? '—'}</b><small>дата манифеста</small></div>
       </div>
 

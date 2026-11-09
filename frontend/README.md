@@ -1,6 +1,6 @@
-# Frontend (`frontend/`)
+# Frontend — TMK Decision Studio (`frontend/`)
 
-React + Vite (SPA) кокпит: экран решения, графики, формула-дерево.
+React + Vite (SPA) кокпит TMK Decision Studio: экран решения, графики, формула-дерево.
 
 Правило: UI не считает финансы сам. В режиме `api` модель приходит из
 `POST /api/estimates` backend'а и приводится к прежней форме адаптером

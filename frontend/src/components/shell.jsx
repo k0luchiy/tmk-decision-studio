@@ -36,7 +36,7 @@ export function Topbar({ page, goHome, theme, toggleTheme, apiStatus }) {
       <button type="button" className="brand-button" onClick={goHome} aria-label="На главную">
         <span className="brand-mark"><span /></span>
         <span className="brand-copy">
-          <strong>DECISION STUDIO</strong>
+          <strong>TMK DECISION STUDIO</strong>
           <small>ТМК++ · ИНСТРУМЕНТ ОЦЕНКИ ИТ-РАБОТ</small>
         </span>
       </button>
@@ -82,7 +82,7 @@ export function Sidebar({ activeTab, goTab, goHome, model }) {
         ))}
       </nav>
       <div className="sidebar-bottom">
-        <div className="sidebar-status"><i /> Демо-режим <small>v2.0</small></div>
+        <div className="sidebar-status"><i /> Демо-режим <small>v3.0</small></div>
         <button type="button" className="sidebar-home" onClick={goHome}><Home size={14} /> На старт</button>
       </div>
     </aside>
@@ -403,7 +403,7 @@ export function Footer({ goHome }) {
       <div className="footer-links">
         <button type="button" onClick={goHome}>Старт</button>
         <span>·</span>
-        <span>v2.0</span>
+        <span>v3.0</span>
       </div>
     </footer>
   );

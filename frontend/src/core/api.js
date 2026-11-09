@@ -54,12 +54,20 @@ export function importHelpdesk(file) {
   return fetch(`${API_BASE}/api/import/helpdesk`, { method: 'POST', body: form }).then(readJson);
 }
 
-export function fetchIntake(brief, mode = 'cache') {
+export function fetchIntake(brief, mode = import.meta.env?.VITE_INTAKE_MODE ?? 'cache') {
   return fetch(`${API_BASE}/api/intake`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ brief, mode }),
   }).then(readJson);
+}
+
+export function fetchEstimates() {
+  return fetch(`${API_BASE}/api/estimates`).then(readJson);
+}
+
+export function fetchEstimate(id) {
+  return fetch(`${API_BASE}/api/estimates/${encodeURIComponent(id)}`).then(readJson);
 }
 
 export function confirmIntake(params) {

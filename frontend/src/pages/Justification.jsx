@@ -248,7 +248,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
       <div className="justification-signature">
         <div>
           <span>СФОРМИРОВАНО</span>
-          <b>09.11.2026 · Decision Studio v2.0</b>
+          <b>09.11.2026 · TMK Decision Studio v3.0</b>
         </div>
         <div>
           <span>ID ОЦЕНКИ</span>

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildModelFromApi, mapContractorStages, mapStateToRequest } from '../src/core/apiModel.js';
+import { mapExtras, weightedTeamRate } from '../src/core/apiRequest.js';
 import { createCaseState } from '../src/core/calc.js';
 
 const mock = JSON.parse(
@@ -9,7 +10,7 @@ const mock = JSON.parse(
 );
 const [inhouse, contractor, hybrid] = mock;
 
-const apiResponse = () => ({
+const apiResponse = (overrides = {}) => ({
   id: 'est_fixture_d1',
   datasetVersion: inhouse.datasetVersion,
   seed: 42,
@@ -21,6 +22,8 @@ const apiResponse = () => ({
   formulaTree: inhouse.formulaTree,
   params: [],
   warnings: inhouse.warnings,
+  methodDivergence: 0.42,
+  ...overrides,
 });
 
 test('buildModelFromApi maps the API snapshot into the legacy model shape', () => {
@@ -89,11 +92,63 @@ test('mapStateToRequest sends confirmed params and options', () => {
   assert.equal(request.options.model, 't_and_m');
   assert.equal(request.options.utilization, 0.7);
   assert.equal(request.options.vat, false);
-  assert.equal(request.options.teamRate, state.teamRate);
+  const expectedRate = Math.round(
+    state.stages.reduce((acc, stage) => acc + stage.hours * stage.rate, 0) /
+      state.stages.reduce((acc, stage) => acc + stage.hours, 0),
+  );
+  assert.equal(request.options.teamRate, expectedRate);
   assert.equal(request.options.reservePct, state.reserve / 100);
   assert.equal(request.options.oversightPct, state.oversight / 100);
   assert.equal(request.options.stageHours['3'], 560);
+  assert.equal(request.options.targetWeeks, state.deadlineWeeks);
   assert.deepEqual(request.options.contractorStages, [3]);
+  assert.equal(request.options.extras.length, 9);
+  assert.ok(request.options.extras.every((extra) => extra.amountRub > 0));
+  assert.deepEqual(
+    [...new Set(request.options.extras.map((extra) => extra.appliesTo))].sort(),
+    ['contractor', 'hybrid', 'inhouse'],
+  );
+});
+
+test('teamRate falls back to state.teamRate when stage rates match', () => {
+  const state = createCaseState('D1');
+  const uniform = { ...state, stages: state.stages.map((stage) => ({ ...stage, rate: 5000 })) };
+  assert.equal(weightedTeamRate(uniform), uniform.teamRate);
+  assert.equal(weightedTeamRate(state), Math.round(
+    state.stages.reduce((acc, stage) => acc + stage.hours * stage.rate, 0) /
+      state.stages.reduce((acc, stage) => acc + stage.hours, 0),
+  ));
+});
+
+test('mapExtras emits up to three per-scenario lines, skips zeros and caps at 20', () => {
+  const records = mapExtras([{ name: 'Лицензии', internal: 100000, external: 200000, hybrid: 150000 }]);
+  assert.equal(records.length, 3);
+  assert.deepEqual(records.map((record) => record.appliesTo), ['inhouse', 'contractor', 'hybrid']);
+  assert.deepEqual(records.map((record) => record.amountRub), [100000, 200000, 150000]);
+  assert.ok(records.every((record) => record.label.startsWith('Лицензии')));
+
+  assert.deepEqual(mapExtras([{ name: 'GPU', internal: 0, external: 0, hybrid: 0 }]), []);
+  const partial = mapExtras([{ name: 'Инфра', internal: 5000, external: 0, hybrid: 0 }]);
+  assert.equal(partial.length, 1);
+  assert.equal(partial[0].appliesTo, 'inhouse');
+  const many = Array.from({ length: 10 }, (_, index) => ({ name: `E${index}`, internal: 1, external: 1, hybrid: 1 }));
+  assert.equal(mapExtras(many).length, 20);
+});
+
+test('methodDivergence becomes methodDiff and warns above 30%', () => {
+  const high = buildModelFromApi(apiResponse({ methodDivergence: 0.42 }), createCaseState('D1'));
+  assert.equal(high.methodDiff, 0.42);
+  const warning = high.warnings.find((item) => item.title === 'Расхождение методов');
+  assert.ok(warning);
+  assert.equal(warning.tone, 'warn');
+  assert.match(warning.text, /42%/);
+
+  const low = buildModelFromApi(apiResponse({ methodDivergence: 0.1 }), createCaseState('D1'));
+  assert.equal(low.methodDiff, 0.1);
+  assert.ok(!low.warnings.some((item) => item.title === 'Расхождение методов'));
+
+  const missing = buildModelFromApi(apiResponse({ methodDivergence: undefined }), createCaseState('D1'));
+  assert.equal(missing.methodDiff, 0);
 });
 
 test('mapContractorStages maps vendor/split stages and falls back to [3]', () => {

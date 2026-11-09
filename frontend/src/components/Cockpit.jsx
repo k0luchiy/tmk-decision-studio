@@ -14,6 +14,7 @@ export default function Cockpit(props) {
     onExportJSON, onExportCSV, onExportPDF, onExportXLSX, rationale, theme, toggleTheme,
     onDeadlineChange, goHome,
     params, confirmParam, rejectParam, reparse, parsed, intakeSource, files, addFiles, removeFile,
+    intakeMode, changeIntakeMode,
     update, updateStage, removeStage, addStage, updateExtra, removeExtra, addExtra,
     apiStatus,
   } = props;
@@ -64,6 +65,8 @@ export default function Cockpit(props) {
             reparse={reparse}
             parsed={parsed}
             intakeSource={intakeSource}
+            intakeMode={intakeMode}
+            changeIntakeMode={changeIntakeMode}
             files={files}
             addFiles={addFiles}
             removeFile={removeFile}

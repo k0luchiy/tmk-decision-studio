@@ -6,8 +6,14 @@ import { Toast } from './components/ui.jsx';
 import { CASES } from './data/cases.js';
 import { computeModel, createCaseState, recommendedRationale } from './core/calc.js';
 import { buildModelFromApi, exportApiEstimate, fetchApiModel } from './core/apiModel.js';
-import { fetchIntake, confirmIntake, mapIntakeToParams } from './core/api.js';
+import { fetchIntake, confirmIntake, mapIntakeToParams, fetchEstimates, fetchEstimate } from './core/api.js';
 import { applyParam, parseBrief } from './core/parseBrief.js';
+
+const INTAKE_SOURCES = { rules: 'правила', 'jev-cache': 'Jev-кэш', 'jev-live': 'Jev live' };
+const savedName = (brief) => {
+  const text = (brief ?? '').trim();
+  return text.length > 50 ? `${text.slice(0, 50)}…` : text;
+};
 
 const buildParams = (state) => [
   {
@@ -81,11 +87,17 @@ export default function App() {
   const [model, setModel] = useState(() => computeModel(createCaseState(initialCaseId)));
   const [apiStatus, setApiStatus] = useState('idle');
   const [intakeSource, setIntakeSource] = useState(null);
+  const [intakeMode, setIntakeMode] = useState(() => import.meta.env?.VITE_INTAKE_MODE ?? 'cache');
   const apiErrorNotified = useRef(false);
+  const skipNextRecalc = useRef(false);
 
   const rationale = useMemo(() => recommendedRationale(model), [model]);
 
   useEffect(() => {
+    if (skipNextRecalc.current) {
+      skipNextRecalc.current = false;
+      return undefined;
+    }
     const localModel = computeModel(state);
     if (import.meta.env.VITE_DATA_MODE === 'local' || (state.description ?? '').trim().length < 20) {
       setModel(localModel);
@@ -97,9 +109,17 @@ export default function App() {
       setApiStatus('loading');
       fetchApiModel(state, { signal: controller.signal })
         .then((response) => {
-          setModel(buildModelFromApi(response, state));
+          const nextModel = buildModelFromApi(response, state);
+          setModel(nextModel);
           setApiStatus('api');
           apiErrorNotified.current = false;
+          const row = {
+            id: response.id,
+            name: savedName(state.description) || state.name,
+            date: response.createdAt ?? new Date().toISOString(),
+            cost: nextModel.scenarios[nextModel.recommended].p50,
+          };
+          setSaved((old) => [row, ...old.filter((item) => item.id !== row.id && item.name !== row.name)]);
         })
         .catch((error) => {
           if (error?.name === 'AbortError') return;
@@ -116,6 +136,27 @@ export default function App() {
       controller.abort();
     };
   }, [state]);
+
+  useEffect(() => {
+    let alive = true;
+    fetchEstimates()
+      .then((data) => {
+        if (!alive) return;
+        const rows = (data?.items ?? []).map((item) => ({
+          id: item.id,
+          name: savedName(item.brief) || 'Оценка',
+          date: item.createdAt,
+          cost: item.p50Rub,
+        }));
+        if (rows.length) setSaved(rows);
+      })
+      .catch(() => {
+        if (!alive) return;
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -135,19 +176,44 @@ export default function App() {
 
   const notify = (message) => setToast(message);
 
-  const parseViaApi = async (brief) => {
+  const parseViaApi = async (brief, mode = intakeMode) => {
     try {
-      const response = await fetchIntake(brief, 'cache');
+      const response = await fetchIntake(brief, mode);
       const mapped = mapIntakeToParams(response?.params);
       if (mapped.length) {
-        setIntakeSource(response.status === 'jev-cache' ? 'Jev-кэш' : 'правила');
+        setIntakeSource(INTAKE_SOURCES[response.status] ?? 'правила');
         return mapped;
       }
     } catch {
-      // Backend intake is optional: fall through to the local parser.
+      if (mode === 'live') notify('Jev live недоступен — бриф разобран локальными правилами');
     }
     setIntakeSource(null);
     return parseBrief(brief);
+  };
+
+  const changeIntakeMode = (mode) => {
+    setIntakeMode(mode);
+    reparse(mode);
+  };
+
+  const openSaved = async (id) => {
+    try {
+      const stored = await fetchEstimate(id);
+      const nextState = stored.state ?? state;
+      const nextModel = buildModelFromApi(stored, nextState);
+      skipNextRecalc.current = Boolean(stored.state);
+      setState(nextState);
+      setParams(buildParams(nextState));
+      setParsed(true);
+      setModel(nextModel);
+      setActiveScenario(nextModel.recommended);
+      setPage('cockpit');
+      setActiveTab('overview');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      notify('Сохранённая оценка открыта');
+    } catch (error) {
+      notify(`Не удалось открыть оценку: ${error.message}`);
+    }
   };
 
   const goTab = (tab) => {
@@ -298,8 +364,8 @@ export default function App() {
     notify(`Параметр «${param.label}» отклонён — уверенность снижена`);
   };
 
-  const reparse = async () => {
-    const extracted = state.description?.trim() ? await parseViaApi(state.description) : [];
+  const reparse = async (mode = intakeMode) => {
+    const extracted = state.description?.trim() ? await parseViaApi(state.description, mode) : [];
     setParams(extracted.length ? extracted : buildParams(state));
     setState((old) => ({ ...old, confirmedParams: 0, rejectedParams: 0 }));
     setParsed(true);
@@ -334,7 +400,7 @@ export default function App() {
     }
     const payload = {
       product: 'TMK Decision Studio',
-      version: '2.0.0',
+      version: '3.0.0',
       generatedAt: new Date().toISOString(),
       estimateId: model.estimateId ?? `${state.caseId}-2026-${model.confidence.score}`,
       notice: 'Все данные демонстрационные. Не является коммерческим предложением.',
@@ -416,7 +482,7 @@ export default function App() {
     <div className="app">
       <Topbar page={page} goHome={goHome} theme={theme} toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} apiStatus={apiStatus} />
       {page === 'start' ? (
-        <StartScreen onStart={startAssessment} onLoadCase={loadCase} saved={saved} />
+        <StartScreen onStart={startAssessment} onLoadCase={loadCase} onOpenSaved={openSaved} saved={saved} />
       ) : (
         <Cockpit
           model={model}
@@ -442,6 +508,8 @@ export default function App() {
           reparse={reparse}
           parsed={parsed}
           intakeSource={intakeSource}
+          intakeMode={intakeMode}
+          changeIntakeMode={changeIntakeMode}
           files={files}
           addFiles={addFiles}
           removeFile={removeFile}

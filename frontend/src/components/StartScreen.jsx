@@ -10,7 +10,7 @@ import { fmtMoney, fmtWeeks } from '../core/format.js';
 
 const SCENARIO_ICON = { internal: ShieldCheck, vendor: GitMerge, hybrid: Sparkles };
 
-export default function StartScreen({ onStart, onLoadCase, saved }) {
+export default function StartScreen({ onStart, onLoadCase, onOpenSaved, saved }) {
   const [brief, setBrief] = useState('');
   const [files, setFiles] = useState([]);
   const inputRef = useRef(null);
@@ -26,7 +26,7 @@ export default function StartScreen({ onStart, onLoadCase, saved }) {
     <main className="start-page">
       <section className="start-hero">
         <div className="start-hero-copy">
-          <div className="eyebrow light">РАДИОХАК 4.0 · ТРЕК ТМК++ · ИНСТРУМЕНТ ПОДДЕРЖКИ РЕШЕНИЙ</div>
+          <div className="eyebrow light">TMK DECISION STUDIO · РАДИОХАК 4.0 · ТРЕК ТМК++</div>
           <h1>
             СДЕЛАТЬ
             <br />
@@ -200,7 +200,7 @@ export default function StartScreen({ onStart, onLoadCase, saved }) {
             </div>
           ) : (
             saved.map((item) => (
-              <button key={`${item.id}-${item.date}`} type="button" className="recent-row" onClick={() => onLoadCase(item.id)}>
+              <button key={`${item.id}-${item.date}`} type="button" className="recent-row" onClick={() => onOpenSaved(item.id)}>
                 <FileText size={15} />
                 <span><b>{item.name}</b><small>{item.date} · {fmtMoney(item.cost)}</small></span>
                 <Pill tone="good"><Check size={11} /> Сохранено</Pill>

@@ -21,6 +21,7 @@ const OWNER_OPTIONS = [
 
 export default function Parameters({
   state, update, params, confirmParam, rejectParam, reparse, parsed, intakeSource,
+  intakeMode, changeIntakeMode,
   files, addFiles, removeFile, model, goTab, activeScenario, setActiveScenario,
 }) {
   const [unit, setUnit] = useState('weeks');
@@ -113,6 +114,16 @@ export default function Parameters({
                   onChange={(event) => addFiles(event.target.files)}
                 />
               </label>
+              <select
+                className="intake-mode"
+                value={intakeMode}
+                onChange={(event) => changeIntakeMode(event.target.value)}
+                aria-label="Режим разбора брифа"
+              >
+                <option value="off">Правила</option>
+                <option value="cache">Jev-кэш</option>
+                <option value="live">Jev live</option>
+              </select>
               <Button size="sm" variant="primary" icon={Sparkles} onClick={reparse}>Разобрать бриф</Button>
             </div>
           </div>

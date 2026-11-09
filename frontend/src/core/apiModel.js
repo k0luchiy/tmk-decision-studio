@@ -28,50 +28,9 @@ const median = (values) => {
   const mid = Math.floor(sorted.length / 2);
   return !sorted.length ? 0 : sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 };
-const workTypeFor = (type) => {
-  const text = String(type ?? '').toLowerCase();
-  if (/интеграц/.test(text)) return 'integration';
-  if (/vision|cv|дефект/.test(text)) return 'cv';
-  if (/сопровожд|поддержк|sla/.test(text)) return 'support';
-  if (/разработ|мобильн/.test(text)) return 'development';
-  return 'default';
-};
-const confirmedParam = (key, value) => ({ key, value, status: 'confirmed', defaultUsed: false, unit: '', confidence: 1 });
-export function mapStageHours(stages = []) {
-  const hours = {};
-  stages.forEach((stage) => {
-    const number = STAGE_NUMBER[stage.id];
-    const value = Number(stage.hours) || 0;
-    if (number !== undefined && value > 0) hours[number] = (hours[number] || 0) + value;
-  });
-  return hours;
-}
-export function mapContractorStages(stages = []) {
-  const numbers = new Set();
-  stages.forEach((stage) => {
-    const split = Number(stage.split ?? 50);
-    if ((stage.owner === 'vendor' || split <= 35) && STAGE_NUMBER[stage.id] !== undefined) numbers.add(STAGE_NUMBER[stage.id]);
-  });
-  const result = [...numbers].sort((a, b) => a - b);
-  return result.length ? result : [3];
-}
-export function mapStateToRequest(state) {
-  return {
-    params: [
-      confirmedParam('work_type', workTypeFor(state.type)),
-      confirmedParam('flows', state.integrations),
-      confirmedParam('screens', state.screens),
-      confirmedParam('users', state.users),
-      confirmedParam('duration_weeks', state.deadlineWeeks),
-    ],
-    options: {
-      hiring: state.hiring, utilization: 0.7, model: state.contractType === 'fixed' ? 'fixed_price' : 't_and_m',
-      vat: false, teamRate: state.teamRate, reservePct: (Number(state.reserve) || 0) / 100,
-      oversightPct: (Number(state.oversight) || 0) / 100,
-      contractorStages: mapContractorStages(state.stages), stageHours: mapStageHours(state.stages),
-    },
-  };
-}
+import { mapContractorStages, mapStageHours, mapStateToRequest } from './apiRequest.js';
+export { mapContractorStages, mapStageHours, mapStateToRequest };
+
 async function apiErrorFrom(response) {
   let payload = null;
   try {
@@ -86,7 +45,12 @@ export async function fetchApiModel(state, { signal, seed = 42 } = {}) {
   const response = await fetch(`${API_BASE}/api/estimates`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...mapStateToRequest(state), seed }),
+    body: JSON.stringify({
+      ...mapStateToRequest(state),
+      brief: state.description || state.name,
+      state,
+      seed,
+    }),
     ...(signal ? { signal } : {}),
   });
   if (!response.ok) throw await apiErrorFrom(response);
@@ -234,15 +198,23 @@ export function buildModelFromApi(response, state) {
     return { value: x, label: (x / 1_000_000).toFixed(1).replace('.', ','),
       count: Math.round(Math.exp(-0.5 * ((x - rec.p50) / sigma) ** 2) * 100 + (index === 0 ? 2 : 0)) };
   });
+  const methodDiff = response.methodDivergence ?? 0;
   const warnings = (inhouse.warnings ?? []).map((warning) => ({
     tone: warning.severity === 'error' ? 'bad' : warning.severity === 'warning' ? 'warn' : 'info',
     title: warning.code ?? 'Предупреждение', text: warning.message ?? '',
   }));
+  if (methodDiff > 0.3 && !warnings.some((warning) => warning.title === 'Расхождение методов')) {
+    warnings.unshift({
+      tone: 'warn',
+      title: 'Расхождение методов',
+      text: `Методы расходятся на ${Math.round(methodDiff * 100)}%`,
+    });
+  }
   return {
     meta, state, k: 1, effort: Number(response.effortGrid?.totalHours) || 0,
     effortRange: { p10: Number(response.effortGrid?.p10Hours) || 0, p90: Number(response.effortGrid?.p90Hours) || 0 },
     stageRows, stageDays, scenarios, recommended, ranking: [...scores].sort((a, b) => b.total - a.total), scores, confidence,
-    analogMedian, methodDiff: 0, breakEven: inhouse.breakevenMonth ?? null, breakEvenSeries, tcoSeries, sensitivity, distribution,
+    analogMedian, methodDiff, breakEven: inhouse.breakevenMonth ?? null, breakEvenSeries, tcoSeries, sensitivity, distribution,
     risks, risksTotal: sum(risks, (risk) => risk.expected), warnings, pending: 0,
     rawWeeks: { internal: scenarios.internal.rawWeeks, vendor: scenarios.vendor.rawWeeks, hybrid: scenarios.hybrid.rawWeeks },
     deadline: { weeks: Number(state.deadlineWeeks) || 0, compressedScenarios: [] }, estimateId: response.id, api: true,
