@@ -14,7 +14,23 @@ const SCENARIO_ICONS = {
   hybrid: GitMerge,
 };
 
-export function Topbar({ page, goHome, theme, toggleTheme }) {
+const API_STATUS = {
+  idle: { label: 'локально', title: 'Локальный расчёт (API не используется)' },
+  loading: { label: 'API…', title: 'Запрос к API выполняется' },
+  error: { label: 'ошибка API', title: 'API недоступен — показаны локальные расчёты' },
+  api: { label: 'API', title: 'Расчёты получены от backend API' },
+};
+
+function ApiBadge({ apiStatus = 'idle' }) {
+  const status = API_STATUS[apiStatus] ?? API_STATUS.idle;
+  return (
+    <span className={`demo-badge api-status api-${apiStatus}`} title={status.title}>
+      {status.label}
+    </span>
+  );
+}
+
+export function Topbar({ page, goHome, theme, toggleTheme, apiStatus }) {
   return (
     <header className="topbar">
       <button type="button" className="brand-button" onClick={goHome} aria-label="На главную">
@@ -31,6 +47,7 @@ export function Topbar({ page, goHome, theme, toggleTheme }) {
           </button>
         )}
         <span className="demo-badge" title="Все данные демонстрационные"><i /> ДЕМО</span>
+        <ApiBadge apiStatus={apiStatus} />
       </div>
     </header>
   );
@@ -118,7 +135,7 @@ function CaseSwitcher({ model, onCaseChange }) {
   );
 }
 
-export function WorkspaceBar({ model, onCaseChange, onExportJSON, onExportCSV, onPrint, theme, toggleTheme }) {
+export function WorkspaceBar({ model, onCaseChange, onExportJSON, onExportCSV, onPrint, theme, toggleTheme, apiStatus }) {
   return (
     <div className="workspace-bar">
       <div className="workspace-case">
@@ -129,6 +146,7 @@ export function WorkspaceBar({ model, onCaseChange, onExportJSON, onExportCSV, o
         </div>
       </div>
       <div className="workspace-actions">
+        <ApiBadge apiStatus={apiStatus} />
         <CaseSwitcher model={model} onCaseChange={onCaseChange} />
         <div className="workspace-icons">
           <button type="button" className="icon-button" onClick={onExportJSON} title="Скачать JSON-снимок" aria-label="Скачать JSON-снимок">

@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Topbar, Footer } from './components/shell.jsx';
 import StartScreen from './components/StartScreen.jsx';
 import Cockpit from './components/Cockpit.jsx';
 import { Toast } from './components/ui.jsx';
 import { CASES } from './data/cases.js';
 import { computeModel, createCaseState, recommendedRationale } from './core/calc.js';
+import { buildModelFromApi, exportApiEstimate, fetchApiModel } from './core/apiModel.js';
 import { applyParam, parseBrief } from './core/parseBrief.js';
 
 const buildParams = (state) => [
@@ -76,9 +77,43 @@ export default function App() {
   const [files, setFiles] = useState([]);
   const [saved, setSaved] = useState([]);
   const [toast, setToast] = useState('');
+  const [model, setModel] = useState(() => computeModel(createCaseState(initialCaseId)));
+  const [apiStatus, setApiStatus] = useState('idle');
+  const apiErrorNotified = useRef(false);
 
-  const model = useMemo(() => computeModel(state), [state]);
   const rationale = useMemo(() => recommendedRationale(model), [model]);
+
+  useEffect(() => {
+    const localModel = computeModel(state);
+    if (import.meta.env.VITE_DATA_MODE === 'local' || (state.description ?? '').trim().length < 20) {
+      setModel(localModel);
+      setApiStatus('idle');
+      return undefined;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setApiStatus('loading');
+      fetchApiModel(state, { signal: controller.signal })
+        .then((response) => {
+          setModel(buildModelFromApi(response, state));
+          setApiStatus('api');
+          apiErrorNotified.current = false;
+        })
+        .catch((error) => {
+          if (error?.name === 'AbortError') return;
+          setModel(localModel);
+          setApiStatus('error');
+          if (!apiErrorNotified.current) {
+            apiErrorNotified.current = true;
+            setToast('API недоступен — показаны локальные расчёты');
+          }
+        });
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [state]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -258,12 +293,30 @@ export default function App() {
 
   const removeFile = (name) => setFiles((old) => old.filter((item) => item !== name));
 
-  const exportJSON = () => {
+  const rememberSnapshot = () => {
+    setSaved((old) => [
+      { id: state.caseId, name: state.name, date: new Date().toLocaleDateString('ru-RU'), cost: model.scenarios[model.recommended].p50 },
+      ...old.filter((item) => item.id !== state.caseId),
+    ]);
+  };
+
+  const exportJSON = async () => {
+    if (model.estimateId) {
+      try {
+        const { blob, filename } = await exportApiEstimate(model.estimateId, 'json');
+        download(blob, filename);
+        rememberSnapshot();
+        notify('JSON-снимок получен из API и добавлен в последние оценки');
+        return;
+      } catch (error) {
+        notify(`Экспорт API недоступен: ${error.message}. Сохранён локальный снимок`);
+      }
+    }
     const payload = {
       product: 'TMK Decision Studio',
       version: '2.0.0',
       generatedAt: new Date().toISOString(),
-      estimateId: `${state.caseId}-2026-${model.confidence.score}`,
+      estimateId: model.estimateId ?? `${state.caseId}-2026-${model.confidence.score}`,
       notice: 'Все данные демонстрационные. Не является коммерческим предложением.',
       state,
       summary: {
@@ -278,10 +331,7 @@ export default function App() {
       },
     };
     download(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `tmk-decision-${state.caseId}-${Date.now()}.json`);
-    setSaved((old) => [
-      { id: state.caseId, name: state.name, date: new Date().toLocaleDateString('ru-RU'), cost: model.scenarios[model.recommended].p50 },
-      ...old.filter((item) => item.id !== state.caseId),
-    ]);
+    rememberSnapshot();
     notify('JSON-снимок сохранён и добавлен в последние оценки');
   };
 
@@ -319,7 +369,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <Topbar page={page} goHome={goHome} theme={theme} toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+      <Topbar page={page} goHome={goHome} theme={theme} toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')} apiStatus={apiStatus} />
       {page === 'start' ? (
         <StartScreen onStart={startAssessment} onLoadCase={loadCase} saved={saved} />
       ) : (
@@ -327,6 +377,7 @@ export default function App() {
           model={model}
           state={state}
           goHome={goHome}
+          apiStatus={apiStatus}
           activeTab={activeTab}
           goTab={goTab}
           activeScenario={activeScenario}

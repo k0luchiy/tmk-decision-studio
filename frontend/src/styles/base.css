@@ -537,3 +537,6 @@ input[type='range']:focus { box-shadow: none; }
   color: #b9b1a5;
 }
 .demo-badge i { width: 5px; height: 5px; border-radius: 50%; background: #5cae82; }
+.api-status { text-transform: uppercase; }
+.api-status.api-api { color: #5cae82; border-color: rgba(92, 174, 130, 0.4); }
+.api-status.api-error { color: #d9856b; border-color: rgba(217, 133, 107, 0.45); }

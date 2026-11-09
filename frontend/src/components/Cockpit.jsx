@@ -14,6 +14,7 @@ export default function Cockpit(props) {
     onExportJSON, onExportCSV, onPrint, rationale, theme, toggleTheme, onDeadlineChange, goHome,
     params, confirmParam, rejectParam, reparse, parsed, files, addFiles, removeFile,
     update, updateStage, removeStage, addStage, updateExtra, removeExtra, addExtra,
+    apiStatus,
   } = props;
 
   const showCards = activeTab === 'overview';
@@ -30,6 +31,7 @@ export default function Cockpit(props) {
         onPrint={onPrint}
         theme={theme}
         toggleTheme={toggleTheme}
+        apiStatus={apiStatus}
       />
       <div className="cockpit-body">
         <Sidebar activeTab={activeTab} goTab={goTab} goHome={goHome} model={model} />
