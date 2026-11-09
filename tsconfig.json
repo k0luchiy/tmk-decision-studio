@@ -7,6 +7,9 @@
       "@app/contract": [
         "packages/contract/src/index.ts"
       ],
+      "@app/core": [
+        "packages/core/src/index.ts"
+      ],
       "@app/data": [
         "packages/data/src/index.ts"
       ]
