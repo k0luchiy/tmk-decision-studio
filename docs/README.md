@@ -17,6 +17,8 @@
 | [06_jev_strategy.md](06_jev_strategy.md) | Intake: правила + Jev (без генеративных моделей), ограничения, fallback |
 | [07_action_plan.md](07_action_plan.md) | План действий до стоп-кода 10.11 22:00 и защиты 11.11 |
 | [08_open_questions.md](08_open_questions.md) | Открытые вопросы и решения, которые нужно принять командой |
+| [09_integration_contract.md](09_integration_contract.md) | Контракт для фронтенда: пакеты, функции, мок D1 |
+| [10_api_contract.md](10_api_contract.md) | Связка frontend ↔ backend: REST API, эндпоинты, dev/prod, ошибки |
 | [DECISIONS.md](DECISIONS.md) | Журнал решений (требование регламента: ≥ 8 записей, ведётся по ходу) |
 
 ## Одной фразой
