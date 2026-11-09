@@ -1,0 +1,544 @@
+{
+  "id": "est-d1-hybrid",
+  "taskId": "d1",
+  "scenario": "hybrid",
+  "currency": "RUB",
+  "datasetVersion": "sha256:d1-dataset-v1",
+  "inputHash": "sha256:d1-input-v1",
+  "seed": 42,
+  "methodWeights": {
+    "a": 0.5,
+    "b": 0.2,
+    "c": 0.3
+  },
+  "effort": {
+    "p10Hours": 800,
+    "p50Hours": 930,
+    "p80Hours": 1010,
+    "p90Hours": 1080,
+    "byStage": [
+      {
+        "stage": "analysis",
+        "label": "Анализ",
+        "hours": 120
+      },
+      {
+        "stage": "design",
+        "label": "Проектирование",
+        "hours": 150
+      },
+      {
+        "stage": "development",
+        "label": "Разработка",
+        "hours": 380
+      },
+      {
+        "stage": "testing",
+        "label": "Тестирование",
+        "hours": 150
+      },
+      {
+        "stage": "rollout",
+        "label": "Ввод в эксплуатацию",
+        "hours": 80
+      },
+      {
+        "stage": "acceptance",
+        "label": "Приёмка",
+        "hours": 50
+      }
+    ],
+    "byRole": [
+      {
+        "roleId": "analyst",
+        "label": "Аналитик",
+        "hours": 120
+      },
+      {
+        "roleId": "1c_developer",
+        "label": "1С-разработчик",
+        "hours": 380
+      },
+      {
+        "roleId": "backend",
+        "label": "Backend-разработчик",
+        "hours": 150
+      },
+      {
+        "roleId": "qa_auto",
+        "label": "QA-автоматизатор",
+        "hours": 120
+      },
+      {
+        "roleId": "pm",
+        "label": "Проектный менеджер",
+        "hours": 80
+      },
+      {
+        "roleId": "architect",
+        "label": "Архитектор",
+        "hours": 80
+      }
+    ]
+  },
+  "duration": {
+    "p10Weeks": 12,
+    "p50Weeks": 14,
+    "p80Weeks": 16,
+    "p90Weeks": 17,
+    "criticalPath": [
+      "st-analysis",
+      "st-design",
+      "st-development",
+      "st-testing",
+      "st-rollout",
+      "st-acceptance"
+    ]
+  },
+  "cost": {
+    "p10Rub": 4100000,
+    "p50Rub": 4804230,
+    "p80Rub": 5200000,
+    "p90Rub": 5800000,
+    "reserveRub": 395770,
+    "lines": [
+      {
+        "id": "cl-hybrid-inhouse-labor",
+        "group": "labor",
+        "label": "Трудозатраты in-house (610 ч × 3 830 ₽/ч, 4 из 6 потоков)",
+        "formula": "610 × 3830",
+        "inputRefs": [
+          "effort.p50Hours",
+          "rate-inhouse-middle"
+        ],
+        "valueRub": 2336300,
+        "status": "fact",
+        "sourceId": "src-rate-cards"
+      },
+      {
+        "id": "cl-hybrid-contractor-labor",
+        "group": "labor",
+        "label": "Трудозатраты подрядчика (320 ч × 4 200 ₽/ч, 2 из 6 потоков ≈ 35 %)",
+        "formula": "320 × 4200",
+        "inputRefs": [
+          "effort.p50Hours",
+          "rate-contractor-middle"
+        ],
+        "valueRub": 1344000,
+        "status": "offer",
+        "sourceId": "src-contractor-rate-cards"
+      },
+      {
+        "id": "cl-hybrid-hiring",
+        "group": "hiring",
+        "label": "Найм 1С-разработчика",
+        "formula": "1.5 оклада + 60 дней поиска",
+        "inputRefs": [
+          "assumption.hiring"
+        ],
+        "valueRub": 420000,
+        "status": "assumption",
+        "sourceId": "src-hiring"
+      },
+      {
+        "id": "cl-hybrid-rampup",
+        "group": "rampup",
+        "label": "Ramp-up внутренней части (65 %)",
+        "formula": "0.65 × 310000",
+        "inputRefs": [
+          "assumption.rampup"
+        ],
+        "valueRub": 201500,
+        "status": "assumption",
+        "sourceId": "src-rampup"
+      },
+      {
+        "id": "cl-hybrid-inhouse-coordination",
+        "group": "coordination",
+        "label": "Координация in-house (10 % от труда команды)",
+        "formula": "0.10 × inhouse labor",
+        "inputRefs": [
+          "cl-hybrid-inhouse-labor"
+        ],
+        "valueRub": 233630,
+        "status": "assumption",
+        "sourceId": "src-coordination"
+      },
+      {
+        "id": "cl-hybrid-contractor-coordination",
+        "group": "coordination",
+        "label": "Координация подрядчика (15 %)",
+        "formula": "0.15 × contractor labor",
+        "inputRefs": [
+          "cl-hybrid-contractor-labor"
+        ],
+        "valueRub": 201600,
+        "status": "assumption",
+        "sourceId": "src-coordination"
+      },
+      {
+        "id": "cl-hybrid-contractor-acceptance",
+        "group": "extra",
+        "label": "Приёмка и передача знаний по 2 потокам (5 %)",
+        "formula": "0.05 × contractor labor",
+        "inputRefs": [
+          "cl-hybrid-contractor-labor"
+        ],
+        "valueRub": 67200,
+        "status": "assumption",
+        "sourceId": "src-acceptance"
+      }
+    ]
+  },
+  "tco": [
+    {
+      "year": 1,
+      "costRub": 4804230,
+      "cumulativeRub": 4804230
+    },
+    {
+      "year": 2,
+      "costRub": 522276,
+      "cumulativeRub": 5326506
+    },
+    {
+      "year": 3,
+      "costRub": 522276,
+      "cumulativeRub": 5848782
+    },
+    {
+      "year": 4,
+      "costRub": 522276,
+      "cumulativeRub": 6371058
+    }
+  ],
+  "breakevenMonth": 6,
+  "verdict": {
+    "code": "hybrid",
+    "templateId": "hybrid_v1",
+    "text": "Рекомендация: гибрид — подрядчик на критическом пути (2 из 6 потоков), команда на остальном и на поддержке. Реализация 4,8 млн ₽, точка безубыточности — 6 мес. эксплуатации.",
+    "numbersRefs": [
+      "cl-hybrid-inhouse-labor",
+      "cl-hybrid-contractor-labor",
+      "cl-hybrid-contractor-coordination",
+      "tco",
+      "breakevenMonth"
+    ]
+  },
+  "confidence": {
+    "score": 68,
+    "level": "medium",
+    "components": [
+      {
+        "key": "brief",
+        "weight": 0.3,
+        "value": 0.75
+      },
+      {
+        "key": "methods",
+        "weight": 0.3,
+        "value": 0.8
+      },
+      {
+        "key": "analogues",
+        "weight": 0.2,
+        "value": 0.6
+      },
+      {
+        "key": "data",
+        "weight": 0.2,
+        "value": 0.5
+      }
+    ]
+  },
+  "assumptions": [
+    {
+      "id": "asm-overhead",
+      "label": "Накладные расходы (соцпакет, обучение, управление)",
+      "value": 15,
+      "range": {
+        "low": 10,
+        "high": 18
+      },
+      "sourceId": "src-assumption-overhead",
+      "sensitivity": 0.12,
+      "pinned": false,
+      "owner": "Экономика ИТ"
+    },
+    {
+      "id": "asm-contractor-rate",
+      "label": "Ставка подрядчика RU onshore, middle",
+      "value": 4200,
+      "range": {
+        "low": 3800,
+        "high": 4800
+      },
+      "sourceId": "src-assumption-contractor-rate",
+      "sensitivity": 0.21,
+      "pinned": false,
+      "owner": "Закупки"
+    },
+    {
+      "id": "asm-support-rate",
+      "label": "Поддержка: 12 %/год in-house, 18 %/год подрядчик",
+      "value": "12/18",
+      "range": {
+        "low": 10,
+        "high": 20
+      },
+      "sourceId": "src-assumption-support",
+      "sensitivity": 0.09,
+      "pinned": true,
+      "owner": "Экономика ИТ"
+    }
+  ],
+  "risks": [
+    {
+      "id": "risk-hiring-delay",
+      "label": "Задержка найма 1С-разработчика",
+      "probability": 0.3,
+      "impactRub": {
+        "low": 100000,
+        "mid": 200000,
+        "high": 300000
+      },
+      "expectedRub": 60000,
+      "mitigation": "Резерв P80 и параллельный старт с подрядчиком на критическом пути.",
+      "party": "inhouse",
+      "sourceId": "src-risk-registry"
+    },
+    {
+      "id": "risk-key-person",
+      "label": "Key-person риск подрядчика",
+      "probability": 0.2,
+      "impactRub": {
+        "low": 150000,
+        "mid": 300000,
+        "high": 450000
+      },
+      "expectedRub": 60000,
+      "mitigation": "Требование замены ключевого специалиста и передача знаний в контракте.",
+      "party": "contractor",
+      "sourceId": "src-risk-registry"
+    }
+  ],
+  "analogues": [
+    {
+      "id": "an_tmk_1c_1",
+      "corpus": "tmk_eis",
+      "type": "Интеграция 1С:ERP ↔ WMS",
+      "title": "Интеграция 1С:ERP с WMS, 6 потоков (ТМК, ЭТП)",
+      "year": 2024,
+      "currency": "RUB",
+      "price": {
+        "low": 3800000,
+        "mid": 4200000,
+        "high": 4900000,
+        "basis": "НМЦК"
+      },
+      "sourceId": "src-an-tmk-1",
+      "url": "https://zakupki.tmk-group.com/tender/1c-erp-wms-2024",
+      "date": "2024-06-15",
+      "normalization": {
+        "kScope": 1,
+        "kComplexity": 1.05,
+        "kRegion": 1,
+        "kAge": 1.06,
+        "kVat": 1.2
+      },
+      "vatFlag": true,
+      "scopeVector": {
+        "streams": 6,
+        "platform": "1C",
+        "system": "WMS",
+        "region": "RU"
+      },
+      "normalizedPriceRub": 5609520,
+      "included": true
+    },
+    {
+      "id": "an_tmk_1c_2",
+      "corpus": "tmk_eis",
+      "type": "Интеграция 1С:ERP ↔ WMS",
+      "title": "Интеграция 1С:ERP с WMS, 5 потоков (ТМК, ЭТП)",
+      "year": 2025,
+      "currency": "RUB",
+      "price": {
+        "low": 3500000,
+        "mid": 3900000,
+        "high": 4500000,
+        "basis": "НМЦК"
+      },
+      "sourceId": "src-an-tmk-2",
+      "url": "https://zakupki.tmk-group.com/tender/1c-erp-wms-2025",
+      "date": "2025-03-20",
+      "normalization": {
+        "kScope": 1.1,
+        "kComplexity": 0.98,
+        "kRegion": 1,
+        "kAge": 1.04,
+        "kVat": 1.2
+      },
+      "vatFlag": true,
+      "scopeVector": {
+        "streams": 6,
+        "platform": "1C",
+        "system": "WMS",
+        "region": "RU"
+      },
+      "normalizedPriceRub": 5246842,
+      "included": true
+    },
+    {
+      "id": "an_pub_1c_1",
+      "corpus": "published",
+      "type": "Интеграция 1С:ERP ↔ WMS",
+      "title": "Открытый контракт: интеграция 1С:ERP и WMS, 6 потоков",
+      "year": 2024,
+      "currency": "RUB",
+      "price": {
+        "low": 4100000,
+        "mid": 4500000,
+        "high": 5200000,
+        "basis": "Цена контракта"
+      },
+      "sourceId": "src-an-pub-1",
+      "url": "https://zakupki.gov.ru/epz/order/notice/1c-wms-2024",
+      "date": "2024-09-01",
+      "normalization": {
+        "kScope": 0.95,
+        "kComplexity": 1.02,
+        "kRegion": 1.05,
+        "kAge": 1.1,
+        "kVat": 1.2
+      },
+      "vatFlag": true,
+      "scopeVector": {
+        "streams": 6,
+        "platform": "1C",
+        "system": "WMS",
+        "region": "RU"
+      },
+      "normalizedPriceRub": 6043653,
+      "included": true
+    }
+  ],
+  "warnings": [
+    {
+      "code": "analogue_basis",
+      "message": "НМЦК, не победная цена; НДС не расщеплён",
+      "severity": "info",
+      "refs": [
+        "an_tmk_1c_1",
+        "an_tmk_1c_2",
+        "an_pub_1c_1"
+      ]
+    }
+  ],
+  "formulaTree": {
+    "id": "cost_p50",
+    "label": "Стоимость реализации (P50)",
+    "kind": "total",
+    "valueRub": 4804230,
+    "formula": "cl-hybrid-inhouse-labor + cl-hybrid-contractor-labor + cl-hybrid-hiring + cl-hybrid-rampup + cl-hybrid-inhouse-coordination + cl-hybrid-contractor-coordination + cl-hybrid-contractor-acceptance",
+    "inputs": [],
+    "children": [
+      {
+        "id": "cl-hybrid-inhouse-labor",
+        "label": "Трудозатраты in-house (610 ч × 3 830 ₽/ч, 4 из 6 потоков)",
+        "kind": "line",
+        "valueRub": 2336300,
+        "formula": "610 × 3830",
+        "inputs": [
+          "effort.p50Hours",
+          "rate-inhouse-middle"
+        ],
+        "refs": [
+          "effort.p50Hours",
+          "rate-inhouse-middle"
+        ]
+      },
+      {
+        "id": "cl-hybrid-contractor-labor",
+        "label": "Трудозатраты подрядчика (320 ч × 4 200 ₽/ч, 2 из 6 потоков ≈ 35 %)",
+        "kind": "line",
+        "valueRub": 1344000,
+        "formula": "320 × 4200",
+        "inputs": [
+          "effort.p50Hours",
+          "rate-contractor-middle"
+        ],
+        "refs": [
+          "effort.p50Hours",
+          "rate-contractor-middle"
+        ]
+      },
+      {
+        "id": "cl-hybrid-hiring",
+        "label": "Найм 1С-разработчика",
+        "kind": "line",
+        "valueRub": 420000,
+        "formula": "1.5 оклада + 60 дней поиска",
+        "inputs": [
+          "assumption.hiring"
+        ],
+        "refs": [
+          "assumption.hiring"
+        ]
+      },
+      {
+        "id": "cl-hybrid-rampup",
+        "label": "Ramp-up внутренней части (65 %)",
+        "kind": "line",
+        "valueRub": 201500,
+        "formula": "0.65 × 310000",
+        "inputs": [
+          "assumption.rampup"
+        ],
+        "refs": [
+          "assumption.rampup"
+        ]
+      },
+      {
+        "id": "cl-hybrid-inhouse-coordination",
+        "label": "Координация in-house (10 % от труда команды)",
+        "kind": "line",
+        "valueRub": 233630,
+        "formula": "0.10 × inhouse labor",
+        "inputs": [
+          "cl-hybrid-inhouse-labor"
+        ],
+        "refs": [
+          "cl-hybrid-inhouse-labor"
+        ]
+      },
+      {
+        "id": "cl-hybrid-contractor-coordination",
+        "label": "Координация подрядчика (15 %)",
+        "kind": "line",
+        "valueRub": 201600,
+        "formula": "0.15 × contractor labor",
+        "inputs": [
+          "cl-hybrid-contractor-labor"
+        ],
+        "refs": [
+          "cl-hybrid-contractor-labor"
+        ]
+      },
+      {
+        "id": "cl-hybrid-contractor-acceptance",
+        "label": "Приёмка и передача знаний по 2 потокам (5 %)",
+        "kind": "line",
+        "valueRub": 67200,
+        "formula": "0.05 × contractor labor",
+        "inputs": [
+          "cl-hybrid-contractor-labor"
+        ],
+        "refs": [
+          "cl-hybrid-contractor-labor"
+        ]
+      }
+    ]
+  },
+  "createdAt": "2026-11-09T12:00:00.000Z"
+}
