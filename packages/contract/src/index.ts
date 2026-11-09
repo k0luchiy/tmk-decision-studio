@@ -1,0 +1,2 @@
+// contract package
+export {};
