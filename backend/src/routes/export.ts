@@ -35,12 +35,19 @@ export async function exportRoutes(app: FastifyInstance): Promise<void> {
     }
 
     const estimate = winnerEstimate(stored.verdict.code, stored.result.estimates);
+    const comparison = {
+      estimates: stored.result.estimates,
+      verdict: stored.result.verdict,
+      confidence: stored.result.confidence,
+      ...(stored.state === undefined ? {} : { state: stored.state }),
+    };
     const bundle = await buildExportBundle({
       estimate,
       params: stored.result.params.map((param) => ({ status: param.status })),
       datasetVersion: stored.datasetVersion,
       seed: stored.seed,
       format: body.format,
+      comparison,
     });
 
     reply.header('Content-Type', bundle.mime);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as XLSX from 'xlsx';
+import { PDFDocument } from 'pdf-lib';
 import { EstimateSchema } from '@app/contract';
 import type { Estimate } from '@app/contract';
 import d1ScenariosJson from '../../contract/mock/d1.scenarios.json';
@@ -8,6 +9,14 @@ import type { BuildExportBundleInput, ExportFormat } from './bundle.js';
 
 function firstEstimate(): Estimate {
   return EstimateSchema.parse(d1ScenariosJson[0]);
+}
+
+function scenario(name: Estimate['scenario']): Estimate {
+  const raw = d1ScenariosJson.find((item) => item.scenario === name);
+  if (raw === undefined) {
+    throw new Error(`Missing D1 scenario ${name}`);
+  }
+  return EstimateSchema.parse(raw);
 }
 
 function input(format: ExportFormat): BuildExportBundleInput {
@@ -42,6 +51,26 @@ describe('buildExportBundle', () => {
     expect(pdf.mime).toBe('application/pdf');
     expect(pdf.filename).toBe(`${firstEstimate().id}.pdf`);
     expect(pdf.data.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  });
+
+  it('renders the three-scenario comparison into the PDF bundle', async () => {
+    const inhouse = scenario('inhouse');
+    const contractor = scenario('contractor');
+    const hybrid = scenario('hybrid');
+    const pdf = await buildExportBundle({
+      ...input('pdf'),
+      comparison: {
+        estimates: { inhouse, contractor, hybrid },
+        verdict: hybrid.verdict,
+        confidence: hybrid.confidence,
+        state: { source: 'bundle-test' },
+      },
+    });
+
+    expect(pdf.data.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+    expect(pdf.data.byteLength).toBeGreaterThan(20_000);
+    const document = await PDFDocument.load(pdf.data);
+    expect(document.getPageCount()).toBeGreaterThanOrEqual(3);
   });
 
   it('blocks export when a parameter is still auto-derived', async () => {

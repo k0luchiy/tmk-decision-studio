@@ -1,10 +1,20 @@
 /** Decision pages of the TMK Decision Studio report (sections 1–6). */
 
-import type { Estimate } from '@app/contract';
+import type { ConfidenceScore, Estimate } from '@app/contract';
 import { breakEvenChart, confidenceBars, costRangeChart, tcoChart } from './charts.js';
-import { badge, coverHeader, divider, ensureSpace, kpiCard, note, sectionTitle } from './components.js';
+import {
+  badge,
+  coverHeader,
+  divider,
+  ensureSpace,
+  kpiCard,
+  note,
+  sectionTitle,
+} from './components.js';
 import type { PageMeta } from './components.js';
-import { barRow, table } from './tables.js';
+import { comparisonSection, verdictCodeLabel } from './comparison.js';
+import type { PdfContext } from './context.js';
+import { barRow } from './tables.js';
 import type { Fonts } from './fonts.js';
 import {
   COLORS,
@@ -12,16 +22,11 @@ import {
   TYPE,
   confidenceColor,
   confidenceLabel,
-  costIndex,
-  cumulativeTco,
   dateRu,
   hours,
   money,
   moneyShort,
-  millions,
-  num,
   pct,
-  scenarioName,
   weeks,
 } from './theme.js';
 
@@ -34,20 +39,30 @@ function caption(doc: PDFKit.PDFDocument, fonts: Fonts, text: string, y: number)
   return y + 14;
 }
 
-function verdictSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
+function verdictSection(
+  doc: PDFKit.PDFDocument,
+  fonts: Fonts,
+  estimate: Estimate,
+  context: PdfContext | undefined,
+  y: number,
+): number {
   y = sectionTitle(doc, fonts, 2, 'Вердикт', y);
   const x = doc.page.margins.left;
   const width = contentWidth(doc);
   const boxHeight = 74;
+  const code = context?.verdict?.code ?? estimate.verdict.code;
+  const text = context?.verdict?.text ?? estimate.verdict.text;
+  const confidence = context?.confidence ?? estimate.confidence;
+
   doc.save().fillColor(COLORS.surface).rect(x, y, width, boxHeight).fill();
   doc.fillColor(COLORS.brand).rect(x, y, 4, boxHeight).fill().restore();
   doc.font(fonts.body).fontSize(TYPE.label).fillColor(COLORS.muted).text(
-    `СЦЕНАРИЙ · ${scenarioName(estimate.scenario).toUpperCase()}`,
+    `РЕКОМЕНДАЦИЯ · ${verdictCodeLabel(code).toUpperCase()}`,
     x + 14,
     y + 10,
     { lineBreak: false },
   );
-  doc.font(fonts.body).fontSize(TYPE.body).fillColor(COLORS.ink).text(estimate.verdict.text, x + 14, y + 24, {
+  doc.font(fonts.body).fontSize(TYPE.body).fillColor(COLORS.ink).text(text, x + 14, y + 24, {
     width: width - 28,
   });
   y += boxHeight + SPACE.md;
@@ -76,8 +91,8 @@ function verdictSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimat
   });
   y += cardHeight + SPACE.sm;
 
-  const level = estimate.confidence.level;
-  const badgeWidth = badge(doc, fonts, x, y, `Уверенность ${estimate.confidence.score}/100 · ${confidenceLabel(level)}`, confidenceColor(level));
+  const level = confidence.level;
+  const badgeWidth = badge(doc, fonts, x, y, `Уверенность ${confidence.score}/100 · ${confidenceLabel(level)}`, confidenceColor(level));
   doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text(
     'Вердикт — оценка порядка, не смета: все числа — вероятностные диапазоны и требуют подтверждения перед закупкой.',
     x + badgeWidth + SPACE.sm,
@@ -88,40 +103,6 @@ function verdictSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimat
 
   y = costRangeChart(doc, fonts, x, y + SPACE.sm, width, estimate);
   return caption(doc, fonts, 'P10–P90 — вероятностный коридор; точка P50 — медианная оценка. Цвет — акцент на P50.', y);
-}
-
-function comparisonSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
-  y = sectionTitle(doc, fonts, 3, 'Сравнение сценариев', y);
-  const row = [
-    scenarioName(estimate.scenario),
-    millions(estimate.cost.p10Rub),
-    millions(estimate.cost.p50Rub),
-    millions(estimate.cost.p80Rub),
-    millions(estimate.cost.p90Rub),
-    weeks(estimate.duration.p50Weeks),
-    `${millions(cumulativeTco(estimate, 1) ?? 0)} / ${millions(cumulativeTco(estimate, 3) ?? 0)} / ${millions(cumulativeTco(estimate, 5) ?? 0)}`,
-    num(costIndex(estimate)),
-  ];
-  y = table(doc, fonts, {
-    y,
-    columns: [
-      { header: 'Сценарий', width: 110 },
-      { header: 'P10', width: 48, align: 'right' },
-      { header: 'P50', width: 48, align: 'right' },
-      { header: 'P80', width: 48, align: 'right' },
-      { header: 'P90', width: 48, align: 'right' },
-      { header: 'Срок', width: 42, align: 'right' },
-      { header: 'TCO 1/3/5, млн', width: 95, align: 'right' },
-      { header: 'Индекс', width: 56, align: 'right' },
-    ],
-    rows: [row],
-  });
-  return note(
-    doc,
-    fonts,
-    'P10–P90 и TCO — млн ₽ (TCO накопительно на 1/3/5 год); индекс — стоимость P50 за час. В отчёт выгружен сценарий, выбранный движком; полная матрица трёх сценариев доступна в кокпите до экспорта.',
-    y,
-  );
 }
 
 function costStructureSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
@@ -159,15 +140,20 @@ function tcoSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate): 
   );
 }
 
-function confidenceSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
+function confidenceSection(
+  doc: PDFKit.PDFDocument,
+  fonts: Fonts,
+  confidence: ConfidenceScore,
+  y: number,
+): number {
   y = sectionTitle(doc, fonts, 6, 'Уверенность', y);
   const x = doc.page.margins.left;
-  const level = estimate.confidence.level;
-  doc.font(fonts.condensed).fontSize(TYPE.metricLg).fillColor(COLORS.ink).text(`${estimate.confidence.score} / 100`, x, y, { lineBreak: false });
+  const level = confidence.level;
+  doc.font(fonts.condensed).fontSize(TYPE.metricLg).fillColor(COLORS.ink).text(`${confidence.score} / 100`, x, y, { lineBreak: false });
   const badgeWidth = badge(doc, fonts, x + 168, y + 9, confidenceLabel(level), confidenceColor(level));
   doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text('класс уверенности', x + 168 + badgeWidth + 8, y + 13, { lineBreak: false });
   y += 36;
-  y = confidenceBars(doc, fonts, x, y, contentWidth(doc), estimate);
+  y = confidenceBars(doc, fonts, x, y, contentWidth(doc), confidence);
   return note(
     doc,
     fonts,
@@ -179,16 +165,17 @@ function confidenceSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Esti
 export interface ReportContext {
   estimate: Estimate;
   meta: PageMeta;
+  comparison?: PdfContext;
 }
 
 export function writeDecisionPages(doc: PDFKit.PDFDocument, fonts: Fonts, context: ReportContext): void {
-  const { estimate, meta } = context;
+  const { estimate, meta, comparison } = context;
   let y = coverHeader(doc, fonts, meta);
-  y = verdictSection(doc, fonts, estimate, y);
-  y = comparisonSection(doc, fonts, estimate, y);
+  y = verdictSection(doc, fonts, estimate, comparison, y);
+  y = comparisonSection(doc, fonts, estimate, comparison, y);
   costStructureSection(doc, fonts, estimate, y);
   const confidenceY = tcoSection(doc, fonts, estimate);
-  confidenceSection(doc, fonts, estimate, confidenceY);
+  confidenceSection(doc, fonts, comparison?.confidence ?? estimate.confidence, confidenceY);
   divider(doc, doc.page.margins.left, doc.page.height - 90, contentWidth(doc), COLORS.border, 0.6);
   doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text(
     `Отчёт TMK Decision Studio · ${dateRu(meta.createdAt)} · оценка порядка, не смета`,

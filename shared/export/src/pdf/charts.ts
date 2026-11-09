@@ -1,6 +1,6 @@
 /** Vector charts drawn with PDFKit primitives — no charting dependency. */
 
-import type { Estimate } from '@app/contract';
+import type { ConfidenceScore, Estimate } from '@app/contract';
 import { COLORS, SPACE, TYPE, hours, moneyShort, num, weeks } from './theme.js';
 import type { Fonts } from './fonts.js';
 
@@ -214,9 +214,9 @@ export function confidenceBars(
   x: number,
   y: number,
   width: number,
-  estimate: Estimate,
+  confidence: ConfidenceScore,
 ): number {
-  const components = estimate.confidence.components;
+  const components = confidence.components;
   let cursor = y;
   if (components.length === 0) {
     doc.font(fonts.body).fontSize(TYPE.bodyS).fillColor(COLORS.muted).text('Компоненты уверенности не переданы.', x, cursor);

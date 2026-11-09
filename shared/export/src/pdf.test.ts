@@ -12,6 +12,43 @@ function firstEstimate(): Estimate {
   return scenarios[0] as Estimate;
 }
 
+function scenario(name: Estimate['scenario']): Estimate {
+  const found = scenarios.find((item) => item.scenario === name);
+  if (found === undefined) {
+    throw new Error(`Missing D1 scenario ${name}`);
+  }
+  return found;
+}
+
+function threeScenarioContext() {
+  const inhouse = scenario('inhouse');
+  const contractor = scenario('contractor');
+  const hybrid = scenario('hybrid');
+  return {
+    estimates: { inhouse, contractor, hybrid },
+    verdict: {
+      code: 'hybrid' as const,
+      templateId: 'hybrid_v1',
+      text: 'Рекомендация: гибрид — подрядчик на критическом пути, команда на остальном.',
+      numbersRefs: [],
+    },
+    confidence: hybrid.confidence,
+  };
+}
+
+function parityContext() {
+  const context = threeScenarioContext();
+  return {
+    ...context,
+    verdict: {
+      code: 'parity' as const,
+      templateId: 'parity_v1',
+      text: 'Паритет: сценарии сопоставимы по TCO, выбор — по рискам и компетенциям.',
+      numbersRefs: [],
+    },
+  };
+}
+
 function pdftotext(buffer: Buffer): string | undefined {
   const result = spawnSync('pdftotext', ['-enc', 'UTF-8', '-', '-'], {
     input: buffer,
@@ -53,6 +90,33 @@ describe('toPdf (TMK Decision Studio)', () => {
       expect(document.getPageCount()).toBeGreaterThanOrEqual(3);
       expect(buffer.byteLength).toBeGreaterThan(20_000);
     }
+  });
+
+  it('renders the three-scenario matrix and recommendation from context', async () => {
+    const buffer = await toPdf(scenario('hybrid'), threeScenarioContext());
+    expect(buffer.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+    const document = await PDFDocument.load(buffer);
+    expect(document.getPageCount()).toBeGreaterThanOrEqual(3);
+
+    const text = pdftotext(buffer);
+    if (text === undefined) {
+      return;
+    }
+    expect(text).toContain('Внутренняя команда');
+    expect(text).toContain('Подрядчик');
+    expect(text).toContain('Гибрид');
+    expect(text).toMatch(/РЕКОМЕНДАЦИЯ · ГИБРИД/u);
+    expect(text).toMatch(/рекоменд/iu);
+  });
+
+  it('marks every scenario as parity when the verdict is parity', async () => {
+    const text = pdftotext(await toPdf(scenario('hybrid'), parityContext()));
+    if (text === undefined) {
+      return;
+    }
+    expect(text).toMatch(/паритет/iu);
+    expect(text).toContain('Внутренняя команда');
+    expect(text).toContain('Подрядчик');
   });
 
   it('extracts Cyrillic brand and report sections with pdftotext', async () => {

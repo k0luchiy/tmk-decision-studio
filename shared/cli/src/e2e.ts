@@ -136,6 +136,11 @@ export async function runE2E(baseDir: string = process.cwd()): Promise<E2EContro
     // Demo shortcut: the review table is auto-confirmed so the export gate
     // opens. A real UI blocks export until a human confirms every parameter.
     const exportParams = intake.params.map(() => ({ status: 'confirmed' }));
+    const comparison = {
+      estimates: result.estimates,
+      verdict: result.verdict,
+      confidence: result.confidence,
+    };
 
     for (const format of FORMATS) {
       const bundle = await buildExportBundle({
@@ -144,6 +149,7 @@ export async function runE2E(baseDir: string = process.cwd()): Promise<E2EContro
         datasetVersion,
         seed,
         format,
+        comparison,
       });
       writeFileSync(path.join(outDir, `${brief.id}.${format}`), bundle.data);
     }

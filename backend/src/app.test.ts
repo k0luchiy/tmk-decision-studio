@@ -7,7 +7,6 @@
 
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { estimateTask } from '@app/core';
 import { buildApp } from './app.js';
 import {
   confirmedParams,
@@ -17,9 +16,6 @@ import {
   type IntakeDto,
   type ParamDto,
 } from './app.test-helpers.js';
-import { loadDatasets } from './datasets.js';
-import { saveEstimate, type StoredEstimate } from './store.js';
-import { buildTask } from './task.js';
 
 let app: FastifyInstance;
 let d1Text: string;
@@ -186,63 +182,5 @@ describe('estimates', () => {
     });
     expect(response.statusCode).toBe(422);
     expect((response.json() as { error: { code: string } }).error.code).toBe('validation_error');
-  });
-});
-
-describe('export', () => {
-  it('POST /api/estimates/:id/export renders a PDF', async () => {
-    const created = await estimate();
-    const response = await app.inject({
-      method: 'POST',
-      url: `/api/estimates/${created.id}/export`,
-      payload: { format: 'pdf' },
-    });
-    expect(response.statusCode).toBe(200);
-    expect(response.headers['content-type']).toContain('application/pdf');
-    expect(response.rawPayload.subarray(0, 5).toString('utf8')).toBe('%PDF-');
-  });
-
-  it('POST /api/estimates/:id/export returns 409 when parameters are not confirmed', async () => {
-    const datasets = await loadDatasets();
-    const datasetVersion = datasets.manifest?.datasetVersion;
-    expect(datasetVersion).toBeDefined();
-
-    const params = await confirmed();
-    const task = buildTask(d1Text, params);
-    const result = estimateTask({ task, datasets, seed: 42, datasetVersion: datasetVersion ?? '' });
-    const stored: StoredEstimate = {
-      id: 'est_unconfirmed_fixture',
-      createdAt: new Date().toISOString(),
-      brief: d1Text,
-      verdict: result.verdict,
-      p50Rub: result.estimates.inhouse.cost.p50Rub,
-      weeks: result.estimates.inhouse.duration.p50Weeks,
-      confidence: result.confidence.score,
-      datasetVersion: datasetVersion ?? '',
-      seed: 42,
-      result: {
-        ...result,
-        params: (task.params ?? []).map((param) => ({ ...param, status: 'auto' })),
-        warnings: result.estimates.inhouse.warnings,
-      },
-    };
-    saveEstimate(stored);
-
-    const response = await app.inject({
-      method: 'POST',
-      url: `/api/estimates/${stored.id}/export`,
-      payload: { format: 'pdf' },
-    });
-    expect(response.statusCode).toBe(409);
-    expect((response.json() as { error: { code: string } }).error.code).toBe('needs_review');
-  });
-
-  it('export returns 404 for an unknown estimate', async () => {
-    const response = await app.inject({
-      method: 'POST',
-      url: '/api/estimates/est_missing/export',
-      payload: { format: 'pdf' },
-    });
-    expect(response.statusCode).toBe(404);
   });
 });

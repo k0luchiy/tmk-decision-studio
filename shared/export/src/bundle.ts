@@ -9,6 +9,7 @@
 
 import type { Estimate } from '@app/contract';
 import { toPdf } from './pdf.js';
+import type { PdfContext } from './pdf.js';
 import { snapshotHash, toSnapshot } from './snapshot.js';
 import { toXlsx } from './xlsx.js';
 
@@ -41,6 +42,8 @@ export interface BuildExportBundleInput {
   datasetVersion: string;
   seed: number;
   format: ExportFormat;
+  /** Optional cross-scenario data rendered only into the PDF report. */
+  comparison?: PdfContext;
 }
 
 /** Rendered export ready to be written to disk. */
@@ -102,7 +105,7 @@ export async function buildExportBundle(input: BuildExportBundleInput): Promise<
       return {
         filename: `${estimate.id}.pdf`,
         mime: MIME.pdf,
-        data: await toPdf(estimate),
+        data: await toPdf(estimate, input.comparison),
       };
   }
 }

@@ -5,18 +5,23 @@ import type { Estimate } from '@app/contract';
 import { writeAppendixPages } from './appendix.js';
 import { drawFooters } from './components.js';
 import type { PageMeta } from './components.js';
+import type { PdfContext } from './context.js';
 import { registerFonts } from './fonts.js';
 import { PAGE } from './theme.js';
 import { writeDecisionPages } from './sections.js';
 
+export type { PdfContext } from './context.js';
+
 /**
- * Renders a branded PDF report for a single estimate.
+ * Renders a branded PDF report for an estimate.
  *
- * The contract is unchanged: the caller gets a `Buffer`. The report always has
- * a decision page plus appendices, embeds DejaVu (Cyrillic) fonts from the
- * package assets, and degrades gracefully when optional collections are empty.
+ * Without `context` the report keeps the legacy single-scenario layout. When
+ * the API passes `context`, the verdict/confidence blocks use the aggregate
+ * values and section 3 renders the full in-house / contractor / hybrid matrix.
+ * The caller always gets a `Buffer`; DejaVu (Cyrillic) fonts come from the
+ * package assets and the renderer degrades gracefully for empty collections.
  */
-export function toPdf(estimate: Estimate): Promise<Buffer> {
+export function toPdf(estimate: Estimate, context?: PdfContext): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     const doc = new PDFDocument({
       size: 'A4',
@@ -50,7 +55,11 @@ export function toPdf(estimate: Estimate): Promise<Buffer> {
 
     try {
       const fonts = registerFonts(doc);
-      writeDecisionPages(doc, fonts, { estimate, meta });
+      writeDecisionPages(doc, fonts, {
+        estimate,
+        meta,
+        ...(context === undefined ? {} : { comparison: context }),
+      });
       writeAppendixPages(doc, fonts, estimate);
       drawFooters(doc, fonts, meta, doc.bufferedPageRange().count);
       doc.end();
