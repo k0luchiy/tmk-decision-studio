@@ -39,13 +39,14 @@ RadioHack4.0/
 ├── LICENSE                      # MIT
 ├── .env.example                 # ключ OpenCode (Jev), без значений
 ├── docs/                        # эта папка
-├── research/                    # исследование (как есть)
-├── data/                        # версионируемые датасеты (копии для запуска)
-│   ├── rates/                   # rate_cards.json, contractor_rate_cards.json
-│   ├── archetypes/              # work_archetypes.json
-│   ├── analogues/               # analogue_corpus.json, tmk_contracts.json
-│   ├── coefficients/            # coefficients.json
-│   ├── seeds/                   # D1.json, D2.json, D3.json (демо-брифы и ожидаемые результаты)
+├── research/                    # архив исследования и исходных материалов (не runtime)
+├── data/                        # версионируемые рабочие данные (копии для запуска)
+│   ├── datasets/                # rate_cards, contractor_rate_cards, work_archetypes, analogue_corpus, coefficients, tmk_it_contracts
+│   ├── schemas/                 # helpdesk_import_schema.json
+│   ├── import/                  # helpdesk-sample.xlsx (обезличенный пример выгрузки)
+│   ├── seeds/                   # control.json (ожидания D1–D3)
+│   ├── eval/                    # briefs.json (12 брифов с метками)
+│   ├── cache/                   # кэш ответов Jev
 │   └── manifest.json            # версия каждого файла, дата, хеш, источник
 ├── packages/
 │   ├── core/                    # ЧИСТОЕ ЯДРО
@@ -68,8 +69,9 @@ RadioHack4.0/
 │   │   └── jev/                 # адаптер Jev (systemone), вопросы, валидация ответа
 │   └── export/                  # PDF (print), XLSX, JSON-снимок
 ├── apps/
-│   └── web/                     # React UI (кокпит)
-├── scripts/                     # пересборка данных из research/, проверка манифеста
+│   ├── web/                     # React UI (кокпит)
+│   └── api/                     # Fastify backend-for-frontend
+├── scripts/                     # пересборка данных из data/datasets/, проверка манифеста
 └── tests/
     ├── core/                    # unit: формулы, Монте-Карло (фиксированный seed), граничные случаи
     ├── data/                    # валидация, импорт 4 строк и 100+ строк
@@ -142,7 +144,7 @@ DataQualityReport  dataset, rows_total, rows_ok, rows_dropped[{row, reason}], an
 
 ## 5. Импорт HelpDesk
 
-Источник: `research/data/Выгрузка полей.xlsx` (4 строки × 16 колонок) и схема `data/product/helpdesk_import_schema.json`. Анализ — `research/20`.
+Источник: `data/import/helpdesk-sample.xlsx` (4 строки × 16 колонок) и схема `data/schemas/helpdesk_import_schema.json`. Анализ — `research/20`.
 
 ### 5.1. Маппинг
 

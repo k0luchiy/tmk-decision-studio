@@ -140,7 +140,7 @@ describe('helpdesk import', () => {
   it('uses the repository root by default via findHelpdeskFile()', async () => {
     const filePath = await findHelpdeskFile();
     expect(filePath.toLowerCase().endsWith('.xlsx')).toBe(true);
-    expect(filePath).toContain('research');
+    expect(filePath).toContain('data');
   });
 
   it('keeps repositoryRoot in sync with the test root', () => {

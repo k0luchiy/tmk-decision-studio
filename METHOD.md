@@ -46,7 +46,7 @@ E = (O + 4·M + P) / 6
 
 - Этапы 1–6 масштабируются долями `STAGE_SHARES`; поддержка (`category:
   support`) — одна работа этапа 7 на весь объём.
-- Источник параметров: `research/data/product/work_archetypes.json`
+- Источник параметров: `data/datasets/work_archetypes.json`
   (`three_point`, `default_role_mix_pct`, `typical_unit_count`,
   `productivity_basis.sources`).
 
@@ -82,7 +82,7 @@ K_age       = 1.08 ^ (targetYear − year), если year ≤ targetYear
 - Для перевода цены в часы используется hours-weighted fully loaded rate из
   `rate_cards.json`; если тип работы не имеет аналогового типа (например,
   поддержка), метод C совпадает с A.
-- Источник: `research/data/product/analogue_corpus.json`,
+- Источник: `data/datasets/analogue_corpus.json`,
   `research/15_sector_analogues.md`.
 
 ## 5. Триангуляция A/B/C
@@ -127,7 +127,7 @@ p90 = p50 + 1.2816·σ
 - Текучесть: `billable × turnover × 0.5 × (avg fully_loaded_month × 12)`,
   `turnover = 0.13`.
 - `avg fully_loaded_month` — среднее по часам ролей.
-- Источник: `research/data/product/rate_cards.json` (`source`,
+- Источник: `data/datasets/rate_cards.json` (`source`,
   `derivation`), `research/07_benchmarks_rates_data.md`,
   `research/05_methodology_estimation.md` §5.3.
 
@@ -141,7 +141,7 @@ p90 = p50 + 1.2816·σ
 - Риск-премия: `Σlabor × 0.20` только для `fixed_price`, иначе 0.
 - НДС: `(labor + coordination + acceptance + risk) × 0.20` при `vat: true`.
 - Другие geo не конвертируются: `UnsupportedGeoError` (нет FX).
-- Источники: `research/data/product/contractor_rate_cards.json`
+- Источники: `data/datasets/contractor_rate_cards.json`
   (`fixed_price_risk_load_pct: [15,30]`), `research/10_product_concept.md` §2-L4.
 
 ## 9. Сценарии, TCO и break-even

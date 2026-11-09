@@ -1,0 +1,1245 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "coefficients.json",
+    "generated": "2026-11-08",
+    "title": "Coefficients and policy defaults for the IT should-cost model",
+    "purpose": "One machine-usable place for statutory rates, hours, workplace loading, overheads, margins, contingency, WACC, inflation policy and COCOMO/size coefficients.",
+    "currency_policy": "All monetary coefficients keep the currency in which the source published them. No FX conversion is applied. USD rows (e.g. $300,000/year contract management) are not converted to RUB.",
+    "period": "2025-2026",
+    "provenance": {
+      "source_of_record": [
+        "research/07_benchmarks_rates_data.md",
+        "research/05_methodology_estimation.md",
+        "research/10_product_concept.md",
+        "research/14_regulatory_estimation_pack.md"
+      ],
+      "note": "Every numeric row carries a source or an explicit 'policy assumption' tag. Where the research pack has no value (CPI, KZ/India/Poland VAT), the value is null and the required feed is named; it is not invented.",
+      "licence_note": "Statutory rates, COCOMO tables and ISBSG-derived aggregate coefficients are cited, not redistributed. No raw ISBSG rows or other restricted datasets are shipped in this file."
+    },
+    "confidence_legend": {
+      "High": "Official statute, primary manual, or a named source that states the value directly.",
+      "Medium": "Arithmetic from High inputs, reputable secondary source, or a small-sample survey.",
+      "Low": "Blog, small or biased sample, ambiguous basis.",
+      "Proxy": "No defensible public value. Built from sourced components and a documented policy assumption; replace before pricing."
+    },
+    "policy_tag": "A value tagged 'policy_assumption' is a product/contract decision, not a market benchmark. It must be shown as an assumption in the estimate, not cited as a source.",
+    "confidence": {
+      "High": "Official statute, primary manual, or a named source that states the value directly.",
+      "Medium": "Arithmetic from High inputs, reputable secondary source, or a small-sample survey.",
+      "Low": "Blog, small or biased sample, ambiguous basis.",
+      "Proxy": "No defensible public value. Built from sourced components and a documented policy assumption; replace before pricing."
+    },
+    "licence_note": "Statutory rates, COCOMO tables and ISBSG-derived aggregate coefficients are cited, not redistributed. No raw ISBSG rows or other restricted datasets are shipped in this file."
+  },
+  "employer_burden_ru": {
+    "year": 2026,
+    "currency": "RUB",
+    "ndfl_employee": {
+      "note": "NDFL is withheld from the employee; it is not an employer contribution. It is listed because the model converts net medians to gross.",
+      "brackets_annual_rub": [
+        {
+          "from": 0,
+          "to": 2400000,
+          "rate_pct": 13
+        },
+        {
+          "from": 2400000,
+          "to": 5000000,
+          "rate_pct": 15
+        },
+        {
+          "from": 5000000,
+          "to": 20000000,
+          "rate_pct": 18
+        },
+        {
+          "from": 20000000,
+          "to": 50000000,
+          "rate_pct": 20
+        },
+        {
+          "from": 50000000,
+          "to": null,
+          "rate_pct": 22
+        }
+      ],
+      "source": "https://www.nalog.gov.ru/rn38/taxation/taxes/ndfl/16453713/",
+      "confidence": "High"
+    },
+    "employer_contributions": {
+      "rate_up_to_threshold_pct": 30,
+      "threshold_rub_per_person_year": 2979000,
+      "rate_above_threshold_pct": 15.1,
+      "formula": "contributions = 0.30 * min(annual_gross, 2,979,000) + 0.151 * max(0, annual_gross - 2,979,000)",
+      "source": "https://www.nalog.gov.ru/rn32/news/seminar/16610341/",
+      "threshold_source": "https://www.nalog.gov.ru/rn77/news/activities_fts/16577139/",
+      "confidence": "High",
+      "note": "Injury contributions 0.2-8.5% by occupational risk class are additional and are NOT included in this formula."
+    },
+    "it_preferential": {
+      "rate_up_to_threshold_pct": 15,
+      "rate_above_threshold_pct": 7.6,
+      "source": "https://www.klerk.ru/buh/articles/669936/",
+      "confidence": "High",
+      "note": "Only for eligible accredited IT companies. Eligibility conditions change; verify before applying. Do not apply the preferential rate by default."
+    },
+    "injury_contributions_pct": {
+      "low": 0.2,
+      "high": 8.5,
+      "source": "research/05 section 6.1; research/06 section on employer on-cost",
+      "confidence": "High",
+      "note": "Depends on the employer's occupational risk class. Not included in any rate card in this pack."
+    },
+    "worked_examples": [
+      {
+        "gross_month": 200000,
+        "annual_gross": 2400000,
+        "contributions_year": 720000,
+        "employer_cost_month": 260000,
+        "gross_multiplier": 1.3,
+        "source": "https://www.nalog.gov.ru/rn32/news/seminar/16610341/",
+        "confidence": "High"
+      },
+      {
+        "gross_month": 250000,
+        "annual_gross": 3000000,
+        "contributions_year": 896871,
+        "employer_cost_month": 324739,
+        "gross_multiplier": 1.299,
+        "source": "https://www.nalog.gov.ru/rn32/news/seminar/16610341/",
+        "confidence": "Medium"
+      },
+      {
+        "gross_month": 300000,
+        "annual_gross": 3600000,
+        "contributions_year": 987471,
+        "employer_cost_month": 382289,
+        "gross_multiplier": 1.274,
+        "source": "https://www.nalog.gov.ru/rn32/news/seminar/16610341/",
+        "confidence": "Medium"
+      },
+      {
+        "gross_month": 500000,
+        "annual_gross": 6000000,
+        "contributions_year": 1349871,
+        "employer_cost_month": 612489,
+        "gross_multiplier": 1.225,
+        "source": "https://www.nalog.gov.ru/rn32/news/seminar/16610341/",
+        "confidence": "Medium"
+      }
+    ],
+    "net_to_gross_to_employer": [
+      {
+        "net_month": 200000,
+        "gross_month": 230588,
+        "ndfl_month": 30588,
+        "employer_payroll_month": 299765,
+        "net_multiplier": 1.499,
+        "source": "https://www.nalog.gov.ru/rn38/taxation/taxes/ndfl/16453713/",
+        "confidence": "Medium"
+      },
+      {
+        "net_month": 300000,
+        "gross_month": 348235,
+        "ndfl_month": 48235,
+        "employer_payroll_month": 437808,
+        "net_multiplier": 1.459,
+        "source": "https://www.nalog.gov.ru/rn38/taxation/taxes/ndfl/16453713/",
+        "confidence": "Medium"
+      },
+      {
+        "net_month": 500000,
+        "gross_month": 589634,
+        "ndfl_month": 89634,
+        "employer_payroll_month": 715658,
+        "net_multiplier": 1.431,
+        "source": "https://www.nalog.gov.ru/rn38/taxation/taxes/ndfl/16453713/",
+        "confidence": "Medium"
+      }
+    ],
+    "severance": {
+      "statutory_months": "1 average monthly earnings, plus a 2nd month if not employed, plus a 3rd month by employment-service decision",
+      "alternative_months": 2,
+      "reserve_recommendation_months": [
+        2,
+        3
+      ],
+      "source": "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+      "confidence": "High"
+    }
+  },
+  "employer_burden_kz": {
+    "year": 2026,
+    "currency": "KZT",
+    "rates": [
+      {
+        "item": "social_tax_SN",
+        "rate_pct": 6,
+        "payer": "employer",
+        "base": "gross minus OPV and VOSMS",
+        "source": "https://kst.kgd.gov.kz/ru/news/izmeneniya-po-socialnomu-nalogu-v-2026-godu-12-163416",
+        "confidence": "High"
+      },
+      {
+        "item": "OPVR_employer_pension",
+        "rate_pct": 3.5,
+        "payer": "employer",
+        "base": "gross, 1-50 MW",
+        "source": "https://uppersetup.com/ru/blog/employer-payroll-taxes-and-contributions-in-kazakhstan-2026",
+        "confidence": "High"
+      },
+      {
+        "item": "social_contributions_SO",
+        "rate_pct": 5,
+        "payer": "employer",
+        "base": "gross minus OPV, capped at 7 minimum wages",
+        "source": "https://vko.kgd.gov.kz/ru/news/socialnye-platezhi-v-respublike-kazahstan-8-160454",
+        "confidence": "High"
+      },
+      {
+        "item": "OSMS_employer_health",
+        "rate_pct": 3,
+        "payer": "employer",
+        "base": "gross, cap 40 minimum wages",
+        "source": "https://uppersetup.com/ru/blog/employer-payroll-taxes-and-contributions-in-kazakhstan-2026",
+        "confidence": "High"
+      },
+      {
+        "item": "OPV_employee_pension",
+        "rate_pct": 10,
+        "payer": "employee",
+        "base": "gross, cap 50 MW",
+        "source": "https://vko.kgd.gov.kz/ru/news/socialnye-platezhi-v-respublike-kazahstan-8-160454",
+        "confidence": "High"
+      },
+      {
+        "item": "VOSMS_employee_health",
+        "rate_pct": 2,
+        "payer": "employee",
+        "base": "gross, cap 20 MW",
+        "source": "https://uppersetup.com/ru/blog/employer-payroll-taxes-and-contributions-in-kazakhstan-2026",
+        "confidence": "High"
+      },
+      {
+        "item": "IPN_personal_income_tax",
+        "rate_pct": 10,
+        "employer_note": "10% up to 8,500 minimum wages per year, 15% above",
+        "payer": "employee",
+        "base": "gross minus OPV and VOSMS",
+        "source": "https://vko.kgd.gov.kz/ru/news/osnovnye-izmeneniya-v-nalogovom-kodekse-rk-s-1-yanvarya-2026-goda-chto-vazhno-znat-o-ipn-i",
+        "confidence": "High"
+      }
+    ],
+    "reference": {
+      "minimum_wage_kzt_month": 85000,
+      "mrp_kzt_month": 4325,
+      "source": "https://zan.kz/kk/news/Details?id=629",
+      "confidence": "High"
+    },
+    "worked_example_1m": {
+      "gross_kzt_month": 1000000,
+      "OPV_employee": 100000,
+      "VOSMS_employee": 20000,
+      "IPN_employee": 88000,
+      "net_kzt_month": 792000,
+      "ST_employer": 52800,
+      "OPVR_employer": 35000,
+      "SO_employer": 29750,
+      "OSMS_employer": 30000,
+      "employer_total": 147550,
+      "employer_cost": 1147550,
+      "gross_multiplier": 1.148,
+      "net_multiplier": 1.449,
+      "source": "research/07 section 4.2",
+      "confidence": "Medium"
+    },
+    "worked_examples_low": [
+      {
+        "gross_kzt_month": 300000,
+        "net_kzt_month": 237600,
+        "employer_total": 48840,
+        "gross_multiplier": 1.163,
+        "net_multiplier": 1.468,
+        "confidence": "Medium"
+      },
+      {
+        "gross_kzt_month": 500000,
+        "net_kzt_month": 396000,
+        "employer_total": 81400,
+        "gross_multiplier": 1.163,
+        "net_multiplier": 1.468,
+        "confidence": "Medium"
+      },
+      {
+        "gross_kzt_month": 1000000,
+        "net_kzt_month": 792000,
+        "employer_total": 147550,
+        "gross_multiplier": 1.148,
+        "net_multiplier": 1.449,
+        "confidence": "Medium"
+      }
+    ],
+    "policy_note": "The KZ IT Park special regime is not modeled; no verified rate card in the research pack. Treat it as a separate legal/tax assessment."
+  },
+  "productive_hours": {
+    "sellable_hours_per_month": 120,
+    "productive_hours_per_year": 1320,
+    "planning_range_hours_per_year": [
+      1200,
+      1400
+    ],
+    "cocomo_nominal_hours_per_person_month": 152,
+    "paid_hours_per_year": 2080,
+    "utilization": {
+      "low": 0.65,
+      "mid": 0.7,
+      "high": 0.75,
+      "high_performer": 0.75,
+      "burnout_threshold": 0.85,
+      "source": "research/05 section 5.3; SPI 2025 benchmark",
+      "confidence": "Medium"
+    },
+    "leave_training_sick_fraction": {
+      "low": 0.1,
+      "high": 0.15,
+      "source": "research/05 section 5.3",
+      "confidence": "Medium"
+    },
+    "effective_hours_formula": "H_eff = 2080 * (1 - leave_fraction) * utilization",
+    "source": "https://www.klerk.ru/materials/2025-10-06/skolko-stoit-chas-raboty-programmista/",
+    "confidence": "High",
+    "note": "Never price a person as 2,080 billable hours. 120 sellable hours/month is the project convention (1,320 productive hours/year)."
+  },
+  "workplace": {
+    "office": {
+      "moscow_class_b_rent_rub_m2_year": 22423,
+      "moscow_class_b_opex_rub_m2_year": 6000,
+      "moscow_class_b_rent_plus_opex_rub_m2_year": 28423,
+      "m2_per_person": [
+        10,
+        12
+      ],
+      "derived_month_10m2": 23686,
+      "derived_month_12m2": 28423,
+      "leased_workstation_rub_month": [
+        36000,
+        52000
+      ],
+      "coworking_rub_month": 56228,
+      "source": "https://media.kf.expert/lenta_analytics/0/889/NF%20GROUP%20_Office%20market%20report_Moscow_Q3%20_2025.pdf",
+      "confidence": "High",
+      "regional_note": "No sourced non-Moscow office figure. Use Moscow as an upper bound and mark regional estimates Proxy."
+    },
+    "hardware": {
+      "peripherals_rub_workstation": 97539,
+      "laptop_pc_rub": [
+        80000,
+        200000
+      ],
+      "component_total_rub_3years": [
+        177539,
+        297539
+      ],
+      "amortized_rub_month": [
+        4932,
+        8265
+      ],
+      "planning_proxy_rub_3years": [
+        150000,
+        300000
+      ],
+      "source": "https://habr.com/ru/articles/827656/",
+      "confidence": "Medium",
+      "note": "The 150-300k per 3 years is a planning proxy; the component build is 177.5-297.5k."
+    },
+    "software_licenses": {
+      "rub_developer_year": [
+        50000,
+        150000
+      ],
+      "share_of_gross_payroll_pct": [
+        5,
+        10
+      ],
+      "source": "no single source",
+      "confidence": "Proxy",
+      "note": "No reliable public per-seat benchmark. Replace with three vendor quotes."
+    },
+    "overhead": {
+      "multiplier": 1.15,
+      "band_pct": [
+        10,
+        18
+      ],
+      "source": "research/10_product_concept.md section 2-L4: social package, training, management 10-18%; 1.15 is the midpoint",
+      "confidence": "Medium",
+      "tag": "policy_assumption",
+      "note": "Applied to employer payroll before adding office/hardware/software. Not a market benchmark."
+    },
+    "full_cost_multiplier": {
+      "gross_basis": [
+        1.3,
+        1.65
+      ],
+      "net_basis": [
+        1.5,
+        1.85
+      ],
+      "source": "research/07 section 5.4",
+      "confidence": "Medium",
+      "note": "State whether a leased office or a co-working desk is included. A co-working desk adds about 32,542 RUB/month versus a 10 m2 leased workplace."
+    }
+  },
+  "coordination_overhead": {
+    "vendor_selection_and_contract_pct_of_total": 3,
+    "ongoing_contract_management_usd_year": 300000,
+    "transition_pct_of_year1_contract": [
+      5,
+      15
+    ],
+    "governance_value_loss_pct_year": [
+      5,
+      30
+    ],
+    "governance_typical_loss_pct": 25,
+    "governance_share_reporting_25pct": 0.63,
+    "hidden_client_cost_outlier_pct_of_contract": 190,
+    "default_coordination_pct_of_contract": [
+      10,
+      25
+    ],
+    "switching": {
+      "selection_months": [
+        6,
+        9
+      ],
+      "knowledge_transfer_months": [
+        0.5,
+        3
+      ],
+      "double_staffing": true
+    },
+    "source": "research/05 section 6.2; https://sloanreview.mit.edu/article/the-hidden-costs-of-it-outsourcing/",
+    "confidence": "Medium",
+    "note": "Set c_c=0.10-0.25 of contract value; keep transition as a separate 5-15% line. Do not bury coordination inside the rate. The 190% figure is a single 26-project outlier, not a default."
+  },
+  "vendor_margin": {
+    "it_staffing_markup_pct_on_pay_rate": [
+      35,
+      50
+    ],
+    "scarce_skills_markup_pct": [
+      65,
+      75
+    ],
+    "gross_margin_pct_on_bill_rate": [
+      20,
+      35
+    ],
+    "some_vendors_gross_margin_pct": [
+      30,
+      50
+    ],
+    "direct_hire_agency_fee_pct_first_year_salary": [
+      18,
+      30
+    ],
+    "pass_through_payrolling_margin_pct_of_bill_rate": [
+      10,
+      20
+    ],
+    "formulas": {
+      "margin_from_markup": "margin = markup / (1 + markup)",
+      "markup_from_margin": "markup = margin / (1 - margin)"
+    },
+    "source": "research/05 section 6.2; https://fullscale.io/blog/staff-augmentation-markup/",
+    "confidence": "Medium",
+    "note": "Margin and markup are different. Convert explicitly; never treat a 30% margin as a 30% markup."
+  },
+  "contingency_policy": {
+    "default_confidence": "P80",
+    "contractual_or_regulatory_confidence": "P90",
+    "primary_formula": "Contingency_P80 = P80 - P50",
+    "legacy_formula": "Contingency_P80 = P80 - E_base, where E_base may be the sum of most-likely values and can sit below P50",
+    "flat_fallback_pct": [
+      15,
+      30
+    ],
+    "flat_fallback_tag": "rule_of_thumb",
+    "default_correlation": 0.5,
+    "lognormal_formulas": {
+      "mu": "mu = (ln(P10) + ln(P90)) / 2",
+      "sigma": "sigma = (ln(P90) - ln(P10)) / (2 * 1.2816)",
+      "P50": "P50 = exp(mu)",
+      "P80": "P80 = exp(mu + 0.8416 * sigma)",
+      "P90": "P90 = exp(mu + 1.2816 * sigma)"
+    },
+    "joint_confidence_warning": "P80 cost and P80 schedule separately gave only 73.6% joint confidence in a correlated example. Do not promise 'P80 cost and P80 date' as an 80% plan.",
+    "source": "research/05 sections 3.2 and 7.2; https://www.vosesoftware.com/Risk-In-Excel/Risk-Analysis-Example-Models-In-Excel/Cost-Contingency-Worked-Example.php",
+    "confidence": "High",
+    "note": "A flat 10% contingency funds only about P58 in the Vose worked example; the P80 contingency was 16.4% of base. Use a distribution, not a flat percentage."
+  },
+  "wacc": {
+    "currency": "USD basis from Damodaran; no FX conversion",
+    "options_pct": [
+      {
+        "label": "US software, system and application",
+        "value_pct": 9.34,
+        "source": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/wacc.html",
+        "source_date": "2026-01",
+        "confidence": "High"
+      },
+      {
+        "label": "US computer services",
+        "value_pct": 7.83,
+        "source": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/wacc.html",
+        "source_date": "2026-01",
+        "confidence": "High"
+      },
+      {
+        "label": "US information services",
+        "value_pct": 7.0,
+        "source": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/wacc.html",
+        "source_date": "2026-01",
+        "confidence": "High"
+      },
+      {
+        "label": "US engineering and construction",
+        "value_pct": 8.69,
+        "source": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/wacc.html",
+        "source_date": "2026-01",
+        "confidence": "High"
+      },
+      {
+        "label": "US total market",
+        "value_pct": 6.96,
+        "source": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/wacc.html",
+        "source_date": "2026-01",
+        "confidence": "High"
+      },
+      {
+        "label": "Emerging-market private IT, planning range",
+        "value_low_pct": 10,
+        "value_high_pct": 15,
+        "source": "research/05 section 6.4",
+        "confidence": "Medium"
+      },
+      {
+        "label": "RU/KZ private industrial IT, practical range",
+        "value_low_pct": 12,
+        "value_high_pct": 18,
+        "source": "research/10_product_concept.md section L5",
+        "confidence": "Medium"
+      }
+    ],
+    "recommended_default_pct": 12,
+    "default_tag": "policy_assumption",
+    "default_note": "12% is inside both the 10-15% emerging-market range and the 12-18% RU/KZ practical range; it is a planning default, not a sourced WACC.",
+    "build_up": "Start from the US industry WACC, add Damodaran's country risk premium and a size/company premium. Document every component.",
+    "country_risk_source": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/ctryprem.html"
+  },
+  "inflation": {
+    "policy": "No inflation index is invented. CPI values must be pulled from Rosstat (RU) or stat.gov.kz (KZ) at run time; the empty values below are intentional and must be filled from a sourced feed.",
+    "ru_cpi_indexation": {
+      "formula": "k = [100 + sum(CPI_t - 100)] / 100, where CPI_t is the monthly consumer price index in % of the previous month",
+      "source": "research/14_regulatory_estimation_pack.md; Order of the Ministry of Economic Development No. 567; Rosstat gks.ru",
+      "values_by_year": [
+        {
+          "year": 2023,
+          "index_pct": null
+        },
+        {
+          "year": 2024,
+          "index_pct": null
+        },
+        {
+          "year": 2025,
+          "index_pct": null
+        },
+        {
+          "year": 2026,
+          "index_pct": null
+        }
+      ],
+      "status": "requires_rosstat_feed",
+      "confidence": "High"
+    },
+    "kz_inflation": {
+      "method": "three-year inflation per the KZ digital-object methodology",
+      "source": "https://adilet.zan.kz/rus/docs/V1900018927",
+      "values_by_year": [
+        {
+          "year": 2024,
+          "index_pct": null
+        },
+        {
+          "year": 2025,
+          "index_pct": null
+        },
+        {
+          "year": 2026,
+          "index_pct": null
+        }
+      ],
+      "status": "requires_stat_gov_kz_feed",
+      "confidence": "High"
+    },
+    "ru_it_salary_growth": [
+      {
+        "year": 2025,
+        "pct": 10,
+        "basis": "hh.ru IT salary growth, cited in research/15 section 4b",
+        "source": "https://habr.com/ru/companies/hh/articles/1010834/",
+        "confidence": "Medium"
+      }
+    ],
+    "project_rate_inflation": [
+      {
+        "year": 2026,
+        "pct": 8,
+        "basis": "UI planning assumption 'rate inflation 8%/yr' in research/08 section 7",
+        "source": "research/08_uiux_design_spec.md",
+        "confidence": "Proxy",
+        "tag": "policy_assumption"
+      }
+    ],
+    "default_rate_inflation_pct_per_year": 8,
+    "default_tag": "policy_assumption",
+    "note": "Use 8%/year only for scenario mode. For a formal NMCK justification, use the Rosstat CPI series, not this default."
+  },
+  "taxes": {
+    "ru_vat": {
+      "rate_pct": 20,
+      "source": "research/10_product_concept.md section 2-L4 ('± НДС 20%')",
+      "confidence": "High",
+      "note": "Rates in the research pack are excl. VAT. Show the VAT flag and recoverability; never silently add VAT."
+    },
+    "kz_vat": {
+      "rate_pct": null,
+      "status": "not_sourced_in_research_pack",
+      "note": "Apply the current KZ Tax Code rate and record it."
+    },
+    "india_gst": {
+      "rate_pct": null,
+      "status": "not_sourced_in_research_pack",
+      "note": "Apply the current GST rate and record it."
+    },
+    "poland_vat": {
+      "rate_pct": null,
+      "status": "not_sourced_in_research_pack",
+      "note": "Apply the current Polish VAT rate and record it."
+    },
+    "kz_ipn": {
+      "rate_pct": 10,
+      "above_threshold_pct": 15,
+      "threshold": "8,500 minimum wages per year",
+      "source": "https://vko.kgd.gov.kz/ru/news/osnovnye-izmeneniya-v-nalogovom-kodekse-rk-s-1-yanvarya-2026-goda-chto-vazhno-znat-o-ipn-i",
+      "confidence": "High"
+    }
+  },
+  "grade_ratios": {
+    "junior": 0.55,
+    "middle": 1.0,
+    "senior": 1.5,
+    "lead": 1.9,
+    "source": "research/07 section 1.3, derived from the RUIT Union ladder (junior 110k, middle 200k, senior 300k, lead 380k net)",
+    "confidence": "Medium",
+    "tag": "derived_planning_aid",
+    "note": "Use only to move a role median to another grade. Not a salary table. Do not apply to a different geography without a local ladder."
+  },
+  "productivity_norms": {
+    "isbsg_pdr": [
+      {
+        "id": "pdr_recent_median",
+        "value": 6.5,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_recent_average",
+        "value": 7.0,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_government_median",
+        "value": 9.7,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_government_mean",
+        "value": 13.7,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_traditional_median",
+        "value": 8.3,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_traditional_p10",
+        "value": 3.2,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2021/08/Short-Paper-2021-06-Productivity-of-Low-Code-projects.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_java_median",
+        "value": 8.7,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_java_p90",
+        "value": 24.2,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_lowcode_median",
+        "value": 1.8,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2021/08/Short-Paper-2021-06-Productivity-of-Low-Code-projects.pdf",
+        "confidence": "High"
+      },
+      {
+        "id": "pdr_lowcode_p90",
+        "value": 2.4,
+        "unit": "hours/FP",
+        "period": "2021",
+        "source": "https://www.isbsg.org/wp-content/uploads/2021/08/Short-Paper-2021-06-Productivity-of-Low-Code-projects.pdf",
+        "confidence": "High"
+      }
+    ],
+    "fp_per_person_month": {
+      "derived_at_160h": {
+        "low": 16.5,
+        "mid": 20.55,
+        "high": 24.6,
+        "source": "derived: 160/9.7 to 160/6.5",
+        "confidence": "Medium"
+      },
+      "isbsg_mdr_most_projects": {
+        "low": 20,
+        "high": 40,
+        "unit": "FP/person/month",
+        "source": "https://www.isbsg.org/wp-content/uploads/2025/01/2024-12-Manpower-Delivery-Rate.pdf",
+        "confidence": "High"
+      },
+      "isbsg_mdr_top10pct": {
+        "value": 160,
+        "unit": "FP/person/month",
+        "source": "https://www.isbsg.org/wp-content/uploads/2025/01/2024-12-Manpower-Delivery-Rate.pdf",
+        "confidence": "High"
+      },
+      "conservative_bid": [
+        15,
+        20
+      ],
+      "mature_java_web_team": [
+        20,
+        30
+      ],
+      "warning": "The widely repeated '7-8 FP per person-month' is a misreading of 7-8 hours per FP. Do not use it."
+    },
+    "ucp": {
+      "karner_default_h_per_ucp": 20,
+      "ribu_observed_range_h_per_ucp": [
+        15,
+        30
+      ],
+      "schneider_winters": [
+        {
+          "negative_environmental_factors": "2 or fewer",
+          "h_per_ucp": 20
+        },
+        {
+          "negative_environmental_factors": "3-4",
+          "h_per_ucp": 28
+        },
+        {
+          "negative_environmental_factors": "more than 4",
+          "h_per_ucp": 36
+        }
+      ],
+      "ochodek_post_hoc_range_h_per_ucp": [
+        4,
+        35
+      ],
+      "source": "https://people.eecs.ku.edu/~saiedian/Teaching/811/Papers/Use-Case-Points/use-case-points-simplify.pdf",
+      "confidence": "Medium"
+    },
+    "fp_per_person_month_by_language": [
+      {
+        "language": "C",
+        "loc_per_fp": 128,
+        "fp_per_person_month_low": 5,
+        "fp_per_person_month_high": 10,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "COBOL",
+        "loc_per_fp": 107,
+        "fp_per_person_month_low": 5,
+        "fp_per_person_month_high": 10,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "C++",
+        "loc_per_fp": 53,
+        "fp_per_person_month_low": 10,
+        "fp_per_person_month_high": 20,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "Java",
+        "loc_per_fp": 53,
+        "fp_per_person_month_low": 10,
+        "fp_per_person_month_high": 20,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "Visual Basic",
+        "loc_per_fp": 40,
+        "fp_per_person_month_low": 10,
+        "fp_per_person_month_high": 20,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "SQL",
+        "loc_per_fp": 13,
+        "fp_per_person_month_low": 30,
+        "fp_per_person_month_high": 50,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "ABAP",
+        "loc_per_fp": 16,
+        "fp_per_person_month_low": 15,
+        "fp_per_person_month_high": 30,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      },
+      {
+        "language": "Access",
+        "loc_per_fp": 38,
+        "fp_per_person_month_low": 16,
+        "fp_per_person_month_high": 23,
+        "source": "https://doi.org/10.5277/e-inf180102",
+        "confidence": "High"
+      }
+    ],
+    "story_points": {
+      "universal_hours_per_point": null,
+      "status": "no_defensible_cross_company_benchmark",
+      "local_calibration_range_hours": [
+        4,
+        16
+      ],
+      "source": "research/07 section 7.3",
+      "confidence": "Proxy"
+    },
+    "scope_creep": {
+      "monthly_growth_pct": 1,
+      "total_change_pct_low": 20,
+      "total_change_pct_high": 53,
+      "source": "research/05 section 7.3",
+      "confidence": "Medium"
+    }
+  },
+  "size_units": {
+    "ifpug_fp_weights": {
+      "ILF": {
+        "low": 7,
+        "average": 10,
+        "high": 15
+      },
+      "EIF": {
+        "low": 5,
+        "average": 7,
+        "high": 10
+      },
+      "EI": {
+        "low": 3,
+        "average": 4,
+        "high": 6
+      },
+      "EO": {
+        "low": 4,
+        "average": 5,
+        "high": 7
+      },
+      "EQ": {
+        "low": 3,
+        "average": 4,
+        "high": 6
+      },
+      "source": "IFPUG CPM 4.3 / ISO/IEC 20926",
+      "note": "Use unadjusted FP. VAF/GSC is optional in CPM 4.3+ and ISBSG reports unadjusted FP."
+    },
+    "ucp_weights": {
+      "actor_simple": 1,
+      "actor_average": 2,
+      "actor_complex": 3,
+      "usecase_simple": 5,
+      "usecase_average": 10,
+      "usecase_complex": 15,
+      "TCF_formula": "TCF = 0.6 + 0.01 * sum(w_i * v_i)",
+      "ECF_formula": "ECF = 1.4 - 0.03 * sum(w_i * v_i)",
+      "source": "https://people.eecs.ku.edu/~saiedian/Teaching/811/Papers/Use-Case-Points/use-case-points-simplify.pdf"
+    },
+    "object_points": {
+      "screen_weights": {
+        "simple": 1,
+        "medium": 2,
+        "difficult": 3
+      },
+      "report_weights": {
+        "simple": 2,
+        "medium": 5,
+        "difficult": 8
+      },
+      "3gl_component_weight": 10,
+      "productivity_nop_per_person_month": {
+        "very_low": 4,
+        "low": 7,
+        "nominal": 13,
+        "high": 25,
+        "very_high": 50
+      },
+      "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf"
+    },
+    "cocomo_ii_2000": {
+      "A": 2.94,
+      "B": 0.91,
+      "C": 3.67,
+      "D": 0.28,
+      "hours_per_person_month": 152,
+      "effort_equation": "PM_NS = A * Size^E * product(EM_i); E = B + 0.01 * sum(SF_j); PM = PM_NS * EM_SCED",
+      "schedule_equation": "TDEV_NS = C * PM_NS^F; F = D + 0.2 * (E - B); TDEV = TDEV_NS * SCED%/100",
+      "scale_factor_max_sum": 31.62,
+      "E_max": 1.2262,
+      "scale_factor_table": {
+        "PREC": {
+          "VL": 6.2,
+          "L": 4.96,
+          "N": 3.72,
+          "H": 2.48,
+          "VH": 1.24,
+          "XH": 0.0
+        },
+        "FLEX": {
+          "VL": 5.07,
+          "L": 4.05,
+          "N": 3.04,
+          "H": 2.03,
+          "VH": 1.01,
+          "XH": 0.0
+        },
+        "RESL": {
+          "VL": 7.07,
+          "L": 5.65,
+          "N": 4.24,
+          "H": 2.83,
+          "VH": 1.41,
+          "XH": 0.0
+        },
+        "TEAM": {
+          "VL": 5.48,
+          "L": 4.38,
+          "N": 3.29,
+          "H": 2.19,
+          "VH": 1.1,
+          "XH": 0.0
+        },
+        "PMAT": {
+          "VL": 7.8,
+          "L": 6.24,
+          "N": 4.68,
+          "H": 3.12,
+          "VH": 1.56,
+          "XH": 0.0
+        }
+      },
+      "effort_multiplier_table": {
+        "RELY": {
+          "VL": 0.82,
+          "L": 0.92,
+          "N": 1.0,
+          "H": 1.1,
+          "VH": 1.26
+        },
+        "DATA": {
+          "L": 0.9,
+          "N": 1.0,
+          "H": 1.14,
+          "VH": 1.28
+        },
+        "CPLX": {
+          "VL": 0.73,
+          "L": 0.87,
+          "N": 1.0,
+          "H": 1.17,
+          "VH": 1.34,
+          "XH": 1.74
+        },
+        "RUSE": {
+          "L": 0.95,
+          "N": 1.0,
+          "H": 1.07,
+          "VH": 1.15,
+          "XH": 1.24
+        },
+        "DOCU": {
+          "VL": 0.81,
+          "L": 0.91,
+          "N": 1.0,
+          "H": 1.11,
+          "VH": 1.23
+        },
+        "TIME": {
+          "N": 1.0,
+          "H": 1.11,
+          "VH": 1.29,
+          "XH": 1.63
+        },
+        "STOR": {
+          "N": 1.0,
+          "H": 1.05,
+          "VH": 1.17,
+          "XH": 1.46
+        },
+        "PVOL": {
+          "L": 0.87,
+          "N": 1.0,
+          "H": 1.15,
+          "VH": 1.3
+        },
+        "ACAP": {
+          "VL": 1.42,
+          "L": 1.19,
+          "N": 1.0,
+          "H": 0.85,
+          "VH": 0.71
+        },
+        "PCAP": {
+          "VL": 1.34,
+          "L": 1.15,
+          "N": 1.0,
+          "H": 0.88,
+          "VH": 0.76
+        },
+        "PCON": {
+          "VL": 1.29,
+          "L": 1.12,
+          "N": 1.0,
+          "H": 0.9,
+          "VH": 0.81
+        },
+        "APEX": {
+          "VL": 1.22,
+          "L": 1.1,
+          "N": 1.0,
+          "H": 0.88,
+          "VH": 0.81
+        },
+        "PLEX": {
+          "VL": 1.19,
+          "L": 1.09,
+          "N": 1.0,
+          "H": 0.91,
+          "VH": 0.85
+        },
+        "LTEX": {
+          "VL": 1.2,
+          "L": 1.09,
+          "N": 1.0,
+          "H": 0.91,
+          "VH": 0.84
+        },
+        "TOOL": {
+          "VL": 1.17,
+          "L": 1.09,
+          "N": 1.0,
+          "H": 0.9,
+          "VH": 0.78
+        },
+        "SITE": {
+          "VL": 1.22,
+          "L": 1.09,
+          "N": 1.0,
+          "H": 0.93,
+          "VH": 0.86,
+          "XH": 0.8
+        },
+        "SCED": {
+          "VL": 1.43,
+          "L": 1.14,
+          "N": 1.0,
+          "H": 1.0,
+          "VH": 1.0
+        }
+      },
+      "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+      "confidence": "High",
+      "note": "17 post-architecture effort multipliers including TOOL; the manual prose says 16 in places but lists 17. Use 17 and document the choice."
+    },
+    "cocomo_81": {
+      "organic": {
+        "a": 2.4,
+        "b": 1.05,
+        "c": 2.5,
+        "d": 0.38
+      },
+      "semi_detached": {
+        "a": 3.0,
+        "b": 1.12,
+        "c": 2.5,
+        "d": 0.35
+      },
+      "embedded": {
+        "a": 3.6,
+        "b": 1.2,
+        "c": 2.5,
+        "d": 0.32
+      },
+      "source": "https://athena.ecs.csus.edu/~buckley/CSc231_files/COCOMO.pdf",
+      "confidence": "High",
+      "note": "COCOMO 81, not COCOMO II.2000. The 3.0 constant is the semi-detached COCOMO 81 value and is a common source of version confusion."
+    },
+    "loc_per_fp_capers_jones": {
+      "C": 128,
+      "COBOL": 107,
+      "FORTRAN": 107,
+      "Pascal": 91,
+      "PL/I": 80,
+      "Ada_83": 71,
+      "JavaScript": 71,
+      "C++": 53,
+      "Java": 53,
+      "Python": 53,
+      "C#": 51,
+      "Ruby": 46,
+      "SQL": 13,
+      "source": "https://doi.org/10.5277/e-inf180102",
+      "confidence": "High",
+      "note": "Logical statements per FP, not physical lines. This is a cited prior, not a conversion law. Calibrate locally."
+    },
+    "conversion_warnings": [
+      "IFPUG FP to COSMIC CFP: no universal ratio; calibrate locally.",
+      "COSMIC CFP to IFPUG FP: same; do not sum the units.",
+      "FP to SLOC: no universal table; calibrate per language and codebase.",
+      "Story points to hours: team-specific; use the team's own velocity history only.",
+      "Object points to FP and UCP to FP: different models; calibrate locally."
+    ]
+  },
+  "risk_and_overrun_priors": {
+    "overrun_evidence": [
+      {
+        "source": "Flyvbjerg and Budzier, 1,471 IT projects",
+        "average_cost_overrun_pct": 27,
+        "one_in_six_average_overrun_pct": 200,
+        "schedule_overrun_pct": 55,
+        "source_url": "https://hbr.org/2011/09/why-your-it-project-may-be-riskier-than-you-think",
+        "confidence": "Medium"
+      },
+      {
+        "source": "McKinsey/Oxford, 5,400+ projects above $15m",
+        "average_cost_overrun_pct": 45,
+        "average_schedule_overrun_pct": 7,
+        "average_value_shortfall_pct": 56,
+        "source_url": "https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/delivering-large-scale-it-projects-on-time-on-budget-and-on-value",
+        "confidence": "Medium"
+      },
+      {
+        "source": "McKinsey software subset",
+        "average_cost_overrun_pct": 66,
+        "average_schedule_overrun_pct": 33,
+        "source_url": "https://www.cio.de/article/3667811/software-projekte-zwei-drittel-uber-dem-budget.html",
+        "confidence": "Medium"
+      }
+    ],
+    "cone_of_uncertainty": [
+      {
+        "phase": "initial_concept",
+        "low_multiplier": 0.25,
+        "high_multiplier": 4.0
+      },
+      {
+        "phase": "approved_product_definition",
+        "low_multiplier": 0.5,
+        "high_multiplier": 2.0
+      },
+      {
+        "phase": "requirements_complete",
+        "low_multiplier": 0.67,
+        "high_multiplier": 1.5
+      },
+      {
+        "phase": "ui_design_complete",
+        "low_multiplier": 0.8,
+        "high_multiplier": 1.25
+      },
+      {
+        "phase": "detailed_design_complete",
+        "low_multiplier": 0.9,
+        "high_multiplier": 1.1
+      }
+    ],
+    "cone_status": "DISPUTED: judgment-based 80% confidence limits, not a measured dataset. Use as a phase prior, not a statistical law.",
+    "schedule_compression": {
+      "effort_exponent": -4,
+      "example": "20% schedule cut -> 1/0.8^4 = 2.44x effort, about +95% over nominal 1.0x",
+      "source": "research/05 section 5.2",
+      "confidence": "High"
+    }
+  },
+  "fx_policy": {
+    "conversion_applied": false,
+    "rule": "Do not convert RUB, KZT or USD in this data pack. Apply the central-bank rate on the estimate date and store {rate, date, source} in the estimate provenance.",
+    "ru_kz_usd_rows": "KZ, India and Poland contractor rates are quoted in USD; KZ payroll burden is quoted in KZT. They are different ledgers and must not be combined without a sourced FX rate.",
+    "source": "research/07 section 11.1 (FX is an explicit gap)"
+  },
+  "sensitivity_policy": {
+    "triangulation_threshold_pct": 10,
+    "method_divergence_threshold_pct": 30,
+    "default_method_weights": {
+      "bottom_up": 0.5,
+      "parametric_fp": 0.2,
+      "analogue": 0.3
+    },
+    "price_with_percentiles": [
+      "P50",
+      "P75",
+      "P80"
+    ],
+    "source": "research/07 section 11.2; research/10 section 2-L2",
+    "note": "Any number that moves the project price by more than 10% needs two independent sources or one source plus internal data. If the three sizing methods diverge by more than 30%, show the divergence; do not average it away."
+  }
+}

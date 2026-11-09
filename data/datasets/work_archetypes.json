@@ -1,0 +1,3415 @@
+{
+  "meta": {
+    "schema_version": "1.0",
+    "file": "work_archetypes.json",
+    "generated": "2026-11-08",
+    "title": "IT work archetypes: default role mix, productivity norms, three-point spread, complexity drivers and risk templates",
+    "purpose": "Bottom-up WBS seed data for the should-cost cockpit. Each archetype is a planning template, not a market price.",
+    "currency_policy": "No currency is embedded in the norms. Hours are currency-free; convert to RUB with rate_cards.json or contractor_rate_cards.json. No FX conversion.",
+    "period": "2025-2026",
+    "basis": "Hours per unit of work. P50 is the most-likely value; O/M/P feed PERT and Monte Carlo.",
+    "provenance": {
+      "source_of_record": [
+        "research/05_methodology_estimation.md",
+        "research/07_benchmarks_rates_data.md"
+      ],
+      "norm_sources": [
+        "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+        "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf",
+        "https://www.isbsg.org/wp-content/uploads/2021/08/Short-Paper-2021-06-Productivity-of-Low-Code-projects.pdf",
+        "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+        "https://doi.org/10.5277/e-inf180102",
+        "https://people.eecs.ku.edu/~saiedian/Teaching/811/Papers/Use-Case-Points/use-case-points-simplify.pdf",
+        "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf"
+      ],
+      "price_anchor_sources": [
+        "research/07 section 9",
+        "research/15_sector_analogues.md",
+        "research/14_regulatory_estimation_pack.md"
+      ],
+      "licence_note": "ISBSG-derived aggregate coefficients are cited, not raw ISBSG rows. ISBSG data cannot be redistributed without a distribution licence."
+    },
+    "confidence_legend": {
+      "High": "The hours-per-unit is a directly published language/platform PDR (e.g. ISBSG low-code, ABAP, government median).",
+      "Medium": "Derived from a published PDR plus a small, explicit adjustment, or cross-checked against a published price anchor.",
+      "Low": "Blog or small-sample source.",
+      "Proxy": "No direct public norm. Built from sourced components and an explicit planning assumption; calibrate before pricing."
+    },
+    "role_mix_policy": "Default role mixes are planning templates derived from the project's integration example (research/10 section 2-L3) and professional judgement. They are NOT benchmarks. Replace them with the client's actual staffing plan.",
+    "unit_policy": "Do not sum hours across different units (FP, flow, report, bot, ticket, object, workload). Convert to hours first, then sum. Do not convert FP to CFP or story points without a local calibration (research/05 section 1.7).",
+    "three_point_policy": "P50 is the most likely value, not a statistical median. Use PERT for the mean and Monte Carlo for P50/P80/P90. Do not quote a single point.",
+    "recalibration": {
+      "procedure": "Replace p50_hours_per_unit and the O/M/P spread with the client's actuals for the same archetype; keep the role mix only if the actual staffing matches. If only total effort is known, back-solve hours per unit from the unit count.",
+      "minimum_sample": "5-10 completed projects per archetype; report MMRE/MdMRE/PRED(25) (research/05 section 9.4).",
+      "what_to_replace_first": [
+        "rpa_bot",
+        "l2_l3_support",
+        "infrastructure_migration",
+        "cv_quality_control",
+        "integration_1c_wms"
+      ]
+    },
+    "confidence": {
+      "High": "The hours-per-unit is a directly published language/platform PDR (e.g. ISBSG low-code, ABAP, government median).",
+      "Medium": "Derived from a published PDR plus a small, explicit adjustment, or cross-checked against a published price anchor.",
+      "Low": "Blog or small-sample source.",
+      "Proxy": "No direct public norm. Built from sourced components and an explicit planning assumption; calibrate before pricing."
+    },
+    "licence_note": "ISBSG-derived aggregate coefficients are cited, not raw ISBSG rows. ISBSG data cannot be redistributed without a distribution licence.",
+    "assumption_register": [
+      {
+        "id": "mobile_premium",
+        "value": "1.45x on the 8.3 h/FP traditional median",
+        "used_in": [
+          "mobile_app"
+        ],
+        "status": "planning_assumption",
+        "basis": "ISBSG says mobile is the lowest-productivity platform but publishes no single mobile PDR in the research pack.",
+        "replace_with": "a mobile-specific PDR from the vendor's history"
+      },
+      {
+        "id": "mes_complexity",
+        "value": "1.2x on the 9.7 h/FP government median",
+        "used_in": [
+          "mes_module"
+        ],
+        "status": "planning_assumption",
+        "basis": "MES adds shop-floor integration, near-real-time constraints and traceability.",
+        "replace_with": "MES actuals or a vendor quote"
+      },
+      {
+        "id": "erp_org_change",
+        "value": "1.2x on the 10 h/FP 1C extension norm",
+        "used_in": [
+          "erp_1c_rollout"
+        ],
+        "status": "planning_assumption",
+        "basis": "ERP rollout adds training, data migration and hypercare beyond configuration.",
+        "replace_with": "a rollout actuals set"
+      },
+      {
+        "id": "legacy_reverse_engineering",
+        "value": "1.35x on the 8.7 h/FP Java median",
+        "used_in": [
+          "legacy_modernization"
+        ],
+        "status": "planning_assumption",
+        "basis": "A rewrite that preserves behaviour needs reverse engineering and regression.",
+        "replace_with": "legacy actuals"
+      },
+      {
+        "id": "1c_fp_norm",
+        "value": "10 h/FP",
+        "used_in": [
+          "functional_extension_1c",
+          "erp_1c_rollout"
+        ],
+        "status": "planning_assumption",
+        "basis": "ISBSG traditional 8.3 h/FP plus 1C configuration/test loading; 1C is not in the ISBSG language table.",
+        "replace_with": "the client's 1C backlog actuals"
+      },
+      {
+        "id": "integration_fp_per_flow",
+        "value": "10-20 FP per flow",
+        "used_in": [
+          "integration_1c_wms"
+        ],
+        "status": "planning_assumption",
+        "basis": "A flow includes 2-6 message types, mapping, error handling and monitoring.",
+        "replace_with": "a flow inventory with message and field counts"
+      },
+      {
+        "id": "rpa_ucp_per_bot",
+        "value": "6-10 UCP per bot",
+        "used_in": [
+          "rpa_bot"
+        ],
+        "status": "planning_assumption",
+        "basis": "No public bot-effort benchmark; UCP is used as a proxy.",
+        "replace_with": "process-mining data"
+      },
+      {
+        "id": "bi_fp_per_report",
+        "value": "2-8 FP per report",
+        "used_in": [
+          "bi_report_pack"
+        ],
+        "status": "planning_assumption",
+        "basis": "Report complexity varies with sources, calculations and layout.",
+        "replace_with": "a report inventory"
+      },
+      {
+        "id": "cv_team_weeks",
+        "value": "8-16 weeks x 3-5 people",
+        "used_in": [
+          "cv_quality_control"
+        ],
+        "status": "planning_assumption",
+        "basis": "Published CV pilot durations and typical team size.",
+        "replace_with": "a pilot quote and data-collection plan"
+      },
+      {
+        "id": "infra_fp_per_workload",
+        "value": "1-2 FP per workload",
+        "used_in": [
+          "infrastructure_migration"
+        ],
+        "status": "planning_assumption",
+        "basis": "No public per-server effort benchmark in the research pack.",
+        "replace_with": "a discovery wave plan"
+      },
+      {
+        "id": "support_hours_per_ticket",
+        "value": "3 h per L2/L3 ticket",
+        "used_in": [
+          "l2_l3_support"
+        ],
+        "status": "planning_assumption",
+        "basis": "No cross-company hours-per-ticket benchmark.",
+        "replace_with": "the client's ITSM history"
+      },
+      {
+        "id": "data_migration_fp_per_entity",
+        "value": "2-4 FP per entity",
+        "used_in": [
+          "data_migration"
+        ],
+        "status": "planning_assumption",
+        "basis": "Entity effort varies with sources, quality and reconciliation.",
+        "replace_with": "data profiling"
+      },
+      {
+        "id": "api_fp_per_endpoint",
+        "value": "1-2 FP per endpoint",
+        "used_in": [
+          "api_gateway"
+        ],
+        "status": "planning_assumption",
+        "basis": "Endpoint effort varies with security, adapters and documentation.",
+        "replace_with": "an API inventory"
+      },
+      {
+        "id": "dwh_fp_per_source",
+        "value": "5-10 FP per source system",
+        "used_in": [
+          "dwh_build"
+        ],
+        "status": "planning_assumption",
+        "basis": "Source effort varies with volume, history and model complexity.",
+        "replace_with": "a source-system inventory"
+      },
+      {
+        "id": "chatbot_fp_per_intent",
+        "value": "1-2 FP per intent",
+        "used_in": [
+          "chatbot_assistant"
+        ],
+        "status": "planning_assumption",
+        "basis": "Intent effort varies with backend actions and evaluation.",
+        "replace_with": "an intent catalogue"
+      },
+      {
+        "id": "observability_fp_per_service",
+        "value": "2 FP per service",
+        "used_in": [
+          "observability_monitoring"
+        ],
+        "status": "planning_assumption",
+        "basis": "Service effort varies with legacy agents, dashboards and retention.",
+        "replace_with": "a service inventory"
+      },
+      {
+        "id": "role_mixes",
+        "value": "22 templates summing to 100%",
+        "used_in": [
+          "all archetypes"
+        ],
+        "status": "planning_assumption",
+        "basis": "Based on research/10 section 2-L3 integration example and professional judgement; not a benchmark.",
+        "replace_with": "the client's actual staffing plan"
+      }
+    ],
+    "default_grade_by_role": {
+      "analyst_ba_sa": "middle",
+      "1c_developer": "middle",
+      "backend": "middle",
+      "frontend": "middle",
+      "mobile": "middle",
+      "qa_manual": "middle",
+      "qa_auto": "middle",
+      "devops_sre": "middle",
+      "architect": "senior",
+      "pm": "lead",
+      "ux": "middle",
+      "infosec": "middle",
+      "data_engineer": "middle",
+      "sysadmin": "senior"
+    },
+    "default_grade_by_role_note": "Planning default for costing a role mix. It mirrors the anchor_grade in rate_cards.json. Replace with the actual grade mix when known; do not price a junior at a senior rate or vice versa."
+  },
+  "role_ids": [
+    "analyst_ba_sa",
+    "1c_developer",
+    "backend",
+    "frontend",
+    "mobile",
+    "qa_manual",
+    "qa_auto",
+    "devops_sre",
+    "architect",
+    "pm",
+    "ux",
+    "infosec",
+    "data_engineer",
+    "sysadmin"
+  ],
+  "archetypes": [
+    {
+      "id": "integration_1c_wms",
+      "name_ru": "Интеграция 1С:ERP ↔ WMS",
+      "name_en": "1C ERP <-> WMS integration",
+      "category": "integration",
+      "unit": "integration_flow",
+      "unit_definition": "One end-to-end business flow with 2-6 message types, field mapping, error handling and monitoring.",
+      "p50_hours_per_unit": 120,
+      "three_point": {
+        "optimistic": 70,
+        "most_likely": 120,
+        "pessimistic": 220
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "10-20 FP/flow x 8.3 h/FP (ISBSG traditional median) = 83-166 h; P50 120 h is the midpoint of the derived interval.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+          "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 15,
+        "1c_developer": 45,
+        "backend": 20,
+        "qa_auto": 12,
+        "pm": 8
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Multiple master-data objects and field mappings across two systems.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Bidirectional flows, error handling, idempotency.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Inventory and warehouse errors are operationally visible.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "PVOL",
+          "rating": "H",
+          "multiplier": 1.15,
+          "effect": "1C and WMS release cycles differ.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "integration_api",
+        "data_quality",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 2,
+        "mid": 6,
+        "high": 15
+      },
+      "secondary_units": [
+        {
+          "unit": "endpoint",
+          "p50_hours_per_unit": 40,
+          "derivation": "5 FP/endpoint x 8.3 h/FP = 41.5 h; proxy.",
+          "confidence": "Proxy",
+          "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        }
+      ],
+      "notes": "Demo D1 in research/10 uses 6 flows and 930 person-hours; this archetype at 6 flows gives 720 h P50, before the integration-specific overhead captured in the D1 WBS. Use the WBS for a bid, not the archetype alone.",
+      "pert": {
+        "expected_hours": 128.33,
+        "sigma_hours": 25.0,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Third-party API or schema instability",
+          "probability": 0.35,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 35,
+          "mechanism": "Partner API changes, rate limits, undocumented behaviour or schema drift break integration (planning estimate).",
+          "mitigation": "Contract tests, API version pinning, adapter layer, sandbox access, fallback batch.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "integration_api"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "functional_extension_1c",
+      "name_ru": "Функциональная доработка 1С",
+      "name_en": "1C functional extension",
+      "category": "1c",
+      "unit": "FP",
+      "unit_definition": "One unadjusted IFPUG/COSMIC-equivalent function point of 1C configuration change, including document form, posting logic and tests.",
+      "p50_hours_per_unit": 10,
+      "three_point": {
+        "optimistic": 6.5,
+        "most_likely": 10,
+        "pessimistic": 16
+      },
+      "productivity_basis": {
+        "method": "ISBSG PDR prior",
+        "derivation": "ISBSG traditional median 8.3 h/FP, plus a 1C configuration/test loading to 10 h/FP; 1C is not in the ISBSG language table, so this is a proxy.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+          "https://doi.org/10.5277/e-inf180102"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 12,
+        "1c_developer": 58,
+        "qa_manual": 10,
+        "qa_auto": 8,
+        "pm": 7,
+        "ux": 5
+      },
+      "complexity_drivers": [
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "1C posting, accounting and integration logic.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Master data and registers.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Financial/accounting errors are material.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "data_quality",
+        "platform_constraint",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 30,
+        "mid": 120,
+        "high": 400
+      },
+      "secondary_units": [],
+      "notes": "1C functional size is not an ISO-certified FP count. Treat the FP as a normalized planning unit and calibrate against the client's 1C backlog.",
+      "pert": {
+        "expected_hours": 10.42,
+        "sigma_hours": 1.58,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "Platform or upgrade constraint",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "1C/ERP platform limits, version lock, or mandatory upgrade changes the design.",
+          "mitigation": "Architecture review, platform roadmap check, upgrade sandbox.",
+          "source": "planning estimate; research/14 lists the 1C/ERP regulatory context",
+          "confidence": "Proxy",
+          "id": "platform_constraint"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "new_web_app",
+      "name_ru": "Новое веб-приложение",
+      "name_en": "New web application",
+      "category": "development",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of a greenfield web application, including backend, frontend, tests and deployment.",
+      "p50_hours_per_unit": 8.7,
+      "three_point": {
+        "optimistic": 3.2,
+        "most_likely": 8.7,
+        "pessimistic": 24.2
+      },
+      "productivity_basis": {
+        "method": "ISBSG PDR",
+        "derivation": "ISBSG Java median 8.7 h/FP; optimistic 3.2 h/FP is the ISBSG traditional P10; pessimistic 24.2 h/FP is the ISBSG Java P90.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Medium"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 10,
+        "frontend": 30,
+        "backend": 30,
+        "ux": 10,
+        "qa_auto": 12,
+        "devops_sre": 5,
+        "pm": 3
+      },
+      "complexity_drivers": [
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Responsive performance and concurrency.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "STOR",
+          "rating": "H",
+          "multiplier": 1.05,
+          "effect": "Data volume and retention.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RUSE",
+          "rating": "L",
+          "multiplier": 0.95,
+          "effect": "Low reuse on a greenfield product.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "N",
+          "multiplier": 1.0,
+          "effect": "Nominal business logic.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "acceptance",
+        "schedule_compression",
+        "adoption"
+      ],
+      "typical_unit_count": {
+        "low": 40,
+        "mid": 120,
+        "high": 400
+      },
+      "secondary_units": [
+        {
+          "unit": "screen",
+          "p50_hours_per_unit": 24,
+          "derivation": "3 FP/screen x 8.7 h/FP = 26 h; 24 h used after rounding; proxy.",
+          "confidence": "Proxy",
+          "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf"
+        }
+      ],
+      "notes": "Use ISBSG PDR as a prior, then calibrate to the team's own delivery rate. Do not treat 8.7 h/FP as a point estimate for a fixed-price bid.",
+      "pert": {
+        "expected_hours": 10.37,
+        "sigma_hours": 3.5,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        }
+      ],
+      "confidence": "Medium",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "mobile_app",
+      "name_ru": "Мобильное приложение",
+      "name_en": "Mobile application",
+      "category": "development",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of a native or cross-platform mobile app, including UI, API integration, tests and store release.",
+      "p50_hours_per_unit": 12,
+      "three_point": {
+        "optimistic": 6.5,
+        "most_likely": 12,
+        "pessimistic": 24.2
+      },
+      "productivity_basis": {
+        "method": "ISBSG PDR + mobile premium",
+        "derivation": "ISBSG reports mobile Android/iOS as the lowest-productivity platforms. Traditional median 8.3 h/FP x 1.45 mobile planning factor = 12 h/FP; the factor is an explicit assumption, not a source.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 8,
+        "mobile": 40,
+        "backend": 20,
+        "ux": 10,
+        "qa_auto": 12,
+        "devops_sre": 5,
+        "pm": 5
+      },
+      "complexity_drivers": [
+        {
+          "driver": "PVOL",
+          "rating": "H",
+          "multiplier": 1.15,
+          "effect": "OS and device fragmentation.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Offline mode, push, permissions, store rules.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Battery and latency constraints.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "STOR",
+          "rating": "H",
+          "multiplier": 1.05,
+          "effect": "On-device storage and sync.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "acceptance",
+        "schedule_compression",
+        "adoption"
+      ],
+      "typical_unit_count": {
+        "low": 50,
+        "mid": 120,
+        "high": 300
+      },
+      "secondary_units": [
+        {
+          "unit": "screen",
+          "p50_hours_per_unit": 30,
+          "derivation": "2.5 FP/screen x 12 h/FP = 30 h; proxy.",
+          "confidence": "Proxy",
+          "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        }
+      ],
+      "notes": "The mobile premium is a planning assumption. Replace it with a mobile-specific PDR from the vendor's history.",
+      "pert": {
+        "expected_hours": 13.12,
+        "sigma_hours": 2.95,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "rpa_bot",
+      "name_ru": "RPA-бот",
+      "name_en": "RPA bot",
+      "category": "automation",
+      "unit": "bot",
+      "unit_definition": "One attended or unattended bot covering a defined process, with exception handling, logging and a control dashboard entry.",
+      "p50_hours_per_unit": 120,
+      "three_point": {
+        "optimistic": 60,
+        "most_likely": 120,
+        "pessimistic": 240
+      },
+      "productivity_basis": {
+        "method": "UCP proxy",
+        "derivation": "6-10 UCP/bot x 20 h/UCP (Karner default) = 120-200 h; P50 120 h is the lower bound and assumes a stable, rules-based process.",
+        "sources": [
+          "https://people.eecs.ku.edu/~saiedian/Teaching/811/Papers/Use-Case-Points/use-case-points-simplify.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 20,
+        "backend": 40,
+        "qa_auto": 15,
+        "pm": 10,
+        "devops_sre": 5,
+        "1c_developer": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Process exceptions and UI changes.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Bot errors can post incorrect transactions.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Input data quality and document variants.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "data_quality",
+        "adoption",
+        "vendor_lockin"
+      ],
+      "typical_unit_count": {
+        "low": 1,
+        "mid": 3,
+        "high": 10
+      },
+      "secondary_units": [],
+      "notes": "RPA is priced per bot in the market; the hours-per-bot range is wide. Calibrate on the client's process-mining data.",
+      "pert": {
+        "expected_hours": 130.0,
+        "sigma_hours": 30.0,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Vendor lock-in / proprietary platform",
+          "probability": 0.2,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Proprietary tooling or data formats make switching costly (research/05 section 7.4).",
+          "mitigation": "Open standards, data export rights, IP ownership, exit plan.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "vendor_lockin"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://people.eecs.ku.edu/~saiedian/Teaching/811/Papers/Use-Case-Points/use-case-points-simplify.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "bi_report_pack",
+      "name_ru": "Пакет BI-отчётов",
+      "name_en": "BI report pack",
+      "category": "bi",
+      "unit": "report",
+      "unit_definition": "One production report or dashboard with a defined data source, transformations, layout, access control and acceptance test.",
+      "p50_hours_per_unit": 40,
+      "three_point": {
+        "optimistic": 16,
+        "most_likely": 40,
+        "pessimistic": 90
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "2-8 FP/report x 8.3 h/FP = 16.6-66.4 h; 40 h is the midpoint; 90 h is a complex-report upper bound.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 20,
+        "data_engineer": 40,
+        "backend": 10,
+        "qa_auto": 10,
+        "pm": 10,
+        "ux": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Multiple sources and conformed dimensions.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Business rules and calculations.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Refresh window and query performance.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "data_quality",
+        "adoption",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 5,
+        "mid": 15,
+        "high": 40
+      },
+      "secondary_units": [
+        {
+          "unit": "dashboard",
+          "p50_hours_per_unit": 24,
+          "derivation": "3 FP/dashboard x 8.3 h/FP = 25 h; 24 h used; proxy.",
+          "confidence": "Proxy",
+          "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        }
+      ],
+      "notes": "A 'report pack' is not a fixed unit. Record the number of reports, sources, rows and refresh frequency in the scope vector.",
+      "pert": {
+        "expected_hours": 44.33,
+        "sigma_hours": 12.33,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "mes_module",
+      "name_ru": "Модуль MES",
+      "name_en": "MES module",
+      "category": "mes",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of an MES module (production order, routing, quality, OEE, traceability or dispatching).",
+      "p50_hours_per_unit": 12,
+      "three_point": {
+        "optimistic": 6.5,
+        "most_likely": 12,
+        "pessimistic": 24.2
+      },
+      "productivity_basis": {
+        "method": "ISBSG government PDR x complexity",
+        "derivation": "ISBSG government median 9.7 h/FP x 1.2 MES complexity factor = 11.6 h/FP, rounded to 12; factor is an explicit planning assumption.",
+        "sources": [
+          "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf",
+          "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 12,
+        "backend": 30,
+        "1c_developer": 20,
+        "qa_auto": 12,
+        "devops_sre": 8,
+        "pm": 8,
+        "data_engineer": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Production and quality data are operationally critical.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Shop-floor integration and master data.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "VH",
+          "multiplier": 1.34,
+          "effect": "Routing, scheduling and traceability logic.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Near-real-time shop-floor events.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "integration_api",
+        "data_quality",
+        "schedule_compression",
+        "security_compliance"
+      ],
+      "typical_unit_count": {
+        "low": 150,
+        "mid": 300,
+        "high": 700
+      },
+      "secondary_units": [],
+      "notes": "MES projects are integration-heavy. Pair the FP estimate with an integration-flow count and a site/work-center count.",
+      "pert": {
+        "expected_hours": 13.12,
+        "sigma_hours": 2.95,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Third-party API or schema instability",
+          "probability": 0.35,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 35,
+          "mechanism": "Partner API changes, rate limits, undocumented behaviour or schema drift break integration (planning estimate).",
+          "mitigation": "Contract tests, API version pinning, adapter layer, sandbox access, fallback batch.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "integration_api"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        },
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "cv_quality_control",
+      "name_ru": "Система компьютерного зрения (контроль качества)",
+      "name_en": "CV quality-control system",
+      "category": "cv",
+      "unit": "control_point",
+      "unit_definition": "One camera/lighting control point with a trained model, integration to the line/PLC and an acceptance data set.",
+      "p50_hours_per_unit": 180,
+      "three_point": {
+        "optimistic": 80,
+        "most_likely": 180,
+        "pessimistic": 400
+      },
+      "productivity_basis": {
+        "method": "published case + team-weeks",
+        "derivation": "Published CV pilots are 8-16 weeks with a 3-5 person team; 480-1,600 h/system. A 1-4 point system at 180 h/point is consistent with the lower half; the upper bound covers a difficult 5+ point line.",
+        "sources": [
+          "research/07 section 9.3",
+          "https://process-buro.com/solutions/production/kontrol-kachestva-kompyuternym-zreniem"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 10,
+        "data_engineer": 30,
+        "backend": 20,
+        "qa_auto": 10,
+        "devops_sre": 10,
+        "pm": 10,
+        "ux": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "RELY",
+          "rating": "VH",
+          "multiplier": 1.26,
+          "effect": "False accept/reject directly affects product quality.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "VH",
+          "multiplier": 1.34,
+          "effect": "Lighting, camera, model and PLC integration.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Labeled data volume and class balance.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Line-speed inference.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "model_drift",
+        "data_quality",
+        "adoption",
+        "integration_api"
+      ],
+      "typical_unit_count": {
+        "low": 1,
+        "mid": 4,
+        "high": 12
+      },
+      "secondary_units": [
+        {
+          "unit": "system",
+          "p50_hours_per_unit": 700,
+          "derivation": "8-16 weeks x 3-5 people = 480-1,600 h; 700 h is a mid-low pilot; proxy.",
+          "confidence": "Proxy",
+          "source": "research/07 section 9.3"
+        }
+      ],
+      "notes": "Published prices are 0.6-5M RUB per system, with hardware often included. Do not use the hours-per-point norm without a data-collection plan.",
+      "pert": {
+        "expected_hours": 200.0,
+        "sigma_hours": 53.33,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Model drift / data drift",
+          "probability": 0.3,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "CV/ML model performance degrades when lighting, cameras, products or data distribution change.",
+          "mitigation": "MLOps monitoring, retraining budget, golden data set, acceptance drift thresholds.",
+          "source": "planning estimate; no public benchmark in the research pack",
+          "confidence": "Proxy",
+          "id": "model_drift"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Third-party API or schema instability",
+          "probability": 0.35,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 35,
+          "mechanism": "Partner API changes, rate limits, undocumented behaviour or schema drift break integration (planning estimate).",
+          "mitigation": "Contract tests, API version pinning, adapter layer, sandbox access, fallback batch.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "integration_api"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://process-buro.com/solutions/production/kontrol-kachestva-kompyuternym-zreniem",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "infrastructure_migration",
+      "name_ru": "Миграция инфраструктуры",
+      "name_en": "Infrastructure migration",
+      "category": "infrastructure",
+      "unit": "workload",
+      "unit_definition": "One server, VM or application workload migrated, including inventory, dependency mapping, migration, validation and rollback plan.",
+      "p50_hours_per_unit": 8,
+      "three_point": {
+        "optimistic": 4,
+        "most_likely": 8,
+        "pessimistic": 20
+      },
+      "productivity_basis": {
+        "method": "FP-equivalent proxy",
+        "derivation": "1-2 FP-equivalent per workload x 8.3 h/FP = 8.3-16.6 h; 8 h is the lower bound for a simple lift-and-shift; 20 h covers a complex workload.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "sysadmin": 35,
+        "devops_sre": 30,
+        "analyst_ba_sa": 10,
+        "qa_auto": 10,
+        "pm": 8,
+        "infosec": 7
+      },
+      "complexity_drivers": [
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Application dependencies and undocumented integrations.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "SITE",
+          "rating": "H",
+          "multiplier": 0.93,
+          "effect": "Multiple sites / data centres.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Cutover downtime is business-critical.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Access, segmentation and audit requirements are compliance-critical.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "schedule_compression",
+        "security_compliance",
+        "vendor_lockin",
+        "key_person"
+      ],
+      "typical_unit_count": {
+        "low": 20,
+        "mid": 60,
+        "high": 300
+      },
+      "secondary_units": [],
+      "notes": "Use a migration-factory wave plan; the per-workload norm is only valid after discovery. Complex ERP/database workloads need a separate estimate.",
+      "pert": {
+        "expected_hours": 9.33,
+        "sigma_hours": 2.67,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        },
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        },
+        {
+          "name": "Vendor lock-in / proprietary platform",
+          "probability": 0.2,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Proprietary tooling or data formats make switching costly (research/05 section 7.4).",
+          "mitigation": "Open standards, data export rights, IP ownership, exit plan.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "vendor_lockin"
+        },
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "security_kii_compliance",
+      "name_ru": "Защита КИИ / 187-ФЗ",
+      "name_en": "KII / 187-FZ security compliance",
+      "category": "security",
+      "unit": "kii_object",
+      "unit_definition": "One KII object through categorization, documentation, protection measures and an acceptance audit.",
+      "p50_hours_per_unit": 160,
+      "three_point": {
+        "optimistic": 60,
+        "most_likely": 160,
+        "pessimistic": 400
+      },
+      "productivity_basis": {
+        "method": "price anchor / cost rate",
+        "derivation": "Categorization offers 55,000-277,800 RUB; at 3,860 RUB/h (the 15 case rate 100M/25,900 h) that is 14-72 h. A protection system starts at 900,000 RUB = about 233 h. A combined object budget of 160 h sits between the two; the anchor is a service price, not an effort study.",
+        "sources": [
+          "research/07 section 9.5",
+          "https://www.altirixgroup.com/napravleniya-deyatelnosti/informaczionnaya-bezopasnost/zakonodatelstvo-i-konsalting/kriticheskaya-informaczionnaya-infrastruktura/kategorirovanie-obektov-kii/"
+        ],
+        "confidence": "Medium"
+      },
+      "default_role_mix_pct": {
+        "infosec": 45,
+        "analyst_ba_sa": 15,
+        "sysadmin": 15,
+        "devops_sre": 10,
+        "pm": 10,
+        "qa_auto": 5
+      },
+      "complexity_drivers": [
+        {
+          "driver": "RELY",
+          "rating": "VH",
+          "multiplier": 1.26,
+          "effect": "Regulatory and audit consequences.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DOCU",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Evidence, policies and reporting.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Legacy segmentation and controls.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "VH",
+          "multiplier": 1.26,
+          "effect": "FSTEC measures and KII category drive mandatory controls.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "security_compliance",
+        "scope_creep",
+        "key_person",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 1,
+        "mid": 5,
+        "high": 20
+      },
+      "secondary_units": [],
+      "notes": "KII categorization is a small fixed-price service; a protection system is a project. Do not price both with one per-object norm.",
+      "pert": {
+        "expected_hours": 183.33,
+        "sigma_hours": 56.67,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "Medium",
+      "source": "https://www.altirixgroup.com/napravleniya-deyatelnosti/informaczionnaya-bezopasnost/zakonodatelstvo-i-konsalting/kriticheskaya-informaczionnaya-infrastruktura/kategorirovanie-obektov-kii/",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "l2_l3_support",
+      "name_ru": "Поддержка L2/L3",
+      "name_en": "L2/L3 support",
+      "category": "support",
+      "unit": "ticket",
+      "unit_definition": "One incident or service request resolved at L2/L3, from intake to closure, excluding development of a permanent fix.",
+      "p50_hours_per_unit": 3,
+      "three_point": {
+        "optimistic": 1,
+        "most_likely": 3,
+        "pessimistic": 10
+      },
+      "productivity_basis": {
+        "method": "planning rule",
+        "derivation": "No public cross-company hours-per-ticket benchmark in the research pack. 3 h is a planning midpoint for L2/L3; use the client's ITSM history to calibrate.",
+        "sources": [
+          "research/05 section 9.3 (defaults are not a ticket benchmark)",
+          "https://www.klerk.ru/materials/2025-10-06/skolko-stoit-chas-raboty-programmista/"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "sysadmin": 40,
+        "backend": 25,
+        "analyst_ba_sa": 15,
+        "qa_manual": 10,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "SLA and business continuity.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Legacy and integration incidents.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DOCU",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Knowledge base and handover quality.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "key_person",
+        "scope_creep",
+        "security_compliance",
+        "adoption"
+      ],
+      "typical_unit_count": {
+        "low": 100,
+        "mid": 400,
+        "high": 2000
+      },
+      "secondary_units": [
+        {
+          "unit": "person_month",
+          "p50_hours_per_unit": 152,
+          "derivation": "COCOMO II nominal person-month = 152 h; productive capacity is lower (120 sellable h/month).",
+          "confidence": "High",
+          "source": "research/05 section 9.3 (defaults are not a ticket benchmark)"
+        }
+      ],
+      "notes": "Support is usually priced per FTE/month or per ticket. The 3 h norm is a proxy; the person-month row is a capacity unit, not a ticket.",
+      "pert": {
+        "expected_hours": 3.83,
+        "sigma_hours": 1.5,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.klerk.ru/materials/2025-10-06/skolko-stoit-chas-raboty-programmista/",
+      "provenance_file": "research/05_methodology_estimation.md",
+      "source_note": "No public hours-per-ticket benchmark exists in the research pack. The cited URL is the 120 sellable-hours/month convention used for capacity; the 3 h/ticket value is a planning proxy and must be calibrated on the client ITSM history."
+    },
+    {
+      "id": "sap_dev",
+      "name_ru": "Разработка SAP/ABAP",
+      "name_en": "SAP/ABAP development",
+      "category": "erp",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of ABAP development or SAP enhancement, including specification, coding, unit test and transport.",
+      "p50_hours_per_unit": 16.7,
+      "three_point": {
+        "optimistic": 8,
+        "most_likely": 16.7,
+        "pessimistic": 30
+      },
+      "productivity_basis": {
+        "method": "ISBSG/Lavazza language PDR",
+        "derivation": "Lavazza et al. (2018) report ABAP 0.060 FP/person-hour = 16.7 h/FP. This is a language-level median, not a project bid.",
+        "sources": [
+          "https://doi.org/10.5277/e-inf180102",
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "High"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 10,
+        "backend": 50,
+        "qa_auto": 12,
+        "pm": 8,
+        "data_engineer": 10,
+        "devops_sre": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "SAP data model and interfaces.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Custom enhancements and user exits.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Financial and supply-chain postings.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "legacy_customization",
+        "data_quality",
+        "key_person",
+        "scope_creep"
+      ],
+      "typical_unit_count": {
+        "low": 100,
+        "mid": 250,
+        "high": 600
+      },
+      "secondary_units": [],
+      "notes": "SAP ABAP is a high-PDR language in the ISBSG/Lavazza table. Do not use Java or low-code PDR for ABAP.",
+      "pert": {
+        "expected_hours": 17.47,
+        "sigma_hours": 3.67,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Undocumented legacy customization",
+          "probability": 0.3,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy code or SAP/1C customizations are undocumented; discovery and regression testing expand.",
+          "mitigation": "Code inventory, automated regression tests, discovery sprint.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "legacy_customization"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        }
+      ],
+      "confidence": "High",
+      "source": "https://doi.org/10.5277/e-inf180102",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "data_migration",
+      "name_ru": "Миграция данных",
+      "name_en": "Data migration",
+      "category": "data",
+      "unit": "entity",
+      "unit_definition": "One source entity/table migrated end-to-end: profiling, mapping, extraction, transformation, load, reconciliation and sign-off.",
+      "p50_hours_per_unit": 24,
+      "three_point": {
+        "optimistic": 8,
+        "most_likely": 24,
+        "pessimistic": 60
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "2-4 FP/entity x 8.3 h/FP = 16.6-33.2 h; 24 h is the midpoint; 60 h covers a dirty, multi-source entity.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "data_engineer": 40,
+        "analyst_ba_sa": 20,
+        "backend": 20,
+        "qa_auto": 10,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "VH",
+          "multiplier": 1.28,
+          "effect": "Volume, quality and number of source systems.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Transformations and business rules.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Reconciliation and audit trail.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "data_quality",
+        "scope_creep",
+        "schedule_compression",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 20,
+        "mid": 60,
+        "high": 200
+      },
+      "secondary_units": [],
+      "notes": "The per-entity norm is only valid after data profiling. A migration with 100+ entities needs a wave plan and a reconciliation factory.",
+      "pert": {
+        "expected_hours": 27.33,
+        "sigma_hours": 8.67,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "low_code",
+      "name_ru": "Low-code приложение",
+      "name_en": "Low-code application",
+      "category": "development",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point delivered on a low-code platform, including configuration, integration, tests and deployment.",
+      "p50_hours_per_unit": 1.8,
+      "three_point": {
+        "optimistic": 0.9,
+        "most_likely": 1.8,
+        "pessimistic": 2.4
+      },
+      "productivity_basis": {
+        "method": "ISBSG low-code PDR",
+        "derivation": "ISBSG low-code median 1.8 h/FP; P90 2.4 h/FP. Optimistic 0.9 is half the median, a planning floor.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2021/08/Short-Paper-2021-06-Productivity-of-Low-Code-projects.pdf"
+        ],
+        "confidence": "High"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 20,
+        "frontend": 30,
+        "backend": 20,
+        "qa_manual": 10,
+        "pm": 10,
+        "ux": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "TOOL",
+          "rating": "VH",
+          "multiplier": 0.78,
+          "effect": "Mature low-code platform.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RUSE",
+          "rating": "H",
+          "multiplier": 1.07,
+          "effect": "Reusable components.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "L",
+          "multiplier": 0.87,
+          "effect": "Limited custom logic.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "PVOL",
+          "rating": "H",
+          "multiplier": 1.15,
+          "effect": "Platform upgrade cadence.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "vendor_lockin",
+        "scope_creep",
+        "adoption",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 30,
+        "mid": 100,
+        "high": 300
+      },
+      "secondary_units": [],
+      "notes": "Low-code PDR is 4-5x better than traditional Java in the ISBSG data. Do not use it for complex custom logic or heavy integration.",
+      "pert": {
+        "expected_hours": 1.75,
+        "sigma_hours": 0.25,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Vendor lock-in / proprietary platform",
+          "probability": 0.2,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Proprietary tooling or data formats make switching costly (research/05 section 7.4).",
+          "mitigation": "Open standards, data export rights, IP ownership, exit plan.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "vendor_lockin"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "High",
+      "source": "https://www.isbsg.org/wp-content/uploads/2021/08/Short-Paper-2021-06-Productivity-of-Low-Code-projects.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "api_gateway",
+      "name_ru": "API gateway / интеграционная шина",
+      "name_en": "API gateway / integration layer",
+      "category": "integration",
+      "unit": "endpoint",
+      "unit_definition": "One governed API endpoint: contract, routing, authentication, rate limiting, logging, tests and documentation.",
+      "p50_hours_per_unit": 12,
+      "three_point": {
+        "optimistic": 4,
+        "most_likely": 12,
+        "pessimistic": 30
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "1-2 FP/endpoint x 8.3 h/FP = 8.3-16.6 h; 12 h is the midpoint; 30 h covers security and legacy adapters.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "backend": 40,
+        "devops_sre": 20,
+        "analyst_ba_sa": 10,
+        "qa_auto": 15,
+        "infosec": 5,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "API is a shared dependency.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Legacy adapters and protocol translation.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Authentication, authorization and audit are shared dependencies.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "integration_api",
+        "security_compliance",
+        "scope_creep",
+        "key_person"
+      ],
+      "typical_unit_count": {
+        "low": 10,
+        "mid": 30,
+        "high": 100
+      },
+      "secondary_units": [],
+      "notes": "An API gateway is infrastructure plus integration. Price the platform build separately from the endpoint factory.",
+      "pert": {
+        "expected_hours": 13.67,
+        "sigma_hours": 4.33,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Third-party API or schema instability",
+          "probability": 0.35,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 35,
+          "mechanism": "Partner API changes, rate limits, undocumented behaviour or schema drift break integration (planning estimate).",
+          "mitigation": "Contract tests, API version pinning, adapter layer, sandbox access, fallback batch.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "integration_api"
+        },
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "dwh_build",
+      "name_ru": "Хранилище данных (DWH)",
+      "name_en": "Data warehouse build",
+      "category": "data",
+      "unit": "source_system",
+      "unit_definition": "One source system onboarded to the DWH: extraction, staging, conformed model, data quality rules and a first report.",
+      "p50_hours_per_unit": 80,
+      "three_point": {
+        "optimistic": 40,
+        "most_likely": 80,
+        "pessimistic": 180
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "5-10 FP/source x 8.3 h/FP = 41.5-83 h; 80 h is the upper midpoint; 180 h covers a complex source with history.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "data_engineer": 45,
+        "analyst_ba_sa": 20,
+        "backend": 10,
+        "qa_auto": 10,
+        "pm": 10,
+        "devops_sre": 5
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "VH",
+          "multiplier": 1.28,
+          "effect": "Source count, volume and history.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Dimensional model and transformations.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Batch window and freshness.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "data_quality",
+        "scope_creep",
+        "adoption",
+        "schedule_compression"
+      ],
+      "typical_unit_count": {
+        "low": 3,
+        "mid": 8,
+        "high": 20
+      },
+      "secondary_units": [],
+      "notes": "DWH price anchors range from 1.5M RUB for an SMB BI pack to 1.11B RUB for Rosatom. Normalize by source systems, users, data volume and whether hardware is included.",
+      "pert": {
+        "expected_hours": 90.0,
+        "sigma_hours": 23.33,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "erp_1c_rollout",
+      "name_ru": "Внедрение 1С:ERP",
+      "name_en": "1C ERP rollout",
+      "category": "erp",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of a 1C ERP rollout, including configuration, data migration support, integration and user training.",
+      "p50_hours_per_unit": 12,
+      "three_point": {
+        "optimistic": 6.5,
+        "most_likely": 12,
+        "pessimistic": 24
+      },
+      "productivity_basis": {
+        "method": "1C PDR + org-change factor",
+        "derivation": "1C functional extension 10 h/FP x 1.2 org-change/training factor = 12 h/FP; the factor is an explicit planning assumption.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 15,
+        "1c_developer": 50,
+        "qa_auto": 10,
+        "pm": 15,
+        "data_engineer": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "CPLX",
+          "rating": "VH",
+          "multiplier": 1.34,
+          "effect": "Process coverage and customization.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DATA",
+          "rating": "VH",
+          "multiplier": 1.28,
+          "effect": "Migration and master data.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "VH",
+          "multiplier": 1.26,
+          "effect": "Financial reporting and audit.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "PVOL",
+          "rating": "H",
+          "multiplier": 1.15,
+          "effect": "Parallel legacy operations.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "data_quality",
+        "adoption",
+        "schedule_compression"
+      ],
+      "typical_unit_count": {
+        "low": 200,
+        "mid": 500,
+        "high": 1200
+      },
+      "secondary_units": [],
+      "notes": "1C ERP price anchors are 1-300M RUB. A rollout is not just configuration; include migration, integration, training and hypercare.",
+      "pert": {
+        "expected_hours": 13.08,
+        "sigma_hours": 2.92,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "legacy_modernization",
+      "name_ru": "Модернизация legacy-системы",
+      "name_en": "Legacy modernization",
+      "category": "development",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of a legacy rewrite or re-platform, including reverse engineering, new code, regression tests and cutover.",
+      "p50_hours_per_unit": 12,
+      "three_point": {
+        "optimistic": 6.5,
+        "most_likely": 12,
+        "pessimistic": 24.2
+      },
+      "productivity_basis": {
+        "method": "ISBSG PDR + legacy factor",
+        "derivation": "ISBSG Java median 8.7 h/FP x 1.35 legacy/reverse-engineering factor = 11.7 h/FP, rounded to 12; factor is a planning assumption.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 10,
+        "backend": 40,
+        "frontend": 20,
+        "qa_auto": 12,
+        "devops_sre": 8,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "CPLX",
+          "rating": "VH",
+          "multiplier": 1.34,
+          "effect": "Undocumented legacy behaviour.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "PVOL",
+          "rating": "H",
+          "multiplier": 1.15,
+          "effect": "Platform and dependency churn.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DOCU",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Missing documentation.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Legacy data model.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "legacy_customization",
+        "scope_creep",
+        "key_person",
+        "schedule_compression"
+      ],
+      "typical_unit_count": {
+        "low": 200,
+        "mid": 500,
+        "high": 1500
+      },
+      "secondary_units": [],
+      "notes": "A rewrite that preserves behaviour has a higher effort per FP than greenfield because of reverse engineering and regression. Do not use the greenfield web PDR.",
+      "pert": {
+        "expected_hours": 13.12,
+        "sigma_hours": 2.95,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Undocumented legacy customization",
+          "probability": 0.3,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy code or SAP/1C customizations are undocumented; discovery and regression testing expand.",
+          "mitigation": "Code inventory, automated regression tests, discovery sprint.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "legacy_customization"
+        },
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-12-Productivity-Java-Vs-Low-Code-Projects.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "portal_gis",
+      "name_ru": "Портал / ГИС",
+      "name_en": "Portal / government information system",
+      "category": "development",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of a portal or GIS delivered under public-sector requirements, including security, integration and acceptance.",
+      "p50_hours_per_unit": 9.7,
+      "three_point": {
+        "optimistic": 6.5,
+        "most_likely": 9.7,
+        "pessimistic": 13.7
+      },
+      "productivity_basis": {
+        "method": "ISBSG government PDR",
+        "derivation": "ISBSG government median 9.7 h/FP; pessimistic 13.7 h/FP is the ISBSG government mean.",
+        "sources": [
+          "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf"
+        ],
+        "confidence": "High"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 10,
+        "frontend": 30,
+        "backend": 30,
+        "ux": 10,
+        "qa_auto": 12,
+        "pm": 8
+      },
+      "complexity_drivers": [
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Public-service continuity.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Government security and personal-data requirements.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DOCU",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Regulatory documentation and acceptance.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "GIS and inter-agency integration.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "security_compliance",
+        "adoption",
+        "acceptance"
+      ],
+      "typical_unit_count": {
+        "low": 100,
+        "mid": 300,
+        "high": 800
+      },
+      "secondary_units": [],
+      "notes": "Government PDR is 9.7 h/FP median, 13.7 mean. Public-sector acceptance and documentation are heavier than commercial web.",
+      "pert": {
+        "expected_hours": 9.83,
+        "sigma_hours": 1.2,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Acceptance / warranty dispute",
+          "probability": 0.25,
+          "impact_pct_low": 5,
+          "impact_pct_mid": 12,
+          "impact_pct_high": 20,
+          "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+          "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "acceptance"
+        }
+      ],
+      "confidence": "High",
+      "source": "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "chatbot_assistant",
+      "name_ru": "Чат-бот / ассистент",
+      "name_en": "Chatbot / assistant",
+      "category": "ai",
+      "unit": "intent",
+      "unit_definition": "One supported intent or dialog flow with training data, integration to backend systems, fallback handling and an evaluation set.",
+      "p50_hours_per_unit": 16,
+      "three_point": {
+        "optimistic": 6,
+        "most_likely": 16,
+        "pessimistic": 40
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "1-2 FP/intent x 8.3 h/FP = 8.3-16.6 h; 16 h is the upper midpoint; 40 h covers backend integration and evaluation.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 10,
+        "data_engineer": 30,
+        "backend": 30,
+        "ux": 10,
+        "qa_auto": 10,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Training data and intent coverage.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Backend actions and handover.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Answer quality and safety.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "PII and prompt-injection risk affect answer safety.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "model_drift",
+        "data_quality",
+        "adoption",
+        "security_compliance"
+      ],
+      "typical_unit_count": {
+        "low": 20,
+        "mid": 60,
+        "high": 150
+      },
+      "secondary_units": [],
+      "notes": "An intent is not a stable unit across vendors. Record the channel, languages, backend actions and evaluation criteria.",
+      "pert": {
+        "expected_hours": 18.33,
+        "sigma_hours": 5.67,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Model drift / data drift",
+          "probability": 0.3,
+          "impact_pct_low": 15,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "CV/ML model performance degrades when lighting, cameras, products or data distribution change.",
+          "mitigation": "MLOps monitoring, retraining budget, golden data set, acceptance drift thresholds.",
+          "source": "planning estimate; no public benchmark in the research pack",
+          "confidence": "Proxy",
+          "id": "model_drift"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "document_management",
+      "name_ru": "СЭД / документооборот",
+      "name_en": "Document management",
+      "category": "development",
+      "unit": "FP",
+      "unit_definition": "One unadjusted function point of an electronic document management system, including workflow, storage, integration and audit.",
+      "p50_hours_per_unit": 8.3,
+      "three_point": {
+        "optimistic": 3.2,
+        "most_likely": 8.3,
+        "pessimistic": 13.7
+      },
+      "productivity_basis": {
+        "method": "ISBSG traditional + government",
+        "derivation": "ISBSG traditional median 8.3 h/FP; optimistic 3.2 is the traditional P10; pessimistic 13.7 is the ISBSG government mean.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+          "https://totalmetrics.com/function-points/Software-Productivity-Government-ISBSG.pdf"
+        ],
+        "confidence": "Medium"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 15,
+        "backend": 35,
+        "frontend": 20,
+        "1c_developer": 10,
+        "qa_auto": 10,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "DATA",
+          "rating": "H",
+          "multiplier": 1.14,
+          "effect": "Document volume and retention.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Workflow and approval rules.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Access control and audit.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "DOCU",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Records-management compliance.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "scope_creep",
+        "data_quality",
+        "adoption",
+        "vendor_lockin"
+      ],
+      "typical_unit_count": {
+        "low": 100,
+        "mid": 300,
+        "high": 700
+      },
+      "secondary_units": [],
+      "notes": "Document management often integrates with 1C/ERP and email. Count integrations separately.",
+      "pert": {
+        "expected_hours": 8.35,
+        "sigma_hours": 1.75,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Scope creep / requirements volatility",
+          "probability": 0.6,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 30,
+          "impact_pct_high": 53,
+          "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+          "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+          "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+          "confidence": "Medium",
+          "id": "scope_creep"
+        },
+        {
+          "name": "Data quality / legacy data defects",
+          "probability": 0.4,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 25,
+          "impact_pct_high": 40,
+          "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+          "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+          "confidence": "Proxy",
+          "id": "data_quality"
+        },
+        {
+          "name": "User adoption / change management",
+          "probability": 0.3,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+          "mitigation": "Change-management plan, training, champions, phased rollout.",
+          "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+          "confidence": "Proxy",
+          "id": "adoption"
+        },
+        {
+          "name": "Vendor lock-in / proprietary platform",
+          "probability": 0.2,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Proprietary tooling or data formats make switching costly (research/05 section 7.4).",
+          "mitigation": "Open standards, data export rights, IP ownership, exit plan.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "vendor_lockin"
+        }
+      ],
+      "confidence": "Medium",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "observability_monitoring",
+      "name_ru": "Мониторинг и observability",
+      "name_en": "Observability / monitoring",
+      "category": "infrastructure",
+      "unit": "service",
+      "unit_definition": "One monitored service: metrics, logs, traces, dashboards, alerts, runbooks and an on-call handover.",
+      "p50_hours_per_unit": 16,
+      "three_point": {
+        "optimistic": 6,
+        "most_likely": 16,
+        "pessimistic": 40
+      },
+      "productivity_basis": {
+        "method": "FP-lite",
+        "derivation": "2 FP/service x 8.3 h/FP = 16.6 h; 16 h is used; 40 h covers legacy agents and custom dashboards.",
+        "sources": [
+          "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "devops_sre": 45,
+        "sysadmin": 20,
+        "backend": 15,
+        "qa_auto": 10,
+        "pm": 10
+      },
+      "complexity_drivers": [
+        {
+          "driver": "CPLX",
+          "rating": "H",
+          "multiplier": 1.17,
+          "effect": "Legacy agents and custom metrics.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "TIME",
+          "rating": "H",
+          "multiplier": 1.11,
+          "effect": "Alert latency and noise.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "On-call and incident response.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        },
+        {
+          "driver": "RELY",
+          "rating": "H",
+          "multiplier": 1.1,
+          "effect": "Log sensitivity and retention are compliance-critical.",
+          "source": "https://www.cs.otago.ac.nz/cosc345/resources/COCOMO-II-2000.pdf",
+          "confidence": "High"
+        }
+      ],
+      "risk_template_ids": [
+        "security_compliance",
+        "key_person",
+        "vendor_lockin",
+        "schedule_compression"
+      ],
+      "typical_unit_count": {
+        "low": 20,
+        "mid": 60,
+        "high": 200
+      },
+      "secondary_units": [],
+      "notes": "Observability is usually priced per service or per host. Count the number of services, retention period and log volume.",
+      "pert": {
+        "expected_hours": 18.33,
+        "sigma_hours": 5.67,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [
+        {
+          "name": "Security / KII / 187-FZ compliance",
+          "probability": 0.15,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 40,
+          "impact_pct_high": 60,
+          "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+          "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+          "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+          "confidence": "Proxy",
+          "id": "security_compliance"
+        },
+        {
+          "name": "Key-person dependency",
+          "probability": 0.25,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+          "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "key_person"
+        },
+        {
+          "name": "Vendor lock-in / proprietary platform",
+          "probability": 0.2,
+          "impact_pct_low": 10,
+          "impact_pct_mid": 20,
+          "impact_pct_high": 30,
+          "mechanism": "Proprietary tooling or data formats make switching costly (research/05 section 7.4).",
+          "mitigation": "Open standards, data export rights, IP ownership, exit plan.",
+          "source": "research/05_methodology_estimation.md section 7.4",
+          "confidence": "Proxy",
+          "id": "vendor_lockin"
+        },
+        {
+          "name": "Schedule compression",
+          "probability": 0.3,
+          "impact_pct_low": 20,
+          "impact_pct_mid": 50,
+          "impact_pct_high": 95,
+          "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+          "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+          "source": "research/05_methodology_estimation.md section 5.2",
+          "confidence": "High",
+          "id": "schedule_compression"
+        }
+      ],
+      "confidence": "Proxy",
+      "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
+      "provenance_file": "research/05_methodology_estimation.md"
+    }
+  ],
+  "risk_library": {
+    "scope_creep": {
+      "name": "Scope creep / requirements volatility",
+      "probability": 0.6,
+      "impact_pct_low": 10,
+      "impact_pct_mid": 30,
+      "impact_pct_high": 53,
+      "mechanism": "Requirements grow about 1% per month; 20-53% of original requirements change by completion (research/05 section 7.3).",
+      "mitigation": "Change-control clause, REVL allowance, fixed-price boundary, re-baseline at gates.",
+      "source": "research/05_methodology_estimation.md section 7.3; https://doi.org/10.1109/compsac.2008.216",
+      "confidence": "Medium",
+      "id": "scope_creep"
+    },
+    "key_person": {
+      "name": "Key-person dependency",
+      "probability": 0.25,
+      "impact_pct_low": 10,
+      "impact_pct_mid": 20,
+      "impact_pct_high": 30,
+      "mechanism": "One or two people hold critical knowledge; departure or illness stalls delivery (research/05 section 7.4).",
+      "mitigation": "Escrow, documentation, named backups, knowledge-transfer milestones.",
+      "source": "research/05_methodology_estimation.md section 7.4",
+      "confidence": "Proxy",
+      "id": "key_person"
+    },
+    "data_quality": {
+      "name": "Data quality / legacy data defects",
+      "probability": 0.4,
+      "impact_pct_low": 10,
+      "impact_pct_mid": 25,
+      "impact_pct_high": 40,
+      "mechanism": "Legacy data is incomplete, duplicated or inconsistent; cleansing and reconciliation expand scope (planning estimate).",
+      "mitigation": "Data profiling, cleansing sprint, reconciliation rules, acceptance data set.",
+      "source": "research/05_methodology_estimation.md section 7.4; research/07 section 8.6 (scope vector)",
+      "confidence": "Proxy",
+      "id": "data_quality"
+    },
+    "integration_api": {
+      "name": "Third-party API or schema instability",
+      "probability": 0.35,
+      "impact_pct_low": 15,
+      "impact_pct_mid": 25,
+      "impact_pct_high": 35,
+      "mechanism": "Partner API changes, rate limits, undocumented behaviour or schema drift break integration (planning estimate).",
+      "mitigation": "Contract tests, API version pinning, adapter layer, sandbox access, fallback batch.",
+      "source": "research/05_methodology_estimation.md section 7.4",
+      "confidence": "Proxy",
+      "id": "integration_api"
+    },
+    "acceptance": {
+      "name": "Acceptance / warranty dispute",
+      "probability": 0.25,
+      "impact_pct_low": 5,
+      "impact_pct_mid": 12,
+      "impact_pct_high": 20,
+      "mechanism": "Acceptance criteria are ambiguous; rework and holdback delay payment (research/05 section 7.4).",
+      "mitigation": "Testable acceptance criteria, defect SLA, holdback, joint UAT sign-off.",
+      "source": "research/05_methodology_estimation.md section 7.4",
+      "confidence": "Proxy",
+      "id": "acceptance"
+    },
+    "security_compliance": {
+      "name": "Security / KII / 187-FZ compliance",
+      "probability": 0.15,
+      "impact_pct_low": 20,
+      "impact_pct_mid": 40,
+      "impact_pct_high": 60,
+      "mechanism": "KII categorization, FSTEC measures, audit findings or a breach add controls and delay (research/14).",
+      "mitigation": "Security addendum, audit rights, KII categorization early, insurance, staged certification.",
+      "source": "research/05_methodology_estimation.md section 7.4; research/14_regulatory_estimation_pack.md",
+      "confidence": "Proxy",
+      "id": "security_compliance"
+    },
+    "vendor_lockin": {
+      "name": "Vendor lock-in / proprietary platform",
+      "probability": 0.2,
+      "impact_pct_low": 10,
+      "impact_pct_mid": 20,
+      "impact_pct_high": 30,
+      "mechanism": "Proprietary tooling or data formats make switching costly (research/05 section 7.4).",
+      "mitigation": "Open standards, data export rights, IP ownership, exit plan.",
+      "source": "research/05_methodology_estimation.md section 7.4",
+      "confidence": "Proxy",
+      "id": "vendor_lockin"
+    },
+    "schedule_compression": {
+      "name": "Schedule compression",
+      "probability": 0.3,
+      "impact_pct_low": 20,
+      "impact_pct_mid": 50,
+      "impact_pct_high": 95,
+      "mechanism": "Effort scales roughly as 1/t^4; a 20% schedule cut costs about +95% effort (research/05 section 5.2).",
+      "mitigation": "Phase the scope, add contingency, refuse unsafe compression, use a dedicated team.",
+      "source": "research/05_methodology_estimation.md section 5.2",
+      "confidence": "High",
+      "id": "schedule_compression"
+    },
+    "adoption": {
+      "name": "User adoption / change management",
+      "probability": 0.3,
+      "impact_pct_low": 10,
+      "impact_pct_mid": 20,
+      "impact_pct_high": 30,
+      "mechanism": "Users do not adopt the system; benefits and acceptance slip even when the software works (planning estimate).",
+      "mitigation": "Change-management plan, training, champions, phased rollout.",
+      "source": "research/05_methodology_estimation.md section 7.4 (vendor/quality risk analogue)",
+      "confidence": "Proxy",
+      "id": "adoption"
+    },
+    "model_drift": {
+      "name": "Model drift / data drift",
+      "probability": 0.3,
+      "impact_pct_low": 15,
+      "impact_pct_mid": 25,
+      "impact_pct_high": 40,
+      "mechanism": "CV/ML model performance degrades when lighting, cameras, products or data distribution change.",
+      "mitigation": "MLOps monitoring, retraining budget, golden data set, acceptance drift thresholds.",
+      "source": "planning estimate; no public benchmark in the research pack",
+      "confidence": "Proxy",
+      "id": "model_drift"
+    },
+    "legacy_customization": {
+      "name": "Undocumented legacy customization",
+      "probability": 0.3,
+      "impact_pct_low": 15,
+      "impact_pct_mid": 25,
+      "impact_pct_high": 40,
+      "mechanism": "Legacy code or SAP/1C customizations are undocumented; discovery and regression testing expand.",
+      "mitigation": "Code inventory, automated regression tests, discovery sprint.",
+      "source": "research/05_methodology_estimation.md section 7.4",
+      "confidence": "Proxy",
+      "id": "legacy_customization"
+    },
+    "platform_constraint": {
+      "name": "Platform or upgrade constraint",
+      "probability": 0.3,
+      "impact_pct_low": 10,
+      "impact_pct_mid": 20,
+      "impact_pct_high": 30,
+      "mechanism": "1C/ERP platform limits, version lock, or mandatory upgrade changes the design.",
+      "mitigation": "Architecture review, platform roadmap check, upgrade sandbox.",
+      "source": "planning estimate; research/14 lists the 1C/ERP regulatory context",
+      "confidence": "Proxy",
+      "id": "platform_constraint"
+    }
+  },
+  "archetype_count": 22
+}

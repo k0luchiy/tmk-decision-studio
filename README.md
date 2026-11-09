@@ -52,12 +52,18 @@ npm run report         # TEST_REPORT.md из out/control.json и npm test
 ├── ARCHITECTURE.md           # Mermaid: пакеты и поток данных
 ├── TEST_REPORT.md            # генерируемый отчёт D1–D3 + тесты + intake
 ├── docs/                     # проектная документация (см. docs/README.md)
-├── research/                 # исследование и исходные данные (не меняем)
-├── data/                     # версионируемые данные запуска
+├── research/                 # архив исследования и исходников (не runtime-зависимость)
+├── data/                     # версионируемые рабочие данные запуска
+│   ├── datasets/             # 6 рабочих JSON-датасетов (ставки, архетипы, аналоги, коэффициенты, контракты)
+│   ├── schemas/              # helpdesk_import_schema.json
+│   ├── import/               # helpdesk-sample.xlsx (обезличенный пример)
 │   ├── eval/briefs.json      # 12 брифов с метками
 │   ├── cache/               # кэш ответов Jev
 │   ├── seeds/control.json    # ожидания D1–D3 (регрессия)
 │   └── manifest.json         # версия датасетов
+├── apps/
+│   ├── web/                  # React/Vite кокпит (добавляет второй разработчик)
+│   └── api/                  # Fastify backend-for-frontend
 ├── packages/
 │   ├── contract/             # zod-схемы и типы (единый контракт)
 │   ├── data/                 # загрузка, валидация, импорт HelpDesk
@@ -68,6 +74,10 @@ npm run report         # TEST_REPORT.md из out/control.json и npm test
 ├── scripts/                  # esbuild-обёртки и генераторы отчётов
 └── examples/contract-usage.ts# компилируемый пример контракта
 ```
+
+`research/` — архив исходных материалов для провенанса, а **не** runtime-зависимость:
+код читает рабочие копии из `data/`, а исходные пути зафиксированы в
+`data/manifest.json` (поле `source`).
 
 ## Роли
 

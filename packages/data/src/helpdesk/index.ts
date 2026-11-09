@@ -32,9 +32,9 @@ export async function parseHelpdeskFile(filePath: string): Promise<HelpdeskResul
   return parseHelpdeskWorkbook(workbook);
 }
 
-/** Finds the first `*.xlsx` inside `<baseDir>/research/data` (Unicode-safe). */
+/** Finds the first `*.xlsx` inside `<baseDir>/data/import` (Unicode-safe). */
 export async function findHelpdeskFile(baseDir: string = repositoryRoot()): Promise<string> {
-  const directory = path.join(baseDir, 'research', 'data');
+  const directory = path.join(baseDir, 'data', 'import');
   const entries = await readdir(directory);
   const xlsxFiles = entries.filter((entry) => entry.toLowerCase().endsWith('.xlsx')).sort();
   const first = xlsxFiles[0];

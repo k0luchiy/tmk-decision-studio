@@ -9,27 +9,27 @@ export interface DatasetFileSpec {
 
 export const DATASET_FILES = [
   {
-    path: 'research/data/product/rate_cards.json',
+    path: 'data/datasets/rate_cards.json',
     source: 'research/data/product/rate_cards.json',
   },
   {
-    path: 'research/data/product/contractor_rate_cards.json',
+    path: 'data/datasets/contractor_rate_cards.json',
     source: 'research/data/product/contractor_rate_cards.json',
   },
   {
-    path: 'research/data/product/work_archetypes.json',
+    path: 'data/datasets/work_archetypes.json',
     source: 'research/data/product/work_archetypes.json',
   },
   {
-    path: 'research/data/product/analogue_corpus.json',
+    path: 'data/datasets/analogue_corpus.json',
     source: 'research/data/product/analogue_corpus.json',
   },
   {
-    path: 'research/data/product/coefficients.json',
+    path: 'data/datasets/coefficients.json',
     source: 'research/data/product/coefficients.json',
   },
   {
-    path: 'research/data/tmk_it_contracts.json',
+    path: 'data/datasets/tmk_it_contracts.json',
     source: 'research/data/tmk_it_contracts.json',
   },
 ] as const satisfies readonly DatasetFileSpec[];

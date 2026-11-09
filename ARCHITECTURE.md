@@ -115,7 +115,7 @@ sequenceDiagram
 
 ```mermaid
 graph LR
-  R["research/data/product/*.json"] --> M["scripts/build-manifest.mjs"]
+  R["data/datasets/*.json"] --> M["scripts/build-manifest.mjs"]
   M --> MAN["data/manifest.json — datasetVersion"]
   MAN --> L["packages/data/src/loaders.ts — loadDatasets()"]
   L --> PIPE["estimateTask"]

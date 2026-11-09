@@ -192,12 +192,12 @@ licence?, type (primary|secondary|proxy|assumption)`.
 
 | Файл | Что содержит | Версия |
 |---|---|---|
-| `research/data/product/rate_cards.json` | 14 ролей × 4 грейда, fully loaded ₽/ч и ₽/мес | `data/manifest.json` |
-| `research/data/product/contractor_rate_cards.json` | 224 полосы `(geo, role, grade)` | `data/manifest.json` |
-| `research/data/product/work_archetypes.json` | архетипы, O/M/P, роль-микс, typical units | `data/manifest.json` |
-| `research/data/product/analogue_corpus.json` | 49 аналогов + строки ЕИС | `data/manifest.json` |
-| `research/data/product/coefficients.json` | коэффициенты, налоги, WACC, политики | `data/manifest.json` |
-| `research/data/tmk_it_contracts.json` | 60 контрактов ТМК | `data/manifest.json` |
+| `data/datasets/rate_cards.json` | 14 ролей × 4 грейда, fully loaded ₽/ч и ₽/мес | `data/manifest.json` |
+| `data/datasets/contractor_rate_cards.json` | 224 полосы `(geo, role, grade)` | `data/manifest.json` |
+| `data/datasets/work_archetypes.json` | архетипы, O/M/P, роль-микс, typical units | `data/manifest.json` |
+| `data/datasets/analogue_corpus.json` | 49 аналогов + строки ЕИС | `data/manifest.json` |
+| `data/datasets/coefficients.json` | коэффициенты, налоги, WACC, политики | `data/manifest.json` |
+| `data/datasets/tmk_it_contracts.json` | 60 контрактов ТМК | `data/manifest.json` |
 
 `data/manifest.json` — версия каждого файла, SHA-256, число строк, дата и
 источник; `datasetVersion` — хеш манифеста. Пересборка: `npm run data:manifest`,
