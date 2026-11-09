@@ -13,7 +13,8 @@
     "test": "vitest run",
     "lint": "eslint packages scripts examples 2>/dev/null || eslint packages",
     "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
-    "data:manifest": "node scripts/build-manifest.mjs"
+    "data:manifest": "node scripts/build-manifest.mjs",
+    "data:check": "node scripts/check-data.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
