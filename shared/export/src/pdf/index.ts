@@ -1,27 +1,32 @@
-/** PDF export entry point. */
+/** PDF export entry point: branded TMK Decision Studio report. */
 
 import PDFDocument from 'pdfkit';
 import type { Estimate } from '@app/contract';
-import { resolveFonts } from './layout.js';
-import { writeReport } from './sections.js';
+import { writeAppendixPages } from './appendix.js';
+import { drawFooters } from './components.js';
+import type { PageMeta } from './components.js';
+import { registerFonts } from './fonts.js';
+import { PAGE } from './theme.js';
+import { writeDecisionPages } from './sections.js';
 
 /**
- * Renders a PDF report for a single estimate.
+ * Renders a branded PDF report for a single estimate.
  *
- * The output always contains at least two pages (decision + appendices). A
- * Cyrillic-capable system font is embedded when available; otherwise PDFKit's
- * built-in Helvetica is used so generation never fails.
+ * The contract is unchanged: the caller gets a `Buffer`. The report always has
+ * a decision page plus appendices, embeds DejaVu (Cyrillic) fonts from the
+ * package assets, and degrades gracefully when optional collections are empty.
  */
 export function toPdf(estimate: Estimate): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
-    const fonts = resolveFonts();
     const doc = new PDFDocument({
       size: 'A4',
-      margin: 50,
+      margin: PAGE.margin,
+      bufferPages: true,
       info: {
-        Title: `Оценка ${estimate.id}`,
-        Author: 'Decision Cockpit',
-        Subject: 'Reproducible estimation report',
+        Title: `TMK Decision Studio — ${estimate.id}`,
+        Author: 'TMK Decision Studio',
+        Subject: 'Оценка ИТ-задачи: сделать или заказать',
+        Keywords: `estimate, ${estimate.scenario}, ${estimate.datasetVersion}`,
       },
     });
 
@@ -36,15 +41,19 @@ export function toPdf(estimate: Estimate): Promise<Buffer> {
       reject(error);
     });
 
-    if (fonts.regular !== 'Helvetica') {
-      doc.registerFont('Body', fonts.regular);
-      doc.registerFont('Body-Bold', fonts.bold);
-      fonts.regular = 'Body';
-      fonts.bold = 'Body-Bold';
-    }
+    const meta: PageMeta = {
+      id: estimate.id,
+      createdAt: estimate.createdAt,
+      datasetVersion: estimate.datasetVersion,
+      seed: estimate.seed,
+    };
 
     try {
-      writeReport(doc, fonts, estimate);
+      const fonts = registerFonts(doc);
+      writeDecisionPages(doc, fonts, { estimate, meta });
+      writeAppendixPages(doc, fonts, estimate);
+      drawFooters(doc, fonts, meta, doc.bufferedPageRange().count);
+      doc.end();
     } catch (error) {
       reject(error instanceof Error ? error : new Error(String(error)));
     }

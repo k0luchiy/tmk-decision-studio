@@ -1,0 +1,13 @@
+DejaVu fonts, license: Bitstream Vera / DejaVu (free), source: system package.
+
+Files:
+  DejaVuSans.ttf
+  DejaVuSans-Bold.ttf
+  DejaVuSansCondensed-Bold.ttf
+  DejaVuSansMono.ttf
+
+The DejaVu fonts are derived from Bitstream Vera and are distributed under a
+free, permissive license. They are bundled here so PDF reports render Cyrillic
+text without any network access or system font dependency.
+
+Upstream: https://dejavu-fonts.github.io/

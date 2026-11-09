@@ -1,190 +1,199 @@
-/** PDF report sections: decision page and appendices. */
+/** Decision pages of the TMK Decision Studio report (sections 1–6). */
 
-import type { Estimate, FormulaNode } from '@app/contract';
-import { BRAND, INK, MUTED, body, heading, money, num, type Fonts } from './layout.js';
+import type { Estimate } from '@app/contract';
+import { breakEvenChart, confidenceBars, costRangeChart, tcoChart } from './charts.js';
+import { badge, coverHeader, divider, ensureSpace, kpiCard, note, sectionTitle } from './components.js';
+import type { PageMeta } from './components.js';
+import { barRow, table } from './tables.js';
+import type { Fonts } from './fonts.js';
+import {
+  COLORS,
+  SPACE,
+  TYPE,
+  confidenceColor,
+  confidenceLabel,
+  costIndex,
+  cumulativeTco,
+  dateRu,
+  hours,
+  money,
+  moneyShort,
+  millions,
+  num,
+  pct,
+  scenarioName,
+  weeks,
+} from './theme.js';
 
-function uniqueSources(estimate: Estimate): string[] {
-  const ids = new Set<string>();
-  for (const line of estimate.cost.lines) {
-    if (line.sourceId !== undefined) {
-      ids.add(line.sourceId);
-    }
-  }
-  for (const assumption of estimate.assumptions) {
-    ids.add(assumption.sourceId);
-  }
-  for (const risk of estimate.risks) {
-    ids.add(risk.sourceId);
-  }
-  for (const analogue of estimate.analogues) {
-    ids.add(analogue.sourceId);
-  }
-  return [...ids].sort((a, b) => a.localeCompare(b));
+function contentWidth(doc: PDFKit.PDFDocument): number {
+  return doc.page.width - doc.page.margins.left - doc.page.margins.right;
 }
 
-function key(estimate: Estimate): string {
-  return `${estimate.taskId} · ${estimate.scenario} · ${estimate.id}`;
+function caption(doc: PDFKit.PDFDocument, fonts: Fonts, text: string, y: number): number {
+  doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text(text, doc.page.margins.left, y, { width: contentWidth(doc) });
+  return y + 14;
 }
 
-function writeFirstPage(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate): void {
-  doc.font(fonts.bold).fontSize(20).fillColor(BRAND).text('Decision Cockpit');
-  body(doc, fonts, `Отчёт об оценке · ${key(estimate)}`, 9, MUTED);
-  body(
-    doc,
-    fonts,
-    `Версия датасетов: ${estimate.datasetVersion} · seed: ${estimate.seed} · дата: ${estimate.createdAt}`,
-    8,
-    MUTED,
+function verdictSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
+  y = sectionTitle(doc, fonts, 2, 'Вердикт', y);
+  const x = doc.page.margins.left;
+  const width = contentWidth(doc);
+  const boxHeight = 74;
+  doc.save().fillColor(COLORS.surface).rect(x, y, width, boxHeight).fill();
+  doc.fillColor(COLORS.brand).rect(x, y, 4, boxHeight).fill().restore();
+  doc.font(fonts.body).fontSize(TYPE.label).fillColor(COLORS.muted).text(
+    `СЦЕНАРИЙ · ${scenarioName(estimate.scenario).toUpperCase()}`,
+    x + 14,
+    y + 10,
+    { lineBreak: false },
   );
+  doc.font(fonts.body).fontSize(TYPE.body).fillColor(COLORS.ink).text(estimate.verdict.text, x + 14, y + 24, {
+    width: width - 28,
+  });
+  y += boxHeight + SPACE.md;
 
-  heading(doc, fonts, 'Вердикт');
-  body(doc, fonts, estimate.verdict.text, 11);
+  const gap = SPACE.md;
+  const cardWidth = (width - gap * 2) / 3;
+  const cardHeight = 84;
+  kpiCard(doc, fonts, x, y, cardWidth, cardHeight, {
+    label: 'Стоимость P50',
+    value: moneyShort(estimate.cost.p50Rub),
+    range: `P10–P90: ${moneyShort(estimate.cost.p10Rub)} — ${moneyShort(estimate.cost.p90Rub)}`,
+    note: `Резерв P80−P50: ${money(estimate.cost.reserveRub)}`,
+    accent: true,
+  });
+  kpiCard(doc, fonts, x + cardWidth + gap, y, cardWidth, cardHeight, {
+    label: 'Трудоёмкость P50',
+    value: hours(estimate.effort.p50Hours),
+    range: `P10–P90: ${hours(estimate.effort.p10Hours)} — ${hours(estimate.effort.p90Hours)}`,
+    note: `P80 — резерв: ${hours(estimate.effort.p80Hours)}`,
+  });
+  kpiCard(doc, fonts, x + (cardWidth + gap) * 2, y, cardWidth, cardHeight, {
+    label: 'Срок P50',
+    value: weeks(estimate.duration.p50Weeks),
+    range: `P10–P90: ${weeks(estimate.duration.p10Weeks)} — ${weeks(estimate.duration.p90Weeks)}`,
+    note: `Критический путь: ${estimate.duration.criticalPath.length} этапов`,
+  });
+  y += cardHeight + SPACE.sm;
 
-  heading(doc, fonts, 'Диапазоны');
-  body(
-    doc,
-    fonts,
-    `Трудоёмкость, ч: P10 ${num(estimate.effort.p10Hours)} · P50 ${num(estimate.effort.p50Hours)} · P80 ${num(estimate.effort.p80Hours)} · P90 ${num(estimate.effort.p90Hours)}`,
+  const level = estimate.confidence.level;
+  const badgeWidth = badge(doc, fonts, x, y, `Уверенность ${estimate.confidence.score}/100 · ${confidenceLabel(level)}`, confidenceColor(level));
+  doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text(
+    'Вердикт — оценка порядка, не смета: все числа — вероятностные диапазоны и требуют подтверждения перед закупкой.',
+    x + badgeWidth + SPACE.sm,
+    y + 3,
+    { width: width - badgeWidth - SPACE.sm },
   );
-  body(
-    doc,
-    fonts,
-    `Срок, недель: P10 ${num(estimate.duration.p10Weeks)} · P50 ${num(estimate.duration.p50Weeks)} · P80 ${num(estimate.duration.p80Weeks)} · P90 ${num(estimate.duration.p90Weeks)}`,
-  );
-  body(
-    doc,
-    fonts,
-    `Стоимость: P10 ${money(estimate.cost.p10Rub)} · P50 ${money(estimate.cost.p50Rub)} · P80 ${money(estimate.cost.p80Rub)} · P90 ${money(estimate.cost.p90Rub)}`,
-  );
-  body(doc, fonts, `Резерв бюджета (P80 − P50): ${money(estimate.cost.reserveRub)}`, 10, MUTED);
+  y += 20;
 
-  heading(doc, fonts, 'Сценарии');
-  const implementation = estimate.tco.find((row) => row.year === 0);
-  const support = estimate.tco.find((row) => row.year === 1);
-  if (implementation !== undefined) {
-    body(doc, fonts, `Реализация (год 0, ${estimate.scenario}): ${money(implementation.costRub)}`);
-  }
-  if (support !== undefined) {
-    body(doc, fonts, `Сопровождение (год 1): ${money(support.costRub)}`);
-  }
-
-  heading(doc, fonts, 'Точка безубыточности');
-  body(
-    doc,
-    fonts,
-    estimate.breakevenMonth === null
-      ? 'В горизонте 36 месяцев не достигается.'
-      : `Месяц ${estimate.breakevenMonth} эксплуатации.`,
-  );
-
-  heading(doc, fonts, 'Ключевые допущения');
-  const keyAssumptions = [...estimate.assumptions]
-    .sort((a, b) => (b.sensitivity ?? 0) - (a.sensitivity ?? 0))
-    .slice(0, 4);
-  for (const assumption of keyAssumptions) {
-    const sensitivity = assumption.sensitivity === undefined ? '' : ` · чувствительность ${assumption.sensitivity}`;
-    body(
-      doc,
-      fonts,
-      `• ${assumption.label}: ${String(assumption.value)} (${assumption.range.low}…${assumption.range.high})${sensitivity}`,
-      9,
-    );
-  }
-
-  heading(doc, fonts, 'Уверенность');
-  body(doc, fonts, `${estimate.confidence.score} / 100 · уровень: ${estimate.confidence.level}`);
-  for (const component of estimate.confidence.components) {
-    body(
-      doc,
-      fonts,
-      `• ${component.key}: вес ${component.weight}, значение ${component.value}`,
-      9,
-      MUTED,
-    );
-  }
-
-  doc.moveDown(0.8);
-  body(doc, fonts, 'Оценка порядка, а не смета. Все числа — вероятностные диапазоны.', 9, MUTED);
+  y = costRangeChart(doc, fonts, x, y + SPACE.sm, width, estimate);
+  return caption(doc, fonts, 'P10–P90 — вероятностный коридор; точка P50 — медианная оценка. Цвет — акцент на P50.', y);
 }
 
-function writeFormulaNode(
-  doc: PDFKit.PDFDocument,
-  fonts: Fonts,
-  node: FormulaNode,
-  depth: number,
-): void {
-  const indent = '   '.repeat(depth);
-  const value = node.valueRub === undefined ? '' : ` — ${money(node.valueRub)}`;
-  body(doc, fonts, `${indent}${node.label}${value}`, 9);
-  if (node.formula !== undefined) {
-    body(doc, fonts, `${indent}   = ${node.formula}`, 8, MUTED);
-  }
-  for (const child of node.children ?? []) {
-    writeFormulaNode(doc, fonts, child, depth + 1);
-  }
+function comparisonSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
+  y = sectionTitle(doc, fonts, 3, 'Сравнение сценариев', y);
+  const row = [
+    scenarioName(estimate.scenario),
+    millions(estimate.cost.p10Rub),
+    millions(estimate.cost.p50Rub),
+    millions(estimate.cost.p80Rub),
+    millions(estimate.cost.p90Rub),
+    weeks(estimate.duration.p50Weeks),
+    `${millions(cumulativeTco(estimate, 1) ?? 0)} / ${millions(cumulativeTco(estimate, 3) ?? 0)} / ${millions(cumulativeTco(estimate, 5) ?? 0)}`,
+    num(costIndex(estimate)),
+  ];
+  y = table(doc, fonts, {
+    y,
+    columns: [
+      { header: 'Сценарий', width: 110 },
+      { header: 'P10', width: 48, align: 'right' },
+      { header: 'P50', width: 48, align: 'right' },
+      { header: 'P80', width: 48, align: 'right' },
+      { header: 'P90', width: 48, align: 'right' },
+      { header: 'Срок', width: 42, align: 'right' },
+      { header: 'TCO 1/3/5, млн', width: 95, align: 'right' },
+      { header: 'Индекс', width: 56, align: 'right' },
+    ],
+    rows: [row],
+  });
+  return note(
+    doc,
+    fonts,
+    'P10–P90 и TCO — млн ₽ (TCO накопительно на 1/3/5 год); индекс — стоимость P50 за час. В отчёт выгружен сценарий, выбранный движком; полная матрица трёх сценариев доступна в кокпите до экспорта.',
+    y,
+  );
 }
 
-function writeFormulasAppendix(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate): void {
+function costStructureSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
+  y = sectionTitle(doc, fonts, 4, 'Структура стоимости', y);
+  const lines = [...estimate.cost.lines].sort((a, b) => b.valueRub - a.valueRub).slice(0, 6);
+  const total = estimate.cost.p50Rub;
+  if (lines.length === 0) {
+    return note(doc, fonts, 'Сметные строки не переданы — структура стоимости недоступна для этого сценария.', y);
+  }
+  const x = doc.page.margins.left;
+  const max = lines[0]?.valueRub ?? total;
+  for (const line of lines) {
+    y = ensureSpace(doc, y, 20);
+    const share = total > 0 ? line.valueRub / total : 0;
+    y = barRow(doc, fonts, x, y, contentWidth(doc), `${line.label}${line.status === 'assumption' ? ' · допущение' : ''}`, line.valueRub, max, `${pct(share)} · ${moneyShort(line.valueRub)}`);
+  }
+  return note(doc, fonts, `Топ-${lines.length} строк сметы. Доля считается от P50; строки со статусом «допущение» помечены в подписи.`, y);
+}
+
+function tcoSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate): number {
   doc.addPage();
-  doc.font(fonts.bold).fontSize(15).fillColor(INK).text('Приложение A. Формулы');
-  doc.moveDown(0.4);
-  writeFormulaNode(doc, fonts, estimate.formulaTree, 0);
-}
-
-function writeSourcesAppendix(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate): void {
-  doc.addPage();
-  doc.font(fonts.bold).fontSize(15).fillColor(INK).text('Приложение B. Аналоги, риски и источники');
-  doc.moveDown(0.4);
-
-  doc.font(fonts.bold).fontSize(11).fillColor(INK).text('Аналоги');
-  doc.moveDown(0.2);
-  for (const analogue of estimate.analogues) {
-    const price = analogue.normalizedPriceRub === undefined ? '' : ` · приведённая ${money(analogue.normalizedPriceRub)}`;
-    body(
-      doc,
-      fonts,
-      `• ${analogue.title} (${analogue.year})${price} · источник ${analogue.sourceId}${analogue.url === undefined ? '' : ` · ${analogue.url}`}`,
-      9,
-    );
-  }
-
-  doc.moveDown(0.5);
-  doc.font(fonts.bold).fontSize(11).fillColor(INK).text('Риски');
-  doc.moveDown(0.2);
-  for (const risk of estimate.risks) {
-    body(
-      doc,
-      fonts,
-      `• ${risk.label}: вероятность ${risk.probability}, ущерб ${money(risk.impactRub.mid)}, источник ${risk.sourceId}`,
-      9,
-    );
-    body(doc, fonts, `   Меры: ${risk.mitigation}`, 8, MUTED);
-  }
-
-  doc.moveDown(0.5);
-  doc.font(fonts.bold).fontSize(11).fillColor(INK).text('Источники');
-  doc.moveDown(0.2);
-  for (const sourceId of uniqueSources(estimate)) {
-    body(doc, fonts, `• ${sourceId}`, 9);
-  }
-
-  doc.moveDown(0.6);
-  body(
+  let y = sectionTitle(doc, fonts, 5, 'TCO и break-even', doc.page.margins.top);
+  y = tcoChart(doc, fonts, doc.page.margins.left, y, contentWidth(doc), estimate);
+  y = caption(doc, fonts, 'TCO: накопительные и годовые затраты, плюс контур с ожидаемыми рисками. Г0 — реализация.', y + SPACE.xs);
+  y += SPACE.sm;
+  y = breakEvenChart(doc, fonts, doc.page.margins.left, y, contentWidth(doc), estimate);
+  const breakEven = estimate.breakevenMonth;
+  return caption(
     doc,
     fonts,
-    `Версия датасетов: ${estimate.datasetVersion} · seed: ${estimate.seed} · дата: ${estimate.createdAt}`,
-    8,
-    MUTED,
+    breakEven === null
+      ? 'Break-even в горизонте 24 месяцев не достигается — сравнивайте полный TCO за 3–5 лет.'
+      : `Break-even — месяц ${breakEven} эксплуатации. До этой точки накопленные затраты растут; после — сравнение с альтернативой решает TCO.`,
+    y + SPACE.xs,
   );
 }
 
-export function writeReport(
-  doc: PDFKit.PDFDocument,
-  fonts: Fonts,
-  estimate: Estimate,
-): void {
-  writeFirstPage(doc, fonts, estimate);
-  writeFormulasAppendix(doc, fonts, estimate);
-  writeSourcesAppendix(doc, fonts, estimate);
-  doc.end();
+function confidenceSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estimate, y: number): number {
+  y = sectionTitle(doc, fonts, 6, 'Уверенность', y);
+  const x = doc.page.margins.left;
+  const level = estimate.confidence.level;
+  doc.font(fonts.condensed).fontSize(TYPE.metricLg).fillColor(COLORS.ink).text(`${estimate.confidence.score} / 100`, x, y, { lineBreak: false });
+  const badgeWidth = badge(doc, fonts, x + 168, y + 9, confidenceLabel(level), confidenceColor(level));
+  doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text('класс уверенности', x + 168 + badgeWidth + 8, y + 13, { lineBreak: false });
+  y += 36;
+  y = confidenceBars(doc, fonts, x, y, contentWidth(doc), estimate);
+  return note(
+    doc,
+    fonts,
+    'Уверенность — мера проверяемости расчёта, а не вероятность ошибки. Она падает, когда бриф неполный, методы расходятся, аналогов мало или данные устарели. RAG-цвет всегда сопровождается текстовым уровнем.',
+    y,
+  );
+}
+
+export interface ReportContext {
+  estimate: Estimate;
+  meta: PageMeta;
+}
+
+export function writeDecisionPages(doc: PDFKit.PDFDocument, fonts: Fonts, context: ReportContext): void {
+  const { estimate, meta } = context;
+  let y = coverHeader(doc, fonts, meta);
+  y = verdictSection(doc, fonts, estimate, y);
+  y = comparisonSection(doc, fonts, estimate, y);
+  costStructureSection(doc, fonts, estimate, y);
+  const confidenceY = tcoSection(doc, fonts, estimate);
+  confidenceSection(doc, fonts, estimate, confidenceY);
+  divider(doc, doc.page.margins.left, doc.page.height - 90, contentWidth(doc), COLORS.border, 0.6);
+  doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text(
+    `Отчёт TMK Decision Studio · ${dateRu(meta.createdAt)} · оценка порядка, не смета`,
+    doc.page.margins.left,
+    doc.page.height - 82,
+    { width: contentWidth(doc), lineBreak: false },
+  );
 }
