@@ -4,5 +4,9 @@
   "private": true,
   "type": "module",
   "main": "src/index.ts",
-  "types": "src/index.ts"
+  "types": "src/index.ts",
+  "dependencies": {
+    "@app/contract": "0.1.0",
+    "@app/data": "0.1.0"
+  }
 }
