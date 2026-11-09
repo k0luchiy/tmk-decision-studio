@@ -1,0 +1,250 @@
+/**
+ * End-to-end estimate pipeline (`docs/05_architecture_data.md` §7).
+ *
+ * `estimateTask` turns a confirmed `Task` and the loaded datasets into three
+ * complete `Estimate` snapshots (`inhouse`, `contractor`, `hybrid`), one shared
+ * verdict, one confidence score and one effort grid. It is the single entry
+ * point the CLI / e2e harness use; the frontend only renders the result.
+ *
+ * The pipeline is deterministic: the same `{task, datasets, seed,
+ * datasetVersion, options}` always yields byte-identical snapshots. Every
+ * quantity is either folded from the WBS (`toStageGrid`), scheduled
+ * (`schedule`) or simulated with a seeded Monte Carlo (`simulate`). No clock
+ * or `Math.random()` is used except in the export layer.
+ */
+
+import { costContractor, type ContractModel } from '../cost/contractor.js';
+import { PRODUCTIVE_HOURS_PER_MONTH, costInhouse, type EffortByRole } from '../cost/inhouse.js';
+import { toStageGrid } from '../cost/stageGrid.js';
+import { buildVerdict, type VerdictScenarioInput } from '../decision/verdict.js';
+import type { Quantiles } from '../risk/monteCarlo.js';
+import { buildScenarios } from '../scenarios/scenarios.js';
+import type { ScenarioResult } from '../scenarios/scenarios.js';
+import { schedule } from '../schedule/schedule.js';
+import { DEFAULT_WEIGHTS } from '../sizing/combine.js';
+import { buildWbs, resolveWorkType, WORK_TYPE_TO_ARCHETYPE } from '../sizing/wbs.js';
+import {
+  blendLines,
+  buildConfidenceAndWarnings,
+  hybridShare,
+  lastCumulative,
+  makeEstimate,
+  simulateCost,
+} from './assemble.js';
+import { buildAssumptions, buildRisks, toContractAnalogues } from './dataBridge.js';
+import {
+  combineEffort,
+  hashInput,
+  pickHiringRole,
+  resolveUnitsCount,
+} from './inputs.js';
+import { HYBRID_CONTRACTOR_STAGES, TURNOVER_RATE } from './types.js';
+import type {
+  EstimateTaskInput,
+  EstimateTaskOptions,
+  EstimateTaskResult,
+} from './types.js';
+
+export type { EstimateTaskInput, EstimateTaskOptions, EstimateTaskResult } from './types.js';
+
+/**
+ * Runs the full estimation pipeline for one task.
+ *
+ * @throws {RangeError} when `seed` is not an integer or utilisation is invalid.
+ * @throws {MissingRateError | MissingBandError} when a role/grade pair has no
+ *   rate in the datasets.
+ */
+export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
+  const { task, datasets, seed, datasetVersion } = input;
+  const options: EstimateTaskOptions = input.options ?? {};
+  if (!Number.isInteger(seed)) {
+    throw new RangeError(`seed must be an integer, got ${seed}`);
+  }
+
+  const utilization = options.utilization ?? 0.7;
+  if (!Number.isFinite(utilization) || utilization <= 0 || utilization > 1) {
+    throw new RangeError(`options.utilization must be in (0, 1], got ${utilization}`);
+  }
+  const model: ContractModel = options.model ?? 't_and_m';
+
+  const workType = resolveWorkType(task);
+  const archetypeId =
+    WORK_TYPE_TO_ARCHETYPE[workType] ?? WORK_TYPE_TO_ARCHETYPE.default ?? 'functional_extension_1c';
+  const unitsCount = resolveUnitsCount(task, archetypeId, datasets);
+
+  const baseItems = buildWbs(
+    task,
+    datasets.archetypes.archetypes,
+    unitsCount === undefined ? undefined : { unitsCount },
+  );
+  const baseGrid = toStageGrid(baseItems);
+
+  const { effortGrid, combined, analogueEstimateResult } = combineEffort({
+    task,
+    datasets,
+    workType,
+    baseItems,
+    baseGrid,
+  });
+
+  const effortByRole: EffortByRole[] = effortGrid.byRole.map((entry) => ({
+    roleId: entry.roleId,
+    grade: entry.grade,
+    hours: entry.hours,
+  }));
+
+  const months = Math.max(1, Math.ceil(effortGrid.totalHours / PRODUCTIVE_HOURS_PER_MONTH));
+  const hiringTarget = options.hiring === true ? pickHiringRole(effortByRole) : undefined;
+  const inhouseLines = costInhouse({
+    effortByRole,
+    rateCards: datasets.rateCards.roles,
+    opts: {
+      ...(hiringTarget === undefined ? {} : { hiring: hiringTarget }),
+      utilization,
+      turnoverRate: TURNOVER_RATE,
+      months,
+    },
+  });
+  const contractorLines = costContractor({
+    effortByRole,
+    bands: datasets.contractorRates.bands,
+    opts: { geo: 'RU', model, vat: options.vat === true },
+  });
+
+  const scenarioResult = buildScenarios({
+    inhouseLines,
+    contractorLines,
+    byStage: effortGrid.byStage.map((entry) => ({ stage: entry.stage, hours: entry.hours })),
+    contractorStages: [...HYBRID_CONTRACTOR_STAGES],
+  });
+
+  const scheduleResult = schedule({
+    byRole: effortGrid.byRole.map((entry) => ({
+      roleId: entry.roleId,
+      grade: entry.grade,
+      hours: entry.hours,
+    })),
+    byStage: effortGrid.byStage.map((entry) => ({ stage: entry.stage, hours: entry.hours })),
+    utilization,
+  });
+  const duration = scheduleResult.duration;
+
+  const share = hybridShare(effortGrid.byStage);
+  const hybridLines = blendLines(inhouseLines, contractorLines, share);
+
+  const inhouseCost = simulateCost(
+    scenarioResult.inhouse.implementationRub,
+    effortGrid.totalHours,
+    effortGrid,
+    duration,
+    seed,
+    0,
+  );
+  const contractorCost = simulateCost(
+    scenarioResult.contractor.implementationRub,
+    effortGrid.totalHours,
+    effortGrid,
+    duration,
+    seed,
+    1,
+  );
+  const hybridCost = simulateCost(
+    scenarioResult.hybrid.implementationRub,
+    effortGrid.totalHours,
+    effortGrid,
+    duration,
+    seed,
+    2,
+  );
+
+  const verdictInputOf = (cost: Quantiles, scenario: ScenarioResult): VerdictScenarioInput => ({
+    p50Rub: cost.p50,
+    p80Rub: cost.p80,
+    tcoRub: lastCumulative(scenario.tco),
+    weeks: duration.p50Weeks,
+    breakevenMonth: scenario.breakevenMonth,
+  });
+  const verdict = buildVerdict({
+    inhouse: verdictInputOf(inhouseCost, scenarioResult.inhouse),
+    contractor: verdictInputOf(contractorCost, scenarioResult.contractor),
+    hybrid: verdictInputOf(hybridCost, scenarioResult.hybrid),
+  });
+
+  const analogueRows = toContractAnalogues(datasets, workType);
+  const { confidenceScore, warnings } = buildConfidenceAndWarnings({
+    task,
+    datasets,
+    workType,
+    combined,
+    analogueEstimateResult,
+    scheduleResult,
+    analogueRows,
+  });
+
+  const assumptions = buildAssumptions(utilization, options.hiring === true, model);
+  const risks = buildRisks(scenarioResult.inhouse.implementationRub);
+  const inputHash = hashInput(task, seed, datasetVersion, options);
+  const meta = {
+    datasetVersion,
+    inputHash,
+    seed,
+    methodWeights: { ...DEFAULT_WEIGHTS },
+  };
+
+  const inhouse = makeEstimate(
+    'inhouse',
+    task,
+    inhouseLines,
+    scenarioResult.inhouse,
+    inhouseCost,
+    effortGrid,
+    duration,
+    verdict,
+    confidenceScore,
+    assumptions,
+    risks,
+    analogueRows,
+    warnings,
+    meta,
+  );
+  const contractor = makeEstimate(
+    'contractor',
+    task,
+    contractorLines,
+    scenarioResult.contractor,
+    contractorCost,
+    effortGrid,
+    duration,
+    verdict,
+    confidenceScore,
+    assumptions,
+    risks,
+    analogueRows,
+    warnings,
+    meta,
+  );
+  const hybrid = makeEstimate(
+    'hybrid',
+    task,
+    hybridLines,
+    scenarioResult.hybrid,
+    hybridCost,
+    effortGrid,
+    duration,
+    verdict,
+    confidenceScore,
+    assumptions,
+    risks,
+    analogueRows,
+    warnings,
+    meta,
+  );
+
+  return {
+    estimates: { inhouse, contractor, hybrid },
+    verdict,
+    confidence: confidenceScore,
+    effortGrid,
+    formulaTree: inhouse.formulaTree,
+  };
+}
