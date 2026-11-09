@@ -12,11 +12,13 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "lint": "eslint packages scripts examples 2>/dev/null || eslint packages",
-    "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\""
+    "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
+    "data:manifest": "node scripts/build-manifest.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.10.2",
+    "esbuild": "^0.21.5",
     "eslint": "^10.14.0",
     "prettier": "^3.9.10",
     "typescript": "^5.7.2",
