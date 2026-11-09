@@ -1,0 +1,30 @@
+{
+  "name": "@app/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@app/contract": "0.1.0",
+    "@app/core": "0.1.0",
+    "@app/data": "0.1.0",
+    "@app/export": "0.1.0",
+    "@app/intake": "0.1.0",
+    "@fastify/cors": "^11.4.1",
+    "@fastify/multipart": "^10.1.8",
+    "fastify": "^5.12.8",
+    "xlsx": "^0.18.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.23.15",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": "..",
+    "paths": {
+      "@app/contract": ["shared/contract/src/index.ts"],
+      "@app/core": ["shared/core/src/index.ts"],
+      "@app/data": ["shared/data/src/index.ts"],
+      "@app/export": ["shared/export/src/index.ts"],
+      "@app/intake": ["shared/intake/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}
