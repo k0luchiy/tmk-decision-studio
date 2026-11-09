@@ -1,2 +1,2 @@
 // intake package
-export {};
+export * from './rules/index.js';
