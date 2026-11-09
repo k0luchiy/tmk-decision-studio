@@ -67,6 +67,14 @@ export {
   schedule,
 } from './schedule/schedule.js';
 export type { ScheduleInput, ScheduleResult, TeamMember } from './schedule/schedule.js';
+export { mulberry32, normalPair } from './risk/prng.js';
+export { DEFAULT_CORRELATION, DEFAULT_ITERATIONS, simulate } from './risk/monteCarlo.js';
+export type {
+  EstimateRange,
+  MonteCarloInput,
+  MonteCarloResult,
+  Quantiles,
+} from './risk/monteCarlo.js';
 export { D1_FLOWS, d1Task } from './fixtures/d1.js';
 export { computeCalcD1, formatCalcTable, runCalc } from './cli/calc.js';
 export type { CalcEffort, CalcResult, CalcScenario, CalcStageRow } from './cli/calc.js';
