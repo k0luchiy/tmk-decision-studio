@@ -1,6 +1,36 @@
 # 11. Анализ фронтенда и план интеграции с backend
 
-**Дата:** 9.11.2026 · **Статус:** анализ, решение не принято · **Фронт:** `frontend/` (добавлен вторым разработчиком).
+**Статус: интегрировано (10.11.2026).** Анализ ниже оставлен как история
+решений; актуальное состояние — в таблице и в `docs/10_api_contract.md`.
+
+**Реализовано**
+
+- Fastify BFF (`backend/`) со всеми эндпоинтами: health, meta, datasets,
+  intake/confirm, estimates (POST/GET list/GET by id), export PDF/XLSX/JSON,
+  multipart-импорт HelpDesk.
+- Адаптер фронта (`frontend/src/core/api.js`, `apiModel.js`, `apiRequest.js`):
+  `VITE_DATA_MODE=local|api`, debounce 500 мс, локальный fallback при ошибке API.
+- Backend — единственный источник цифр; `calc.js` работает только в `local`/
+  fallback и для короткого брифа.
+- История оценок через `GET /api/estimates` и `GET /api/estimates/:id`.
+- Матрица решений (scoreParts/recommended), sensitivity, distribution,
+  tco1/3/5, supportMonthly, per-stage `days`/`external` — собираются адаптером
+  из ответа API.
+- Брендированный PDF с полной матрицей трёх сценариев; XLSX; JSON-снимок.
+- UI: экран «Данные» на `/api/datasets`, импорт HelpDesk, intake-режимы
+  `off/cache/live`, статус API в шапке.
+
+**Осталось / осознанно не сделано**
+
+- Playwright-сценарий как обязательный CI-шаг (визуальный QA выполняется
+  отдельно, см. `docs/deliverables/TEST_REPORT.md` §5).
+- Авторизация, rate limiting, disk persistence, SSE-прогресс Jev.
+- `POST /api/estimates/:id/recalculate` — заменён новым POST с `options`.
+- Полный переход фронта на TypeScript: сейчас JS + адаптер и JSDoc-контракт.
+
+---
+
+**Дата анализа:** 9.11.2026 · **Исходный статус:** анализ, решение не принято · **Фронт:** `frontend/` (добавлен вторым разработчиком).
 
 ## 1. Что это за приложение
 

@@ -1,6 +1,6 @@
 # @app/contract
 
-Типы и zod-схемы данных Decision Cockpit: Task, WorkItem, Estimate, CostLine, Assumption, Risk, Analogue, Rate, Source, Scenario, Verdict, ConfidenceScore, FormulaNode, Warning, DataQualityReport. Правила интеграции — `docs/09_integration_contract.md`.
+Типы и zod-схемы данных TMK Decision Studio: Task, WorkItem, Estimate, CostLine, Assumption, Risk, Analogue, Rate, Source, Scenario, Verdict, ConfidenceScore, FormulaNode, Warning, DataQualityReport. Правила интеграции — `docs/09_integration_contract.md`.
 
 ## Импорт
 ```ts

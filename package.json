@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Decision Cockpit — estimation engine and modules (RadioHack 4.0)",
+  "description": "TMK Decision Studio — estimation engine, API and UI (RadioHack 4.0)",
   "license": "MIT",
   "workspaces": [
     "shared/*",
