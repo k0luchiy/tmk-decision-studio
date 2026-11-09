@@ -99,6 +99,14 @@ export {
 export type { TemplateInput, TemplateScenario } from './decision/templates.js';
 export { HYBRID_TCO_TOLERANCE, buildVerdict } from './decision/verdict.js';
 export type { VerdictInput, VerdictScenarioInput } from './decision/verdict.js';
+export {
+  CONFIDENCE_WEIGHTS,
+  HIGH_THRESHOLD,
+  MEDIUM_THRESHOLD,
+  ORDER_OF_MAGNITUDE_CAP,
+  confidence,
+} from './decision/confidence.js';
+export type { AccuracyClass, ConfidenceInput, ConfidenceWeights } from './decision/confidence.js';
 export { D1_FLOWS, d1Task } from './fixtures/d1.js';
 export { computeCalcD1, formatCalcTable, runCalc } from './cli/calc.js';
 export type { CalcEffort, CalcResult, CalcScenario, CalcStageRow } from './cli/calc.js';
