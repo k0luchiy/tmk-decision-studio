@@ -2,6 +2,17 @@
 
 import type { DataQualityReport, Task, WorkItem } from '@app/contract';
 import * as XLSX from 'xlsx';
+import type { WorkBook } from 'xlsx';
+
+/**
+ * `xlsx` is CommonJS; under native ESM (`tsx`, Vite SSR) the namespace may not
+ * expose `SSF` directly and only the `default` interop object does. Resolve
+ * both shapes once, without `any`, so date parsing works in every runtime.
+ */
+const xlsxRuntime = XLSX as unknown as {
+  SSF?: typeof XLSX.SSF;
+  default?: { SSF?: typeof XLSX.SSF };
+};
 
 /** Result of importing a HelpDesk workbook into the domain model. */
 export interface HelpdeskResult {
@@ -66,7 +77,8 @@ function pad(value: number): string {
 }
 
 function serialToIso(serial: number): string {
-  const parts = XLSX.SSF.parse_date_code(serial);
+  const ssf = xlsxRuntime.SSF ?? xlsxRuntime.default?.SSF;
+  const parts = ssf?.parse_date_code(serial);
   if (!parts) {
     return '';
   }
@@ -120,7 +132,7 @@ export interface Sheet {
   cell: (row: Row, key: ColumnKey) => unknown;
 }
 
-export function readSheet(wb: XLSX.WorkBook): Sheet {
+export function readSheet(wb: WorkBook): Sheet {
   const sheetName = wb.SheetNames[0];
   const sheet = sheetName === undefined ? undefined : wb.Sheets[sheetName];
   const rows: Row[] = sheet
