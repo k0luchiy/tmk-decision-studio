@@ -209,7 +209,8 @@ export function parseHelpdeskWorkbook(wb: XLSX.WorkBook): HelpdeskResult {
     const changeNumber = str(cell(row, 'change'));
     const activity = str(cell(row, 'activity'));
     const rawSpecialist = str(cell(row, 'specialist'));
-    const created = parseDate(cell(row, 'createdAt'));
+    const createdAtRaw = cell(row, 'createdAt');
+    const created = parseDate(createdAtRaw);
 
     if (number === '') {
       rowsDropped.push({ row: rowNumber, reason: 'missing_id' });
@@ -231,6 +232,9 @@ export function parseHelpdeskWorkbook(wb: XLSX.WorkBook): HelpdeskResult {
     const actualHours = num(cell(row, 'actual'));
     const quotedHours = num(cell(row, 'quoted'));
 
+    if (created === undefined && str(createdAtRaw) !== '') {
+      warnings.push(`row ${rowNumber}: bad_date`);
+    }
     if (kind === '') {
       warnings.push(`row ${rowNumber}: empty_kind`);
     }
