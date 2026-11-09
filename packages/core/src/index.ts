@@ -2,12 +2,7 @@
 export { STAGE_SHARES, stageSharesSum } from './sizing/stageShares.js';
 export type { StageShareKey } from './sizing/stageShares.js';
 export { buildWbs, WORK_TYPE_TO_ARCHETYPE } from './sizing/wbs.js';
-export {
-  DEFAULT_PDR_HOURS_PER_FP,
-  FP_WEIGHTS,
-  PDR_BY_PLATFORM,
-  fpLite,
-} from './sizing/fpLite.js';
+export { DEFAULT_PDR_HOURS_PER_FP, FP_WEIGHTS, PDR_BY_PLATFORM, fpLite } from './sizing/fpLite.js';
 export type { FpComponent, FpLiteInput, FpLiteResult, FpPlatform } from './sizing/fpLite.js';
 export {
   ANALOGUE_AGE_INDEX,
@@ -24,11 +19,7 @@ export type {
   RawAnalogue,
   UsedAnalogue,
 } from './sizing/analogues.js';
-export {
-  combineMethods,
-  DEFAULT_DIVERGENCE_THRESHOLD,
-  DEFAULT_WEIGHTS,
-} from './sizing/combine.js';
+export { combineMethods, DEFAULT_DIVERGENCE_THRESHOLD, DEFAULT_WEIGHTS } from './sizing/combine.js';
 export type { CombineMethodsInput, CombineMethodsResult, MethodWeights } from './sizing/combine.js';
 export {
   DEFAULT_UTILIZATION,
@@ -60,22 +51,22 @@ export type {
 } from './cost/contractor.js';
 export { costExtras } from './cost/extras.js';
 export type { CostExtra } from './cost/extras.js';
-export {
-  P10_Z,
-  P80_Z,
-  allocateCostByStage,
-  toStageGrid,
-} from './cost/stageGrid.js';
+export { P10_Z, P80_Z, allocateCostByStage, toStageGrid } from './cost/stageGrid.js';
 export type { StageCost } from './cost/stageGrid.js';
-export { D1_FLOWS, d1Task } from './fixtures/d1.js';
 export {
-  computeCalcD1,
-  formatCalcTable,
-  runCalc,
-} from './cli/calc.js';
-export type {
-  CalcEffort,
-  CalcResult,
-  CalcScenario,
-  CalcStageRow,
-} from './cli/calc.js';
+  RU_HOLIDAYS_2026_2027,
+  addWorkingDays,
+  formatCalendarDate,
+  isWorkingDay,
+  workingDaysBetween,
+} from './schedule/calendar.js';
+export {
+  COMPRESSION_WARNING_THRESHOLD,
+  DEFAULT_START_DATE,
+  HOURS_PER_WEEK_PER_FTE,
+  schedule,
+} from './schedule/schedule.js';
+export type { ScheduleInput, ScheduleResult, TeamMember } from './schedule/schedule.js';
+export { D1_FLOWS, d1Task } from './fixtures/d1.js';
+export { computeCalcD1, formatCalcTable, runCalc } from './cli/calc.js';
+export type { CalcEffort, CalcResult, CalcScenario, CalcStageRow } from './cli/calc.js';
