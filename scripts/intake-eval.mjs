@@ -1,4 +1,4 @@
-// Bundles packages/intake/src/cli-eval.ts and runs it on plain Node.
+// Bundles shared/intake/src/cli-eval.ts and runs it on plain Node.
 // The evaluation logic lives in TypeScript; esbuild turns it into an ES module
 // so `npm run intake:eval` needs no TS loader at runtime (same approach as
 // scripts/check-data.mjs).
@@ -9,7 +9,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const entryPoint = path.join(root, 'packages', 'intake', 'src', 'cli-eval.ts');
+const entryPoint = path.join(root, 'shared', 'intake', 'src', 'cli-eval.ts');
 
 const bundle = await build({
   entryPoints: [entryPoint],
@@ -24,7 +24,7 @@ const bundle = await build({
 
 const output = bundle.outputFiles?.[0];
 if (!output) {
-  throw new Error('esbuild produced no output for packages/intake/src/cli-eval.ts');
+  throw new Error('esbuild produced no output for shared/intake/src/cli-eval.ts');
 }
 
 const moduleUrl = `data:text/javascript;base64,${Buffer.from(output.text).toString('base64')}`;

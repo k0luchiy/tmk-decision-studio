@@ -1,4 +1,4 @@
-// Bundles packages/cli/src/e2e.ts and runs the D1–D3 smoke on plain Node.
+// Bundles shared/cli/src/e2e.ts and runs the D1–D3 smoke on plain Node.
 // The pipeline logic lives in TypeScript; esbuild turns it into an ES module so
 // `npm run e2e` needs no TS loader at runtime.
 //
@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL, URL } from 'node:url';
 import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const entryPoint = path.join(root, 'packages', 'cli', 'src', 'e2e.ts');
+const entryPoint = path.join(root, 'shared', 'cli', 'src', 'e2e.ts');
 const outDir = path.join(root, '.artifacts');
 const bundlePath = path.join(outDir, '.e2e-bundle.mjs');
 
@@ -32,7 +32,7 @@ const bundle = await build({
 
 const output = bundle.outputFiles?.[0];
 if (!output) {
-  throw new Error('esbuild produced no output for packages/cli/src/e2e.ts');
+  throw new Error('esbuild produced no output for shared/cli/src/e2e.ts');
 }
 
 await mkdir(outDir, { recursive: true });

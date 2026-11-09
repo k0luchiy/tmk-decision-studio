@@ -6,13 +6,15 @@
   "description": "Decision Cockpit — estimation engine and modules (RadioHack 4.0)",
   "license": "MIT",
   "workspaces": [
-    "packages/*"
+    "shared/*",
+    "frontend",
+    "backend"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "lint": "eslint packages scripts",
-    "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
+    "lint": "eslint shared scripts",
+    "format:check": "prettier --check \"shared/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
     "data:manifest": "node scripts/build-manifest.mjs",
     "data:check": "node scripts/check-data.mjs",
     "calc": "node scripts/calc.mjs",

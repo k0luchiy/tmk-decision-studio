@@ -8,7 +8,7 @@
 
 ```mermaid
 graph TD
-  subgraph Contract["@app/contract — ../../packages/contract"]
+  subgraph Contract["@app/contract — ../../shared/contract"]
     C1["primitives.ts — Warning, Source, Grade"]
     C2["entities/task.ts — Task, WorkItem, EffortGrid"]
     C3["entities/costing.ts — CostLine, Risk, Assumption, Rate"]
@@ -16,13 +16,13 @@ graph TD
     C5["entities/decision.ts — Estimate, Verdict, ConfidenceScore"]
   end
 
-  subgraph Data["@app/data — ../../packages/data"]
+  subgraph Data["@app/data — ../../shared/data"]
     D1["files.ts / loaders.ts — 6 датасетов + manifest"]
     D2["validators.ts / quality.ts — zod + отчёт о качестве"]
     D3["helpdesk.ts / manifest.ts — импорт и хеши"]
   end
 
-  subgraph Core["@app/core — ../../packages/core"]
+  subgraph Core["@app/core — ../../shared/core"]
     K1["sizing/ — wbs, fpLite, analogues, combine"]
     K2["cost/ — inhouse, contractor, stageGrid"]
     K3["risk/ — monteCarlo, prng"]
@@ -32,19 +32,19 @@ graph TD
     K7["pipeline.ts — estimateTask"]
   end
 
-  subgraph Intake["@app/intake — ../../packages/intake"]
+  subgraph Intake["@app/intake — ../../shared/intake"]
     I1["rules/ — classify, numbers, flags"]
     I2["jev/ — adapter, contract"]
     I3["merge.ts / cache.ts / pipeline.ts — classifyBrief"]
   end
 
-  subgraph Export["@app/export — ../../packages/export"]
+  subgraph Export["@app/export — ../../shared/export"]
     E1["snapshot.ts — канонический JSON + hash"]
     E2["xlsx.ts / pdf.ts"]
     E3["bundle.ts — export gate"]
   end
 
-  subgraph CLI["@app/cli — ../../packages/cli"]
+  subgraph CLI["@app/cli — ../../shared/cli"]
     L1["src/e2e.ts — D1–D3 smoke"]
   end
 
@@ -59,11 +59,11 @@ graph TD
   Export --> CLI
 ```
 
-Правила зависимостей (`../../packages/*/package.json`):
+Правила зависимостей (`../../shared/*/package.json`):
 
 - `@app/contract` не зависит ни от кого — только `zod`.
 - `@app/core` зависит от `@app/contract` и `@app/data`; **не** импортирует
-  `@app/intake`, `@app/export`, `apps/`.
+  `@app/intake`, `@app/export`, `frontend/`, `backend/`.
 - `@app/export` зависит от `@app/core` (типы/константы) и рендерит готовый
   `Estimate`.
 - `@app/cli` — единственное место, где встречаются intake + core + export.
@@ -95,7 +95,7 @@ sequenceDiagram
   E-->>F: JSON snapshot / XLSX / PDF
 ```
 
-точка входа CLI: `../../packages/cli/src/e2e.ts` → `../../scripts/e2e.mjs`. Она для D1–D3
+точка входа CLI: `../../shared/cli/src/e2e.ts` → `../../scripts/e2e.mjs`. Она для D1–D3
 читает `../../data/eval/briefs.json`, вызывает `classifyBrief` → `estimateTask` →
 `buildExportBundle` и пишет `.artifacts/<id>.{json,xlsx,pdf}` плюс `.artifacts/control.json`.
 
@@ -103,13 +103,13 @@ sequenceDiagram
 
 | Модуль | Файлы | Ответственность |
 |---|---|---|
-| sizing | `../../packages/core/src/sizing/wbs.ts`, `fpLite.ts`, `analogues.ts`, `combine.ts`, `stageShares.ts` | методы A/B/C, триангуляция |
-| cost | `../../packages/core/src/cost/inhouse.ts`, `contractor.ts`, `stageGrid.ts`, `extras.ts` | строки сметы, сетка часов |
-| risk | `../../packages/core/src/risk/monteCarlo.ts`, `prng.ts` | seeded Монте-Карло |
-| schedule | `../../packages/core/src/schedule/schedule.ts`, `calendar.ts` | срок, критический путь, Putnam |
-| scenarios | `../../packages/core/src/scenarios/scenarios.ts` | inhouse/contractor/hybrid, TCO, break-even |
-| decision | `../../packages/core/src/decision/verdict.ts`, `confidence.ts`, `formulaTree.ts`, `templates.ts` | вердикт, уверенность, дерево |
-| pipeline | `../../packages/core/src/pipeline.ts` | сборка `Estimate` и валидация схемой |
+| sizing | `../../shared/core/src/sizing/wbs.ts`, `fpLite.ts`, `analogues.ts`, `combine.ts`, `stageShares.ts` | методы A/B/C, триангуляция |
+| cost | `../../shared/core/src/cost/inhouse.ts`, `contractor.ts`, `stageGrid.ts`, `extras.ts` | строки сметы, сетка часов |
+| risk | `../../shared/core/src/risk/monteCarlo.ts`, `prng.ts` | seeded Монте-Карло |
+| schedule | `../../shared/core/src/schedule/schedule.ts`, `calendar.ts` | срок, критический путь, Putnam |
+| scenarios | `../../shared/core/src/scenarios/scenarios.ts` | inhouse/contractor/hybrid, TCO, break-even |
+| decision | `../../shared/core/src/decision/verdict.ts`, `confidence.ts`, `formulaTree.ts`, `templates.ts` | вердикт, уверенность, дерево |
+| pipeline | `../../shared/core/src/pipeline.ts` | сборка `Estimate` и валидация схемой |
 
 ## 4. Данные и версионирование
 
@@ -117,7 +117,7 @@ sequenceDiagram
 graph LR
   R["../../data/datasets/*.json"] --> M["../../scripts/build-manifest.mjs"]
   M --> MAN["../../data/manifest.json — datasetVersion"]
-  MAN --> L["../../packages/data/src/loaders.ts — loadDatasets()"]
+  MAN --> L["../../shared/data/src/loaders.ts — loadDatasets()"]
   L --> PIPE["estimateTask"]
   PIPE --> EST["Estimate.datasetVersion"]
   EST --> SNAP["JSON snapshot + hash"]
@@ -127,11 +127,11 @@ graph LR
 - `inputHash` — sha256 входа `{task, seed, datasetVersion, options}`.
 - `seed` — целое, фиксирует Монте-Карло.
 - Одинаковые `inputHash + datasetVersion + seed` ⇒ байт-в-байт одинаковый
-  результат (`../../packages/core/src/pipeline.test.ts`).
+  результат (`../../shared/core/src/pipeline.test.ts`).
 
 ## 5. Экспорт и gate
 
-`../../packages/export/src/bundle.ts`:
+`../../shared/export/src/bundle.ts`:
 
 1. Проверяет, что `params.length > 0` и все `status === 'confirmed'`
    (`needs_review` / `incomplete`).
@@ -147,4 +147,4 @@ graph LR
 получает `Estimate` JSON и валидирует `EstimateSchema.parse`. Импорт ядра
 (`@app/core`), intake (`@app/intake`) и экспорта (`@app/export`) — только на
 серверной стороне (Vite SSR / API / CLI). Подробно — `../../docs/09_integration_contract.md`
-§3.4 и `../../packages/contract/examples/contract-usage.ts`.
+§3.4 и `../../shared/contract/examples/contract-usage.ts`.

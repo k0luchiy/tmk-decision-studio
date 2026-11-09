@@ -1,5 +1,5 @@
 // Generates data/manifest.json from the source datasets.
-// The hashing logic lives in packages/data/src/manifest.ts; this script bundles
+// The hashing logic lives in shared/data/src/manifest.ts; this script bundles
 // that module with esbuild so it can run on plain Node without a TS loader.
 
 import { Buffer } from 'node:buffer';
@@ -10,7 +10,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const entryPoint = path.join(root, 'packages', 'data', 'src', 'manifest.ts');
+const entryPoint = path.join(root, 'shared', 'data', 'src', 'manifest.ts');
 
 const bundle = await build({
   entryPoints: [entryPoint],
@@ -25,7 +25,7 @@ const bundle = await build({
 
 const output = bundle.outputFiles?.[0];
 if (!output) {
-  throw new Error('esbuild produced no output for packages/data/src/manifest.ts');
+  throw new Error('esbuild produced no output for shared/data/src/manifest.ts');
 }
 
 const moduleUrl = `data:text/javascript;base64,${Buffer.from(output.text).toString('base64')}`;

@@ -4,11 +4,11 @@
 
 ## 1. Решение
 
-**HTTP REST API.** Frontend (React/Vite, `apps/web`) не импортирует расчётные пакеты. Он импортирует только типы из `@app/contract` и вызывает API. Backend (`apps/api`, Fastify) импортирует `@app/data`, `@app/core`, `@app/intake`, `@app/export` и выполняет всю работу.
+**HTTP REST API.** Frontend (React/Vite, `frontend`) не импортирует расчётные пакеты. Он импортирует только типы из `@app/contract` и вызывает API. Backend (`backend`, Fastify) импортирует `@app/data`, `@app/core`, `@app/intake`, `@app/export` и выполняет всю работу.
 
 ```
 ┌──────────────────┐   HTTP/JSON + файлы   ┌──────────────────────────────┐
-│ apps/web         │ ────────────────────► │ apps/api (Fastify, BFF)       │
+│ frontend         │ ────────────────────► │ backend (Fastify, BFF)        │
 │ React + Vite     │ ◄──────────────────── │ @app/data  @app/core         │
 │ только @app/     │   Estimate / PDF/XLSX │ @app/intake @app/export      │
 │ contract (типы)  │                       │ Jev key, датасеты, расчёт    │
@@ -30,18 +30,18 @@ Frontend **не считает** стоимость, проценты, ROI и н
 ## 2. Структура
 
 ```
-apps/
-├── web/                 # React + Vite (добавляет второй разработчик)
-│   ├── src/
-│   ├── vite.config.ts   # proxy /api → http://localhost:3001
-│   └── package.json     # зависимость: @app/contract
-└── api/                 # Fastify (backend-for-frontend)
-    ├── src/
-    │   ├── server.ts    # bootstrap, CORS, error handler
-    │   ├── routes/      # intake, estimates, datasets, export, meta
-    │   ├── store.ts     # in-memory + опционально data/estimates/*.json
-    │   └── errors.ts    # единый формат ошибок
-    └── package.json     # зависимости: @app/{contract,data,core,intake,export}
+frontend/
+├── src/
+├── vite.config.ts       # proxy /api → http://localhost:3001
+└── package.json         # зависимость: @app/contract
+
+backend/
+├── src/
+│   ├── server.ts    # bootstrap, CORS, error handler
+│   ├── routes/      # intake, estimates, datasets, export, meta
+│   ├── store.ts     # in-memory + опционально data/estimates/*.json
+│   └── errors.ts    # единый формат ошибок
+└── package.json     # зависимости: @app/{contract,data,core,intake,export}
 ```
 
 Порты: web — `5173`, api — `3001`. В dev Vite проксирует `/api`, поэтому CORS в браузере не нужен. CORS включается только для отдельного домена.
@@ -155,18 +155,18 @@ apps/
 
 **Dev:**
 ```ts
-// apps/web/vite.config.ts
+// frontend/vite.config.ts
 export default defineConfig({
   server: { proxy: { '/api': 'http://localhost:3001' } },
 });
 ```
 ```bash
-npm run dev:api   # tsx watch apps/api/src/server.ts
-npm run dev:web   # vite apps/web
+npm run dev:api   # tsx watch backend/src/server.ts
+npm run dev:web   # vite frontend
 # или оба: npm run dev (concurrently)
 ```
 
-**Prod:** статический билд `apps/web/dist` и `apps/api` за одним reverse proxy (nginx/Caddy), `/api` → api, остальное → `index.html`. CORS не нужен. `VITE_API_URL` — только если домены разные.
+**Prod:** статический билд `frontend/dist` и `backend` за одним reverse proxy (nginx/Caddy), `/api` → api, остальное → `index.html`. CORS не нужен. `VITE_API_URL` — только если домены разные.
 
 ## 5. Хранение
 
@@ -177,7 +177,7 @@ npm run dev:web   # vite apps/web
 
 ## 6. Безопасность
 
-- `OPENCODE_API_KEY` — только в окружении `apps/api`; в браузер не попадает.
+- `OPENCODE_API_KEY` — только в окружении `backend`; в браузер не попадает.
 - Лимит тела запроса 256 КБ; таймаут Jev 10 с; rate limit на `/api/intake` (например, 30/мин на IP) — на уровне Fastify.
 - В Jev уходят только тексты брифа; HelpDesk и внутренние данные — нет.
 - Персональные данные в брифах демо — вымышленные.
@@ -205,4 +205,4 @@ npm run dev:web   # vite apps/web
 1. Нужна ли авторизация (хотя бы один общий токен) для демо? Рекомендация: нет, но закрыть API от внешней сети.
 2. Хранить ли оценки на диске между рестартами? Рекомендация: да, `data/estimates/` с TTL.
 3. Нужен ли SSE/WS для прогресса Jev? Рекомендация: нет, 10 с укладывается в обычный запрос.
-4. Кто пишет `apps/api` — backend-разработчик или я? Рекомендация: я, по этому контракту; фронт только потребляет.
+4. Кто пишет `backend` — backend-разработчик или я? Рекомендация: я, по этому контракту; фронт только потребляет.

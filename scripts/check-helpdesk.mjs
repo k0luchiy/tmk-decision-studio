@@ -1,4 +1,4 @@
-// Bundles packages/data/src/cli-helpdesk.ts to a CommonJS file and runs it on
+// Bundles shared/data/src/cli-helpdesk.ts to a CommonJS file and runs it on
 // plain Node. esbuild produces an intermediate so `npm run helpdesk:check`
 // needs no TS loader at runtime; CJS is used because SheetJS relies on
 // `require`, which an ES-module data URL cannot provide.
@@ -10,7 +10,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const entryPoint = path.join(root, 'packages', 'data', 'src', 'cli-helpdesk.ts');
+const entryPoint = path.join(root, 'shared', 'data', 'src', 'cli-helpdesk.ts');
 const outDir = path.join(root, '.artifacts');
 const outFile = path.join(outDir, '.helpdesk-check.cjs');
 

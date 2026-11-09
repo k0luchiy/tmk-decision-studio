@@ -1,16 +1,16 @@
 # DATA_MODEL — сущности, поля, связи
 
-Модель данных задана **zod-схемами** в `../../packages/contract/src/` — это и runtime-
+Модель данных задана **zod-схемами** в `../../shared/contract/src/` — это и runtime-
 валидация, и TypeScript-типы (`z.infer`). Никакой другой источник истины для
 формы данных не используется: API, файлы, моки и экспорт проходят через те же
 схемы.
 
-- Примитивы: `../../packages/contract/src/primitives.ts`
-- Задачи и декомпозиция: `../../packages/contract/src/entities/task.ts`
-- Стоимость/риски/ставки: `../../packages/contract/src/entities/costing.ts`
-- Аналоги и формула-дерево: `../../packages/contract/src/entities/analogue.ts`
-- Вердикт/confidence/Estimate: `../../packages/contract/src/entities/decision.ts`
-- Единая точка экспорта: `../../packages/contract/src/index.ts`
+- Примитивы: `../../shared/contract/src/primitives.ts`
+- Задачи и декомпозиция: `../../shared/contract/src/entities/task.ts`
+- Стоимость/риски/ставки: `../../shared/contract/src/entities/costing.ts`
+- Аналоги и формула-дерево: `../../shared/contract/src/entities/analogue.ts`
+- Вердикт/confidence/Estimate: `../../shared/contract/src/entities/decision.ts`
+- Единая точка экспорта: `../../shared/contract/src/index.ts`
 
 ## 1. Основная цепочка
 
@@ -66,7 +66,7 @@ Estimate (aggregate root)
 | `defaultUsed` | boolean | Использовано значение по умолчанию |
 
 `status: 'auto'` блокирует экспорт: `buildExportBundle` требует, чтобы все
-параметры были `confirmed` (`../../packages/export/src/bundle.ts`).
+параметры были `confirmed` (`../../shared/export/src/bundle.ts`).
 
 ### WorkItem
 
@@ -186,9 +186,9 @@ licence?, type (primary|secondary|proxy|assumption)`.
 
 ## 4. Датасеты
 
-Код загрузки: `../../packages/data/src/loaders.ts`, список файлов —
-`../../packages/data/src/files.ts`, типы сырых строк — `../../packages/data/src/types.ts`,
-валидация — `../../packages/data/src/validators.ts`.
+Код загрузки: `../../shared/data/src/loaders.ts`, список файлов —
+`../../shared/data/src/files.ts`, типы сырых строк — `../../shared/data/src/types.ts`,
+валидация — `../../shared/data/src/validators.ts`.
 
 | Файл | Что содержит | Версия |
 |---|---|---|

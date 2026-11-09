@@ -48,7 +48,7 @@ RadioHack4.0/
 │   ├── eval/                    # briefs.json (12 брифов с метками)
 │   ├── cache/                   # кэш ответов Jev
 │   └── manifest.json            # версия каждого файла, дата, хеш, источник
-├── packages/
+├── shared/
 │   ├── core/                    # ЧИСТОЕ ЯДРО
 │   │   ├── model/               # типы: Task, WorkItem, Estimate, CostLine, Assumption, Risk, Analogue
 │   │   ├── sizing/              # методы A (WBS), B (FP-lite), C (аналоги)
@@ -68,9 +68,8 @@ RadioHack4.0/
 │   │   ├── rules/               # словарь ключевых слов и шаблоны
 │   │   └── jev/                 # адаптер Jev (systemone), вопросы, валидация ответа
 │   └── export/                  # PDF (print), XLSX, JSON-снимок
-├── apps/
-│   ├── web/                     # React UI (кокпит)
-│   └── api/                     # Fastify backend-for-frontend
+├── frontend/                    # React UI (кокпит)
+├── backend/                     # Fastify backend-for-frontend
 ├── scripts/                     # пересборка данных из data/datasets/, проверка манифеста
 └── tests/
     ├── core/                    # unit: формулы, Монте-Карло (фиксированный seed), граничные случаи
@@ -79,7 +78,7 @@ RadioHack4.0/
     └── control/                 # контрольные задачи D1–D3 с ожидаемыми диапазонами (TEST_REPORT)
 ```
 
-Правило: `packages/core` не импортирует `apps/`, `intake/llm` и `export/`. Зависимости только вниз. Проверка — линтер-правило или скрипт.
+Правило: `shared/core` не импортирует `frontend/`, `backend/`, `intake/llm` и `export/`. Зависимости только вниз. Проверка — линтер-правило или скрипт.
 
 **Размер файлов:** ≤ 250 строк на файл (внутреннее правило команды — принять в `DECISIONS.md`). Длинные таблицы — в JSON, не в коде.
 

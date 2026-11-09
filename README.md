@@ -30,9 +30,9 @@ npm run report         # docs/deliverables/TEST_REPORT.md из .artifacts/contro
 
 | Скрипт | Что делает | Выход |
 |---|---|---|
-| `npm run typecheck` | `tsc --noEmit` по всем пакетам и `packages/*/examples` | код возврата |
+| `npm run typecheck` | `tsc --noEmit` по всем пакетам и `shared/*/examples` | код возврата |
 | `npm test` | Vitest: unit, property (invariants), data, export | 210+ тестов |
-| `npm run lint` | ESLint по `packages`, `scripts` | код возврата |
+| `npm run lint` | ESLint по `shared`, `scripts` | код возврата |
 | `npm run data:manifest` | пересобирает `data/manifest.json` и `datasetVersion` | `data/manifest.json` |
 | `npm run data:check` | проверяет датасеты, схемы, порядок ставок | отчёт в `.artifacts/` |
 | `npm run calc` | демо-расчёт D1 по этапам | `.artifacts/calc-d1.json` |
@@ -46,8 +46,8 @@ npm run report         # docs/deliverables/TEST_REPORT.md из .artifacts/contro
 ## Что где лежит
 
 В корне — только `README.md`, `LICENSE`, конфиги (`package.json`, `tsconfig*.json`,
-`eslint.config.js`, `vitest.config.ts`, `.prettierrc`, …), `apps/`, `packages/`,
-`data/`, `docs/`, `research/`, `scripts/`.
+`eslint.config.js`, `vitest.config.ts`, `.prettierrc`, …), `frontend/`, `backend/`,
+`shared/`, `data/`, `docs/`, `research/`, `scripts/`.
 
 ```
 ├── README.md                 # этот файл
@@ -55,10 +55,9 @@ npm run report         # docs/deliverables/TEST_REPORT.md из .artifacts/contro
 ├── package.json              # workspace-скрипты (typecheck, test, lint, …)
 ├── tsconfig.json             # корневая проверка типов
 ├── eslint.config.js          # ESLint
-├── apps/
-│   ├── web/                  # React/Vite кокпит
-│   └── api/                  # Fastify backend-for-frontend
-├── packages/
+├── frontend/                 # React/Vite кокпит
+├── backend/                  # Fastify backend-for-frontend
+├── shared/
 │   ├── contract/             # zod-схемы и типы (единый контракт) + examples/contract-usage.ts
 │   ├── data/                 # загрузка, валидация, импорт HelpDesk
 │   ├── core/                 # чистый расчёт: sizing, cost, risk, schedule, decision, pipeline
@@ -92,7 +91,7 @@ Deliverables (итоговые документы поставки) лежат �
 
 | Роль | Ответственность | Блоки |
 |---|---|---|
-| R1 Техлид / ядро | архитектура, `packages/core`, интеграция, ревью | Архитектура и код |
+| R1 Техлид / ядро | архитектура, `shared/core`, интеграция, ревью | Архитектура и код |
 | R2 Расчёт | формулы, Монте-Карло, аналоги, `docs/deliverables/METHOD.md` | Рыночная оценка, объяснимость |
 | R3 Данные | загрузчики, валидаторы, HelpDesk, `docs/deliverables/DATA_MODEL.md` | Данные и интеграции |
 | R4 UI/UX | кокпит, графики, формула-дерево, PDF/XLSX | Прототип, удобство |

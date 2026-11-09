@@ -5,18 +5,18 @@
     "baseUrl": ".",
     "paths": {
       "@app/contract": [
-        "packages/contract/src/index.ts"
+        "shared/contract/src/index.ts"
       ],
       "@app/core": [
-        "packages/core/src/index.ts"
+        "shared/core/src/index.ts"
       ],
       "@app/data": [
-        "packages/data/src/index.ts"
+        "shared/data/src/index.ts"
       ]
     }
   },
   "include": [
-    "packages/*/src/**/*.ts",
-    "packages/*/examples/**/*.ts"
+    "shared/*/src/**/*.ts",
+    "shared/*/examples/**/*.ts"
   ]
 }

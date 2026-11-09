@@ -10,7 +10,7 @@
 ## 1. Что импортирует фронт
 
 Единственный источник типов и схем — пакет `@app/contract`. В исходниках он
-разрешается в `packages/contract/src/index.ts` (workspace + `paths` в корневом
+разрешается в `shared/contract/src/index.ts` (workspace + `paths` в корневом
 `tsconfig.json`).
 
 ```ts
@@ -44,18 +44,18 @@ import type {
 
 Мок для разработки и демо:
 
-- `packages/contract/mock/d1.scenarios.json` — массив из трёх сценариев D1:
+- `shared/contract/mock/d1.scenarios.json` — массив из трёх сценариев D1:
   `inhouse`, `contractor`, `hybrid`. У всех одинаковые `taskId`, `datasetVersion`,
   `inputHash`, `seed` и разные `id`.
-- `packages/contract/mock/d1.estimate.json` — одиночный снимок (сценарий `hybrid`).
+- `shared/contract/mock/d1.estimate.json` — одиночный снимок (сценарий `hybrid`).
 
 ```ts
-import d1ScenariosJson from '../packages/contract/mock/d1.scenarios.json' assert { type: 'json' };
+import d1ScenariosJson from '../shared/contract/mock/d1.scenarios.json' assert { type: 'json' };
 
 const scenarios: Estimate[] = EstimateSchema.array().parse(d1ScenariosJson);
 ```
 
-Компилируемый пример: `packages/contract/examples/contract-usage.ts` (проверяется `npm run typecheck`).
+Компилируемый пример: `shared/contract/examples/contract-usage.ts` (проверяется `npm run typecheck`).
 
 ## 2. Поле → что рисует фронт
 
@@ -171,28 +171,28 @@ const scenarios: Estimate[] = EstimateSchema.array().parse(d1ScenariosJson);
 ## 3. Реализованные функции (статус `implemented`)
 
 Ниже — фактический публичный API. Все функции реализованы, покрыты тестами и
-экспортируются пакетами. `@app/*` — workspace-пакеты из `packages/*`; в корневом
+экспортируются пакетами. `@app/*` — workspace-пакеты из `shared/*`; в корневом
 `tsconfig.json` они разрешаются через `paths`, в runtime — через symlink из
 `node_modules/@app`. Фронт не дублирует эти расчёты (см. §4.1).
 
-### 3.1. `@app/core` — `packages/core/src/index.ts`
+### 3.1. `@app/core` — `shared/core/src/index.ts`
 
 | Функция | Сигнатура | Файл |
 |---|---|---|
-| `buildWbs` | `(task: Task, archetypes: Archetype[], params?: { unitsCount?: number; stageShares?: typeof STAGE_SHARES }) => WorkItem[]` | `packages/core/src/sizing/wbs.ts` |
-| `combineMethods` | `(input: CombineMethodsInput) => CombineMethodsResult` | `packages/core/src/sizing/combine.ts` |
-| `costInhouse` | `(input: InhouseInput) => CostLine[]` | `packages/core/src/cost/inhouse.ts` |
-| `costContractor` | `(input: ContractorInput) => CostLine[]` | `packages/core/src/cost/contractor.ts` |
-| `buildScenarios` | `(input: ScenarioInput) => { inhouse: ScenarioResult; contractor: ScenarioResult; hybrid: ScenarioResult }` | `packages/core/src/scenarios/scenarios.ts` |
-| `buildVerdict` | `(input: VerdictInput) => Verdict` | `packages/core/src/decision/verdict.ts` |
-| `confidence` | `(input: ConfidenceInput) => ConfidenceScore` | `packages/core/src/decision/confidence.ts` |
-| `buildFormulaTree` | `(input: FormulaTreeInput) => FormulaNode` | `packages/core/src/decision/formulaTree.ts` |
-| `simulate` | `(input: MonteCarloInput) => MonteCarloResult` | `packages/core/src/risk/monteCarlo.ts` |
-| `schedule` | `(input: ScheduleInput) => ScheduleResult` | `packages/core/src/schedule/schedule.ts` |
-| `estimateTask` | `(input: EstimateTaskInput) => EstimateTaskResult` | `packages/core/src/pipeline.ts` |
+| `buildWbs` | `(task: Task, archetypes: Archetype[], params?: { unitsCount?: number; stageShares?: typeof STAGE_SHARES }) => WorkItem[]` | `shared/core/src/sizing/wbs.ts` |
+| `combineMethods` | `(input: CombineMethodsInput) => CombineMethodsResult` | `shared/core/src/sizing/combine.ts` |
+| `costInhouse` | `(input: InhouseInput) => CostLine[]` | `shared/core/src/cost/inhouse.ts` |
+| `costContractor` | `(input: ContractorInput) => CostLine[]` | `shared/core/src/cost/contractor.ts` |
+| `buildScenarios` | `(input: ScenarioInput) => { inhouse: ScenarioResult; contractor: ScenarioResult; hybrid: ScenarioResult }` | `shared/core/src/scenarios/scenarios.ts` |
+| `buildVerdict` | `(input: VerdictInput) => Verdict` | `shared/core/src/decision/verdict.ts` |
+| `confidence` | `(input: ConfidenceInput) => ConfidenceScore` | `shared/core/src/decision/confidence.ts` |
+| `buildFormulaTree` | `(input: FormulaTreeInput) => FormulaNode` | `shared/core/src/decision/formulaTree.ts` |
+| `simulate` | `(input: MonteCarloInput) => MonteCarloResult` | `shared/core/src/risk/monteCarlo.ts` |
+| `schedule` | `(input: ScheduleInput) => ScheduleResult` | `shared/core/src/schedule/schedule.ts` |
+| `estimateTask` | `(input: EstimateTaskInput) => EstimateTaskResult` | `shared/core/src/pipeline.ts` |
 
 ```ts
-// packages/core/src/pipeline.ts — единственная точка входа полного расчёта
+// shared/core/src/pipeline.ts — единственная точка входа полного расчёта
 interface EstimateTaskOptions {
   hiring?: boolean;
   utilization?: number;              // (0, 1], default 0.7
@@ -227,13 +227,13 @@ options})`, `methodWeights = { a: 0.5, b: 0.2, c: 0.3 }` (методы A/B/C и�
 `schedule`. `estimateTask` использует `node:crypto`, поэтому вызывается на
 сервере/в CLI, а не в браузерном бандле.
 
-### 3.2. `@app/intake` — `packages/intake/src/index.ts`
+### 3.2. `@app/intake` — `shared/intake/src/index.ts`
 
 | Функция | Сигнатура | Файл |
 |---|---|---|
-| `classifyBrief` | `(brief: string, opts?: ClassifyBriefOptions) => Promise<ClassifyBriefResult>` | `packages/intake/src/pipeline.ts` |
-| `evaluateIntake` | `(briefs: EvalBrief[], classifyFn: EvalClassifier) => Promise<EvalReport>` | `packages/intake/src/eval.ts` |
-| `confirmParam` / `allConfirmed` | `(params, key, value?) => MergedParam[]` / `(params) => boolean` | `packages/intake/src/merge.ts` |
+| `classifyBrief` | `(brief: string, opts?: ClassifyBriefOptions) => Promise<ClassifyBriefResult>` | `shared/intake/src/pipeline.ts` |
+| `evaluateIntake` | `(briefs: EvalBrief[], classifyFn: EvalClassifier) => Promise<EvalReport>` | `shared/intake/src/eval.ts` |
+| `confirmParam` / `allConfirmed` | `(params, key, value?) => MergedParam[]` / `(params) => boolean` | `shared/intake/src/merge.ts` |
 
 ```ts
 type IntakeMode = 'off' | 'cache' | 'live';
@@ -244,13 +244,13 @@ interface ClassifyBriefResult { params: MergedParam[]; status: 'rules' | 'jev-ca
 `classifyBrief` возвращает `params` со `status: 'auto'`. До подтверждения
 (`confirmParam`) экспорт заблокирован (`ExportError('needs_review')`).
 
-### 3.3. `@app/export` — `packages/export/src/index.ts`
+### 3.3. `@app/export` — `shared/export/src/index.ts`
 
 | Функция | Сигнатура | Файл |
 |---|---|---|
-| `buildExportBundle` | `(input: BuildExportBundleInput) => Promise<ExportBundle>` | `packages/export/src/bundle.ts` |
-| `toSnapshot` / `fromSnapshot` | `(input: ToSnapshotInput) => ExportSnapshot` / `(json: unknown) => ExportSnapshot` | `packages/export/src/snapshot.ts` |
-| `toXlsx` / `toPdf` | `(estimate: Estimate) => Buffer` / `(estimate: Estimate) => Promise<Buffer>` | `packages/export/src/xlsx.ts`, `pdf.ts` |
+| `buildExportBundle` | `(input: BuildExportBundleInput) => Promise<ExportBundle>` | `shared/export/src/bundle.ts` |
+| `toSnapshot` / `fromSnapshot` | `(input: ToSnapshotInput) => ExportSnapshot` / `(json: unknown) => ExportSnapshot` | `shared/export/src/snapshot.ts` |
+| `toXlsx` / `toPdf` | `(estimate: Estimate) => Buffer` / `(estimate: Estimate) => Promise<Buffer>` | `shared/export/src/xlsx.ts`, `pdf.ts` |
 
 ```ts
 type ExportFormat = 'json' | 'xlsx' | 'pdf';

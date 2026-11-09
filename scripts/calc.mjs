@@ -1,4 +1,4 @@
-// Bundles packages/core/src/cli/calc.ts and runs the exported `runCalc`.
+// Bundles shared/core/src/cli/calc.ts and runs the exported `runCalc`.
 // The calculation logic lives in TypeScript; esbuild turns it into an ES module
 // so `npm run calc` needs no TS loader at runtime (same approach as
 // scripts/check-data.mjs).
@@ -10,7 +10,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const entryPoint = path.join(root, 'packages', 'core', 'src', 'cli', 'calc.ts');
+const entryPoint = path.join(root, 'shared', 'core', 'src', 'cli', 'calc.ts');
 
 const bundle = await build({
   entryPoints: [entryPoint],
@@ -25,7 +25,7 @@ const bundle = await build({
 
 const output = bundle.outputFiles?.[0];
 if (!output) {
-  throw new Error('esbuild produced no output for packages/core/src/cli/calc.ts');
+  throw new Error('esbuild produced no output for shared/core/src/cli/calc.ts');
 }
 
 const moduleUrl = `data:text/javascript;base64,${Buffer.from(output.text).toString('base64')}`;

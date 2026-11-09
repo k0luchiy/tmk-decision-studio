@@ -22,14 +22,14 @@ Task → WBS (метод A) ─┐
                               └→ buildFormulaTree → дерево «формула по клику»
 ```
 
-Точка входа: `estimateTask` в `../../packages/core/src/pipeline.ts`. Она возвращает три
+Точка входа: `estimateTask` в `../../shared/core/src/pipeline.ts`. Она возвращает три
 полных `Estimate` (`inhouse`, `contractor`, `hybrid`), общий вердикт, confidence,
 `EffortGrid` и `FormulaNode`. Все результаты валидируются `EstimateSchema` из
-`../../packages/contract/src/entities/decision.ts`.
+`../../shared/contract/src/entities/decision.ts`.
 
 ## 2. Метод A — WBS из архетипов
 
-Код: `../../packages/core/src/sizing/wbs.ts`, доли этапов — `../../packages/core/src/sizing/stageShares.ts`.
+Код: `../../shared/core/src/sizing/wbs.ts`, доли этапов — `../../shared/core/src/sizing/stageShares.ts`.
 
 - Тип работы определяется по параметрам брифа, затем по ключевым словам
   (`resolveWorkType`), и маппится на архетип (`WORK_TYPE_TO_ARCHETYPE`).
@@ -52,7 +52,7 @@ E = (O + 4·M + P) / 6
 
 ## 3. Метод B — FP-lite
 
-Код: `../../packages/core/src/sizing/fpLite.ts`.
+Код: `../../shared/core/src/sizing/fpLite.ts`.
 
 ```
 FP = Σ count(type) × weight(type)
@@ -66,7 +66,7 @@ PDR по платформам: `traditional 8.3`, `java 8.7`, `lowcode 1.8`, `sa
 
 ## 4. Метод C — аналоги
 
-Код: `../../packages/core/src/sizing/analogues.ts`.
+Код: `../../shared/core/src/sizing/analogues.ts`.
 
 ```
 base        = price_mid, иначе (price_low + price_high) / 2
@@ -87,7 +87,7 @@ K_age       = 1.08 ^ (targetYear − year), если year ≤ targetYear
 
 ## 5. Триангуляция A/B/C
 
-Код: `../../packages/core/src/sizing/combine.ts`.
+Код: `../../shared/core/src/sizing/combine.ts`.
 
 ```
 effort = 0.5·A + 0.2·B + 0.3·C
@@ -101,7 +101,7 @@ divergence = max(A,B,C) / min(A,B,C) − 1
 
 ## 6. Сетка трудоёмкости
 
-Код: `../../packages/core/src/cost/stageGrid.ts`.
+Код: `../../shared/core/src/cost/stageGrid.ts`.
 
 ```
 p50 = Σ expectedHours
@@ -116,7 +116,7 @@ p90 = p50 + 1.2816·σ
 
 ## 7. Стоимость «своей команды»
 
-Код: `../../packages/core/src/cost/inhouse.ts`.
+Код: `../../shared/core/src/cost/inhouse.ts`.
 
 - Труд: `часы × fully_loaded_hour` из `rate_cards.json` (`status: 'fact'`).
   Ставка **не пересчитывается** — берётся `fully_loaded_hour` строки файла.
@@ -133,7 +133,7 @@ p90 = p50 + 1.2816·σ
 
 ## 8. Стоимость подрядчика
 
-Код: `../../packages/core/src/cost/contractor.ts`.
+Код: `../../shared/core/src/cost/contractor.ts`.
 
 - Труд: `часы × rate_mid` из `contractor_rate_cards.json` (geo RU).
 - Координация: `Σlabor × 0.15`.
@@ -146,7 +146,7 @@ p90 = p50 + 1.2816·σ
 
 ## 9. Сценарии, TCO и break-even
 
-Код: `../../packages/core/src/scenarios/scenarios.ts`.
+Код: `../../shared/core/src/scenarios/scenarios.ts`.
 
 - `inhouse` — всё внутри; `contractor` — всё подрядчиком; `hybrid` —
   подрядчик владеет этапом 3 («Разработка»), остальное внутри:
@@ -161,7 +161,7 @@ p90 = p50 + 1.2816·σ
 
 ## 10. Монте-Карло
 
-Код: `../../packages/core/src/risk/monteCarlo.ts`, PRNG — `risk/prng.ts`.
+Код: `../../shared/core/src/risk/monteCarlo.ts`, PRNG — `risk/prng.ts`.
 
 ```
 μ = (ln p10 + ln p90) / 2
@@ -178,7 +178,7 @@ z' = ρ·zg + √(1 − ρ²)·zi
 
 ## 11. Срок и критический путь
 
-Код: `../../packages/core/src/schedule/schedule.ts`, календарь — `schedule/calendar.ts`.
+Код: `../../shared/core/src/schedule/schedule.ts`, календарь — `schedule/calendar.ts`.
 
 ```
 HPPW = 120 × 12 / 52 ≈ 27.69 продуктивных часов/нед на FTE
@@ -195,7 +195,7 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 ## 12. Вердикт
 
-Код: `../../packages/core/src/decision/verdict.ts`, тексты — `decision/templates.ts`.
+Код: `../../shared/core/src/decision/verdict.ts`, тексты — `decision/templates.ts`.
 
 Правила применяются по порядку:
 
@@ -210,7 +210,7 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 ## 13. Уверенность (Confidence Score)
 
-Код: `../../packages/core/src/decision/confidence.ts`.
+Код: `../../shared/core/src/decision/confidence.ts`.
 
 | Компонент | Вес | Что измеряет |
 |---|---:|---|
@@ -225,7 +225,7 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 ## 14. Формула-дерево
 
-Код: `../../packages/core/src/decision/formulaTree.ts`.
+Код: `../../shared/core/src/decision/formulaTree.ts`.
 
 Корень `cost_p50` = сумма строк сметы; дети — `effort` (P50 часы), `reserve`
 (P80 − P50) и группы статей (`labor`, `coordination`, `risk`, `vat`, `hiring`,
