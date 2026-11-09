@@ -68,7 +68,7 @@ export const JevAnswerSchema = z.object({
   type: z.enum(['noul', 'choice', 'score']),
   value: z.union([z.boolean(), z.string(), z.number()]),
   probability: z.number().min(0).max(1),
-  model: z.literal('jev-1.13'),
+  model: z.enum(['jev-1.13', 'jev-1.13-free']),
   promptVersion: z.string(),
   stateHash: z.string(),
 });

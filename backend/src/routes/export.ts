@@ -2,10 +2,11 @@
 
 import type { FastifyInstance } from 'fastify';
 import type { Estimate, Verdict } from '@app/contract';
+import type { EstimateTaskResult } from '@app/core';
 import { buildExportBundle } from '@app/export';
 import { z } from 'zod';
 import { ApiError } from '../errors.js';
-import { getEstimate, type StoredEstimate } from '../store.js';
+import { getEstimate } from '../store.js';
 
 const ExportBodySchema = z.object({
   format: z.enum(['json', 'xlsx', 'pdf']),
@@ -14,7 +15,7 @@ const ExportBodySchema = z.object({
 /** Picks the estimate matching the verdict; `parity` falls back to hybrid. */
 function winnerEstimate(
   code: Verdict['code'],
-  estimates: StoredEstimate['estimates'],
+  estimates: EstimateTaskResult['estimates'],
 ): Estimate {
   if (code === 'inhouse') {
     return estimates.inhouse;
@@ -33,10 +34,10 @@ export async function exportRoutes(app: FastifyInstance): Promise<void> {
       throw new ApiError(404, 'not_found', `Estimate not found: ${request.params.id}`);
     }
 
-    const estimate = winnerEstimate(stored.verdict.code, stored.estimates);
+    const estimate = winnerEstimate(stored.verdict.code, stored.result.estimates);
     const bundle = await buildExportBundle({
       estimate,
-      params: stored.params.map((param) => ({ status: param.status })),
+      params: stored.result.params.map((param) => ({ status: param.status })),
       datasetVersion: stored.datasetVersion,
       seed: stored.seed,
       format: body.format,

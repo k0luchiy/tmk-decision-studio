@@ -18,6 +18,17 @@ export const SIMULATION_CORRELATION = 0.5;
 /** Contractor stages owned by the contractor in the hybrid scenario. */
 export const HYBRID_CONTRACTOR_STAGES: readonly number[] = [3];
 
+/** Scenario an attachable extra is billed to. */
+export type ExtraTarget = 'all' | 'inhouse' | 'contractor' | 'hybrid';
+
+/** One attachable extra article (`docs/03_estimation_model.md` §5.3). */
+export interface EstimateExtra {
+  label: string;
+  amountRub: number;
+  /** Default `all`. */
+  appliesTo?: ExtraTarget;
+}
+
 /** Options that shape the two cost bases. All are optional. */
 export interface EstimateTaskOptions {
   /** Add a hiring line for the most loaded role. */
@@ -38,6 +49,10 @@ export interface EstimateTaskOptions {
   contractorStages?: number[];
   /** Target hours per stage 1..7; overrides the WBS after triangulation. */
   stageHours?: Record<number, number>;
+  /** Deadline in weeks (`>= 1`); compresses the schedule via Putnam. */
+  targetWeeks?: number;
+  /** Attachable cost lines billed to the selected scenarios (default `all`). */
+  extras?: EstimateExtra[];
 }
 
 /** Input of {@link estimateTask}. */
@@ -60,4 +75,6 @@ export interface EstimateTaskResult {
   confidence: ConfidenceScore;
   effortGrid: EffortGrid;
   formulaTree: FormulaNode;
+  /** Relative spread `max / min − 1` between methods A/B/C. */
+  methodDivergence: number;
 }

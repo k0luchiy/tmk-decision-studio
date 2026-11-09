@@ -38,11 +38,30 @@ export const JEV_PROMPT: JevPromptFile = JevPromptFileSchema.parse(questionsJson
 export const JEV_QUESTIONS: readonly JevQuestion[] = JEV_PROMPT.questions;
 export const JEV_PROMPT_VERSION: string = JEV_PROMPT.meta.version;
 
-/** Raw answer entry: `probability` is optional on the wire. */
-export const JevAnswerEntrySchema = z.object({
-  value: z.union([z.boolean(), z.string(), z.number()]),
-  probability: z.number().min(0).max(1).optional(),
-});
+/** Raw answer entry: legacy `{value, probability}` or the live Jev shape. */
+export const JevAnswerEntrySchema = z.union([
+  z.object({
+    value: z.union([z.boolean(), z.string(), z.number()]),
+    probability: z.number().min(0).max(1).optional(),
+  }),
+  z.object({
+    type: z.literal('choice'),
+    choice: z.string().min(1),
+    confidence: z.number().min(0).max(1).optional(),
+    probabilities: z.record(z.string(), z.number()).optional(),
+  }),
+  z.object({
+    type: z.literal('noul'),
+    noul: z.number().min(0).max(1),
+  }),
+  z.object({
+    type: z.literal('score'),
+    score: z.number(),
+    confidence: z.number().min(0).max(1).optional(),
+    probabilities: z.record(z.string(), z.number()).optional(),
+    legend: z.record(z.string(), z.string()).optional(),
+  }),
+]);
 export type JevAnswerEntry = z.infer<typeof JevAnswerEntrySchema>;
 
 /**
@@ -101,6 +120,47 @@ function normalizeValue(
   return undefined;
 }
 
+function clampProbability(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return 0;
+  return Math.min(1, Math.max(0, value));
+}
+
+/**
+ * Normalizes either wire entry into `{value, probability}` for one question.
+ * The live Jev shape carries `choice` / `noul` / `score` instead of `value`.
+ */
+function normalizeEntry(
+  question: JevQuestion,
+  entry: JevAnswerEntry,
+): { value: JevAnswer['value']; probability: number } | undefined {
+  if ('value' in entry) {
+    const value = normalizeValue(question, entry.value);
+    return value === undefined ? undefined : { value, probability: clampProbability(entry.probability) };
+  }
+
+  if ('choice' in entry && question.type === 'choice') {
+    const value = normalizeValue(question, entry.choice);
+    if (value === undefined) return undefined;
+    const probability = entry.probabilities?.[entry.choice] ?? entry.confidence;
+    return { value, probability: clampProbability(probability) };
+  }
+
+  if ('noul' in entry && question.type === 'noul') {
+    const value = entry.noul >= 0.5;
+    return { value, probability: value ? entry.noul : 1 - entry.noul };
+  }
+
+  if ('score' in entry && question.type === 'score') {
+    const index = Math.round(entry.score);
+    const value = normalizeValue(question, index);
+    if (value === undefined) return undefined;
+    const probability = entry.probabilities?.[String(index)] ?? entry.confidence;
+    return { value, probability: clampProbability(probability) };
+  }
+
+  return undefined;
+}
+
 /**
  * Validate a raw Jev response and normalize it into contract answers.
  * Unknown question IDs are ignored; any known question with an invalid
@@ -121,14 +181,14 @@ export function normalizeJevResponse(
     const question = byId.get(questionId);
     if (question === undefined) continue;
 
-    const value = normalizeValue(question, entry.value);
-    if (value === undefined) return { ok: false };
+    const normalized = normalizeEntry(question, entry);
+    if (normalized === undefined) return { ok: false };
 
     answers.push({
       questionId,
       type: question.type,
-      value,
-      probability: entry.probability ?? 0,
+      value: normalized.value,
+      probability: normalized.probability,
       model: context.model,
       promptVersion: context.promptVersion,
       stateHash: context.stateHash,

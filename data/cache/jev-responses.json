@@ -3,15 +3,15 @@
   "entries": [
     {
       "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0",
-      "model": "jev-1.13",
+      "model": "jev-1.13-free",
       "promptVersion": "1.0.0",
       "answers": [
         {
           "questionId": "work_type",
           "type": "choice",
           "value": "integration",
-          "probability": 0.93,
-          "model": "jev-1.13",
+          "probability": 1,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -19,8 +19,8 @@
           "questionId": "platform",
           "type": "choice",
           "value": "1c",
-          "probability": 0.96,
-          "model": "jev-1.13",
+          "probability": 1,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -28,8 +28,8 @@
           "questionId": "security_kii",
           "type": "noul",
           "value": false,
-          "probability": 0.88,
-          "model": "jev-1.13",
+          "probability": 0.73,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -38,7 +38,7 @@
           "type": "noul",
           "value": true,
           "probability": 0.97,
-          "model": "jev-1.13",
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -46,8 +46,8 @@
           "questionId": "integrations_scale",
           "type": "choice",
           "value": "6-10",
-          "probability": 0.81,
-          "model": "jev-1.13",
+          "probability": 1,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -55,8 +55,8 @@
           "questionId": "mobile",
           "type": "noul",
           "value": false,
-          "probability": 0.92,
-          "model": "jev-1.13",
+          "probability": 0.83,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -64,8 +64,8 @@
           "questionId": "complexity",
           "type": "score",
           "value": 2,
-          "probability": 0.64,
-          "model": "jev-1.13",
+          "probability": 0.68,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
@@ -73,33 +73,34 @@
           "questionId": "has_scope_numbers",
           "type": "noul",
           "value": true,
-          "probability": 0.95,
-          "model": "jev-1.13",
+          "probability": 0.98,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         },
         {
           "questionId": "greenfield",
           "type": "noul",
-          "value": false,
-          "probability": 0.7,
-          "model": "jev-1.13",
+          "value": true,
+          "probability": 0.5,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "b428f53f5f73f5785ebab9d2ad05be465d536a14b8e41e49af1731a3ed2001d0"
         }
-      ]
+      ],
+      "savedAt": "2026-11-09T22:52:38.956Z"
     },
     {
       "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c",
-      "model": "jev-1.13",
+      "model": "jev-1.13-free",
       "promptVersion": "1.0.0",
       "answers": [
         {
           "questionId": "work_type",
           "type": "choice",
-          "value": "development",
-          "probability": 0.91,
-          "model": "jev-1.13",
+          "value": "mobile",
+          "probability": 0.99,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -107,8 +108,8 @@
           "questionId": "platform",
           "type": "choice",
           "value": "mobile",
-          "probability": 0.89,
-          "model": "jev-1.13",
+          "probability": 1,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -116,8 +117,8 @@
           "questionId": "security_kii",
           "type": "noul",
           "value": false,
-          "probability": 0.86,
-          "model": "jev-1.13",
+          "probability": 0.83,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -125,8 +126,8 @@
           "questionId": "has_integrations",
           "type": "noul",
           "value": false,
-          "probability": 0.72,
-          "model": "jev-1.13",
+          "probability": 0.5800000000000001,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -134,8 +135,8 @@
           "questionId": "integrations_scale",
           "type": "choice",
           "value": "0-2",
-          "probability": 0.6,
-          "model": "jev-1.13",
+          "probability": 0.92,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -143,8 +144,8 @@
           "questionId": "mobile",
           "type": "noul",
           "value": true,
-          "probability": 0.94,
-          "model": "jev-1.13",
+          "probability": 0.92,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -152,8 +153,8 @@
           "questionId": "complexity",
           "type": "score",
           "value": 2,
-          "probability": 0.66,
-          "model": "jev-1.13",
+          "probability": 0.69,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -161,8 +162,8 @@
           "questionId": "has_scope_numbers",
           "type": "noul",
           "value": true,
-          "probability": 0.9,
-          "model": "jev-1.13",
+          "probability": 0.98,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         },
@@ -170,24 +171,25 @@
           "questionId": "greenfield",
           "type": "noul",
           "value": true,
-          "probability": 0.78,
-          "model": "jev-1.13",
+          "probability": 0.86,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "a99795266ca1a69a4ae7c9e9fce6144bb1df1a2d4f61c6dedda2e09844e7cb9c"
         }
-      ]
+      ],
+      "savedAt": "2026-11-09T22:52:40.287Z"
     },
     {
       "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84",
-      "model": "jev-1.13",
+      "model": "jev-1.13-free",
       "promptVersion": "1.0.0",
       "answers": [
         {
           "questionId": "work_type",
           "type": "choice",
           "value": "support",
-          "probability": 0.9,
-          "model": "jev-1.13",
+          "probability": 0.83,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -195,8 +197,8 @@
           "questionId": "platform",
           "type": "choice",
           "value": "other",
-          "probability": 0.63,
-          "model": "jev-1.13",
+          "probability": 0.56,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -204,8 +206,8 @@
           "questionId": "security_kii",
           "type": "noul",
           "value": false,
-          "probability": 0.8,
-          "model": "jev-1.13",
+          "probability": 0.8200000000000001,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -213,8 +215,8 @@
           "questionId": "has_integrations",
           "type": "noul",
           "value": false,
-          "probability": 0.7,
-          "model": "jev-1.13",
+          "probability": 0.76,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -222,8 +224,8 @@
           "questionId": "integrations_scale",
           "type": "choice",
           "value": "0-2",
-          "probability": 0.62,
-          "model": "jev-1.13",
+          "probability": 1,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -231,17 +233,17 @@
           "questionId": "mobile",
           "type": "noul",
           "value": false,
-          "probability": 0.88,
-          "model": "jev-1.13",
+          "probability": 0.83,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
         {
           "questionId": "complexity",
           "type": "score",
-          "value": 1,
-          "probability": 0.58,
-          "model": "jev-1.13",
+          "value": 2,
+          "probability": 0.69,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -249,8 +251,8 @@
           "questionId": "has_scope_numbers",
           "type": "noul",
           "value": true,
-          "probability": 0.84,
-          "model": "jev-1.13",
+          "probability": 0.96,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         },
@@ -258,12 +260,13 @@
           "questionId": "greenfield",
           "type": "noul",
           "value": false,
-          "probability": 0.69,
-          "model": "jev-1.13",
+          "probability": 0.61,
+          "model": "jev-1.13-free",
           "promptVersion": "1.0.0",
           "stateHash": "4d2e8c72f2174e6db395a43ec45b8c4169fe617806f69be5e92d91bf1695fd84"
         }
-      ]
+      ],
+      "savedAt": "2026-11-09T22:52:41.715Z"
     }
   ]
 }

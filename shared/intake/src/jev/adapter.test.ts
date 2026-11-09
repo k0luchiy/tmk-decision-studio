@@ -130,4 +130,53 @@ describe('classifyWithJev', () => {
     expect(result).toEqual({ answers: [], error: 'unavailable' });
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('normalizes the live Jev shape (choice / noul / score)', async () => {
+    const fetchMock = vi.fn(async () =>
+      jsonResponse({
+        model: 'jev-1.13',
+        answers: {
+          work_type: { type: 'choice', choice: 'integration', confidence: 1, probabilities: { integration: 1 } },
+          security_kii: { type: 'noul', noul: 0.28 },
+          complexity: { type: 'score', score: 2.27, confidence: 0.71, probabilities: { '2': 0.71 } },
+        },
+      }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await classifyWithJev(BRIEF, { apiKey: 'test-key' });
+    const byId = new Map(result.answers.map((answer) => [answer.questionId, answer]));
+
+    expect(byId.get('work_type')).toMatchObject({ value: 'integration', probability: 1 });
+    expect(byId.get('security_kii')).toMatchObject({ value: false, probability: 0.72 });
+    expect(byId.get('complexity')).toMatchObject({ value: 2, probability: 0.71 });
+  });
+
+  it('402 without an explicit model retries with jev-1.13-free', async () => {
+    const models: string[] = [];
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body ?? '{}')) as { model?: string };
+      models.push(body.model ?? '');
+      if (models.length === 1) return new Response('payment required', { status: 402 });
+      return jsonResponse({ answers: { work_type: { value: 'integration', probability: 0.9 } } });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await classifyWithJev(BRIEF, { apiKey: 'test-key' });
+
+    expect(result.error).toBeUndefined();
+    expect(result.answers[0]?.model).toBe('jev-1.13-free');
+    expect(models).toEqual(['jev-1.13', 'jev-1.13-free']);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not fall back when the model was set explicitly', async () => {
+    const fetchMock = vi.fn(async () => new Response('forbidden', { status: 403 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await classifyWithJev(BRIEF, { apiKey: 'test-key', model: 'jev-1.13' });
+
+    expect(result).toEqual({ answers: [], error: 'unavailable' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

@@ -52,9 +52,11 @@ describe('health / meta / datasets', () => {
   it('GET /api/meta returns the dataset version', async () => {
     const response = await app.inject({ method: 'GET', url: '/api/meta' });
     expect(response.statusCode).toBe(200);
-    const body = response.json() as { datasetVersion: string; methodVersion: string };
+    const body = response.json() as { datasetVersion: string; methodVersion: string; brand: string; jevModel: string };
     expect(body.datasetVersion.length).toBeGreaterThan(0);
     expect(body.methodVersion).toBe('1.0.0');
+    expect(body.brand).toBe('TMK Decision Studio');
+    expect(body.jevModel.length).toBeGreaterThan(0);
   });
 
   it('GET /api/datasets returns the six-file manifest', async () => {
@@ -210,16 +212,19 @@ describe('export', () => {
     const result = estimateTask({ task, datasets, seed: 42, datasetVersion: datasetVersion ?? '' });
     const stored: StoredEstimate = {
       id: 'est_unconfirmed_fixture',
+      createdAt: new Date().toISOString(),
+      brief: d1Text,
+      verdict: result.verdict,
+      p50Rub: result.estimates.inhouse.cost.p50Rub,
+      weeks: result.estimates.inhouse.duration.p50Weeks,
+      confidence: result.confidence.score,
       datasetVersion: datasetVersion ?? '',
       seed: 42,
-      createdAt: new Date().toISOString(),
-      estimates: result.estimates,
-      verdict: result.verdict,
-      confidence: result.confidence,
-      effortGrid: result.effortGrid,
-      formulaTree: result.formulaTree,
-      params: (task.params ?? []).map((param) => ({ ...param, status: 'auto' })),
-      warnings: result.estimates.inhouse.warnings,
+      result: {
+        ...result,
+        params: (task.params ?? []).map((param) => ({ ...param, status: 'auto' })),
+        warnings: result.estimates.inhouse.warnings,
+      },
     };
     saveEstimate(stored);
 

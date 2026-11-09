@@ -95,4 +95,43 @@ describe('estimateTask UI parity options', () => {
   it('rejects a non-positive stage target with RangeError', () => {
     expect(() => run({ stageHours: { 3: 0 } })).toThrow(RangeError);
   });
+
+  it('compresses the deadline and adds a Putnam risk line to every scenario', () => {
+    const base = run();
+    const compressed = run({ targetWeeks: 10 });
+
+    for (const key of ['inhouse', 'contractor', 'hybrid'] as const) {
+      expect(compressed.estimates[key].cost.p50Rub).toBeGreaterThan(
+        base.estimates[key].cost.p50Rub,
+      );
+      expect(
+        compressed.estimates[key].cost.lines.some(
+          (line) => line.group === 'risk' && line.label.includes('Putnam'),
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it('adds extras to implementation only and keeps annual support unchanged', () => {
+    const base = run();
+    const extra = run({ extras: [{ label: 'Лицензии', amountRub: 100_000 }] });
+
+    for (const key of ['inhouse', 'contractor', 'hybrid'] as const) {
+      expect(extra.estimates[key].cost.p50Rub).toBeCloseTo(
+        base.estimates[key].cost.p50Rub + 100_000,
+        6,
+      );
+      const baseSupport = base.estimates[key].tco.find((row) => row.year === 1)?.costRub;
+      const extraSupport = extra.estimates[key].tco.find((row) => row.year === 1)?.costRub;
+      expect(extraSupport).toBe(baseSupport);
+    }
+  });
+
+  it('is deterministic with the same seed when extras and deadline are set', () => {
+    const options: EstimateTaskOptions = {
+      targetWeeks: 12,
+      extras: [{ label: 'Облако', amountRub: 250_000, appliesTo: 'hybrid' }],
+    };
+    expect(run(options)).toEqual(run(options));
+  });
 });

@@ -30,6 +30,10 @@ import {
 export const JEV_ENDPOINT = 'https://opencode.ai/inference/systemone/v1/systemone';
 /** Paid model used by the application (D-14). */
 export const JEV_MODEL = 'jev-1.13';
+/** Free fallback model, used when the paid model is unavailable. */
+export const JEV_FREE_MODEL = 'jev-1.13-free';
+/** Statuses that trigger the free-model fallback when no model was chosen. */
+const FALLBACK_STATUS: ReadonlySet<number> = new Set([402, 403, 404]);
 /** Default request deadline. */
 export const JEV_DEFAULT_TIMEOUT_MS = 10_000;
 
@@ -151,12 +155,37 @@ function isRetryableStatus(status: number): boolean {
   return status >= 500 && status <= 599;
 }
 
+function answerModel(model: string): JevAnswer['model'] {
+  return model === JEV_FREE_MODEL ? JEV_FREE_MODEL : JEV_MODEL;
+}
+
+async function callModel(
+  apiKey: string,
+  brief: string,
+  model: string,
+  timeoutMs: number,
+): Promise<Attempt> {
+  const body = JSON.stringify({ model, state: brief, questions: WIRE_QUESTIONS });
+  let last: Attempt = { kind: 'network' };
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const result = await requestOnce(apiKey, body, timeoutMs);
+    last = result;
+    if (result.kind === 'ok' || result.kind === 'timeout' || result.kind === 'invalid') {
+      return result;
+    }
+    if (result.kind === 'status' && !isRetryableStatus(result.status)) return result;
+  }
+  return last;
+}
+
 /**
  * Classify a brief with Jev.
  *
  * Sends only the brief text and the question catalog; no other data is
  * transmitted. The call is best-effort: on any failure the caller gets an
  * empty answer list plus a reason and can fall back to deterministic rules.
+ * When the model was not chosen explicitly, a 402/403/404 response retries
+ * once with `jev-1.13-free` and stamps the actual model on every answer.
  */
 export async function classifyWithJev(
   brief: string,
@@ -168,36 +197,28 @@ export async function classifyWithJev(
   }
 
   const timeoutMs = opts.timeoutMs ?? JEV_DEFAULT_TIMEOUT_MS;
-  const requestModel = opts.model ?? JEV_MODEL;
+  const envModel = process.env.JEV_MODEL;
+  const explicitModel = opts.model !== undefined || envModel !== undefined;
+  let model = opts.model ?? envModel ?? JEV_MODEL;
   const stateHash = hashBrief(brief);
-  const body = JSON.stringify({
-    model: requestModel,
-    state: brief,
-    questions: WIRE_QUESTIONS,
-  });
 
-  // Attempt 0 + a single retry for network errors and 5xx responses.
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const result = await requestOnce(apiKey, body, timeoutMs);
-
-    if (result.kind === 'ok') {
-      const normalized = normalizeJevResponse(result.data, {
-        model: JEV_MODEL,
-        promptVersion: JEV_PROMPT_VERSION,
-        stateHash,
-        questions: JEV_QUESTIONS,
-      });
-      return normalized.ok
-        ? { answers: normalized.answers }
-        : { answers: [], error: 'invalid' };
-    }
-
-    if (result.kind === 'timeout') return { answers: [], error: 'timeout' };
-    if (result.kind === 'invalid') return { answers: [], error: 'invalid' };
-    if (result.kind === 'status' && !isRetryableStatus(result.status)) {
-      return { answers: [], error: 'unavailable' };
-    }
+  let result = await callModel(apiKey, brief, model, timeoutMs);
+  if (result.kind === 'status' && FALLBACK_STATUS.has(result.status) && !explicitModel) {
+    model = JEV_FREE_MODEL;
+    result = await callModel(apiKey, brief, model, timeoutMs);
   }
 
+  if (result.kind === 'ok') {
+    const normalized = normalizeJevResponse(result.data, {
+      model: answerModel(model),
+      promptVersion: JEV_PROMPT_VERSION,
+      stateHash,
+      questions: JEV_QUESTIONS,
+    });
+    return normalized.ok ? { answers: normalized.answers } : { answers: [], error: 'invalid' };
+  }
+
+  if (result.kind === 'timeout') return { answers: [], error: 'timeout' };
+  if (result.kind === 'invalid') return { answers: [], error: 'invalid' };
   return { answers: [], error: 'unavailable' };
 }

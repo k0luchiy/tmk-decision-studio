@@ -30,8 +30,8 @@ import {
   hybridShare,
   lastCumulative,
   makeEstimate,
-  simulateCost,
 } from './assemble.js';
+import { adjustScenarios, simulateScenarios } from './adjust.js';
 import { buildAssumptions, buildRisks, toContractAnalogues } from './dataBridge.js';
 import {
   combineEffort,
@@ -141,37 +141,19 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     })),
     byStage,
     utilization,
+    ...(options.targetWeeks === undefined ? {} : { targetWeeks: options.targetWeeks }),
   });
   const duration = scheduleResult.duration;
 
   const share = hybridShare(effortGrid.byStage, contractorStages);
   const hybridLines = blendLines(inhouseLines, contractorLines, share);
-
-  const inhouseCost = simulateCost(
-    scenarioResult.inhouse.implementationRub,
-    effortGrid.totalHours,
-    effortGrid,
-    duration,
-    seed,
-    0,
-  );
-  const contractorCost = simulateCost(
-    scenarioResult.contractor.implementationRub,
-    effortGrid.totalHours,
-    effortGrid,
-    duration,
-    seed,
-    1,
-  );
-  const hybridCost = simulateCost(
-    scenarioResult.hybrid.implementationRub,
-    effortGrid.totalHours,
-    effortGrid,
-    duration,
-    seed,
-    2,
-  );
-
+  const adjusted = adjustScenarios({
+    scenarios: scenarioResult,
+    lines: { inhouse: inhouseLines, contractor: contractorLines, hybrid: hybridLines },
+    compressionFactor: scheduleResult.effortMultiplier,
+    extras: options.extras ?? [],
+  });
+  const inhouseCost = simulateScenarios(adjusted.scenarios, effortGrid, duration, seed);
   const verdictInputOf = (cost: Quantiles, scenario: ScenarioResult): VerdictScenarioInput => ({
     p50Rub: cost.p50,
     p80Rub: cost.p80,
@@ -180,11 +162,10 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     breakevenMonth: scenario.breakevenMonth,
   });
   const verdict = buildVerdict({
-    inhouse: verdictInputOf(inhouseCost, scenarioResult.inhouse),
-    contractor: verdictInputOf(contractorCost, scenarioResult.contractor),
-    hybrid: verdictInputOf(hybridCost, scenarioResult.hybrid),
+    inhouse: verdictInputOf(inhouseCost.inhouse, adjusted.scenarios.inhouse),
+    contractor: verdictInputOf(inhouseCost.contractor, adjusted.scenarios.contractor),
+    hybrid: verdictInputOf(inhouseCost.hybrid, adjusted.scenarios.hybrid),
   });
-
   const analogueRows = toContractAnalogues(datasets, workType);
   const { confidenceScore, warnings } = buildConfidenceAndWarnings({
     task,
@@ -197,7 +178,7 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
   });
 
   const assumptions = buildAssumptions(utilization, options.hiring === true, model);
-  const risks = buildRisks(scenarioResult.inhouse.implementationRub);
+  const risks = buildRisks(adjusted.scenarios.inhouse.implementationRub);
   const inputHash = hashInput(task, seed, datasetVersion, options);
   const meta = {
     datasetVersion,
@@ -229,14 +210,24 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
       meta,
     );
 
-  const inhouse = buildEstimate('inhouse', inhouseLines, scenarioResult.inhouse, inhouseCost);
+  const inhouse = buildEstimate(
+    'inhouse',
+    adjusted.lines.inhouse,
+    adjusted.scenarios.inhouse,
+    inhouseCost.inhouse,
+  );
   const contractor = buildEstimate(
     'contractor',
-    contractorLines,
-    scenarioResult.contractor,
-    contractorCost,
+    adjusted.lines.contractor,
+    adjusted.scenarios.contractor,
+    inhouseCost.contractor,
   );
-  const hybrid = buildEstimate('hybrid', hybridLines, scenarioResult.hybrid, hybridCost);
+  const hybrid = buildEstimate(
+    'hybrid',
+    adjusted.lines.hybrid,
+    adjusted.scenarios.hybrid,
+    inhouseCost.hybrid,
+  );
 
   return {
     estimates: { inhouse, contractor, hybrid },
@@ -244,5 +235,6 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     confidence: confidenceScore,
     effortGrid,
     formulaTree: inhouse.formulaTree,
+    methodDivergence: combined.divergence,
   };
 }

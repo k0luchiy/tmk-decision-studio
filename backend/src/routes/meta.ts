@@ -14,6 +14,8 @@ export async function metaRoutes(app: FastifyInstance): Promise<void> {
       datasetVersion: datasets.manifest?.datasetVersion ?? '',
       methodVersion: METHOD_VERSION,
       intakeMode: resolveIntakeMode(),
+      jevModel: process.env.JEV_MODEL ?? 'jev-1.13',
+      brand: 'TMK Decision Studio',
       serverTime: new Date().toISOString(),
     };
   });
