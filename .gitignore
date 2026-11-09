@@ -14,6 +14,7 @@ dist/
 apps/*/dist/
 build/
 out/
+.artifacts/
 .vite/
 .turbo/
 .next/

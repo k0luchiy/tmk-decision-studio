@@ -2,7 +2,7 @@
  * Компилируемый пример использования контракта `@app/contract`.
  *
  * Запуск проверки типов: `npm run typecheck` (корневой tsconfig включает
- * каталог `examples`). Пример ничего не вычисляет: он только валидирует
+ * каталог примеров пакетов). Пример ничего не вычисляет: он только валидирует
  * мок схемой и читает готовые поля для отрисовки.
  */
 import { estimateTask } from '@app/core';
@@ -10,7 +10,7 @@ import type { Datasets } from '@app/data';
 import { buildExportBundle } from '@app/export';
 import { EstimateSchema } from '@app/contract';
 import type { Estimate, Task } from '@app/contract';
-import d1ScenariosJson from '../packages/contract/mock/d1.scenarios.json' assert { type: 'json' };
+import d1ScenariosJson from '../mock/d1.scenarios.json' assert { type: 'json' };
 
 /** Разбор массива сценариев D1 схемой контракта. */
 function parseScenarios(raw: unknown): Estimate[] {

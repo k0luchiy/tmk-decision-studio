@@ -20,6 +20,7 @@
 | [09_integration_contract.md](09_integration_contract.md) | Контракт для фронтенда: пакеты, функции, мок D1 |
 | [10_api_contract.md](10_api_contract.md) | Связка frontend ↔ backend: REST API, эндпоинты, dev/prod, ошибки |
 | [DECISIONS.md](DECISIONS.md) | Журнал решений (требование регламента: ≥ 8 записей, ведётся по ходу) |
+| [deliverables/](deliverables/) | Итоговые документы поставки: `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `TEST_REPORT.md` |
 
 ## Одной фразой
 

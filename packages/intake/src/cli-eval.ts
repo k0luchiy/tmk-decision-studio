@@ -3,7 +3,7 @@
  *
  * Reads `data/eval/briefs.json`, runs the cache-mode pipeline (never the
  * network), evaluates against the manual labels and writes
- * `out/intake-eval.json`.
+ * `.artifacts/intake-eval.json`.
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -80,14 +80,14 @@ try {
       stdout.write(`missing labels: ${report.missing_labels.join(', ')}\n`);
     }
 
-    const outDir = path.join(baseDir, 'out');
+    const outDir = path.join(baseDir, '.artifacts');
     mkdirSync(outDir, { recursive: true });
     writeFileSync(
       path.join(outDir, 'intake-eval.json'),
       `${JSON.stringify(report, null, 2)}\n`,
       'utf8',
     );
-    stdout.write('\nout/intake-eval.json written\n');
+    stdout.write('\n.artifacts/intake-eval.json written\n');
   }
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);

@@ -6,9 +6,9 @@
  * 2. builds a `Task` from the extracted parameters;
  * 3. runs `estimateTask` and picks the verdict winner;
  * 4. marks the parameters `confirmed` (demo shortcut) and renders
- *    JSON / XLSX / PDF into `out/<id>.{json,xlsx,pdf}`.
+ *    JSON / XLSX / PDF into `.artifacts/<id>.{json,xlsx,pdf}`.
  *
- * It also writes `out/control.json` with the observed P50 and verdict, which
+ * It also writes `.artifacts/control.json` with the observed P50 and verdict, which
  * `scripts/test-report.mjs` compares against `data/seeds/control.json`.
  * The harness never touches the network and exits non-zero on any failure.
  */
@@ -27,7 +27,7 @@ import { EvalBriefsSchema, classifyBrief } from '@app/intake';
 /** How many control briefs the smoke run covers (D1–D3). */
 export const E2E_TASK_LIMIT = 3;
 
-/** One row of `out/control.json` and the printed table. */
+/** One row of `.artifacts/control.json` and the printed table. */
 export interface E2EControlRow {
   id: string;
   verdict: Estimate['verdict']['code'];
@@ -37,7 +37,7 @@ export interface E2EControlRow {
   confidence: number;
 }
 
-/** Shape of `out/control.json`. */
+/** Shape of `.artifacts/control.json`. */
 export interface E2EControlFile {
   generatedAt: string;
   datasetVersion: string;
@@ -103,7 +103,7 @@ function readBriefs(baseDir: string): EvalBrief[] {
 /**
  * Runs the D1–D3 smoke and writes the export artefacts under `baseDir`.
  *
- * @returns the control rows that were written to `out/control.json`.
+ * @returns the control rows that were written to `.artifacts/control.json`.
  */
 export async function runE2E(baseDir: string = process.cwd()): Promise<E2EControlFile> {
   const datasets = await loadDatasets(baseDir);
@@ -113,7 +113,7 @@ export async function runE2E(baseDir: string = process.cwd()): Promise<E2EContro
   }
 
   const cacheFile = path.join(baseDir, 'data', 'cache', 'jev-responses.json');
-  const outDir = path.join(baseDir, 'out');
+  const outDir = path.join(baseDir, '.artifacts');
   mkdirSync(outDir, { recursive: true });
 
   const briefs = readBriefs(baseDir);
@@ -174,7 +174,7 @@ export async function runE2E(baseDir: string = process.cwd()): Promise<E2EContro
     rows.map((row) => [row.id, row.verdict, formatRub(row.p50Rub), String(row.weeks)]),
   );
   stdout.write(`${table}\n`);
-  stdout.write(`\nout/control.json written, ${rows.length * FORMATS.length} export files\n`);
+  stdout.write(`\n.artifacts/control.json written, ${rows.length * FORMATS.length} export files\n`);
 
   return control;
 }

@@ -5,7 +5,7 @@
 // `pdfkit` and `xlsx` stay external: they are CommonJS packages that resolve
 // their own assets relative to `node_modules`, so they must load through Node's
 // normal resolver instead of being inlined into the bundle. The bundle itself is
-// written to `out/` (gitignored) so bare imports and `import.meta.url` resolve.
+// written to `.artifacts/` (gitignored) so bare imports and `import.meta.url` resolve.
 
 import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -15,7 +15,7 @@ import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const entryPoint = path.join(root, 'packages', 'cli', 'src', 'e2e.ts');
-const outDir = path.join(root, 'out');
+const outDir = path.join(root, '.artifacts');
 const bundlePath = path.join(outDir, '.e2e-bundle.mjs');
 
 const bundle = await build({

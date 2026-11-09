@@ -4,7 +4,7 @@
  * Loads the datasets, builds the D1 WBS, folds it into the stage grid and prices
  * it with both cost bases: in-house (including hiring) and contractor (T&M and
  * fixed price). Prints a `stage | hours | cost inhouse | cost contractor` table
- * and writes `out/calc-d1.json`.
+ * and writes `.artifacts/calc-d1.json`.
  *
  * `computeCalcD1` is pure with respect to the filesystem (it only reads the
  * provided datasets), so tests can call it without launching a process or
@@ -175,7 +175,7 @@ export function formatCalcTable(result: CalcResult): string {
 
 /**
  * Loads datasets, computes the D1 result, prints the table and writes
- * `out/calc-d1.json` under `baseDir`.
+ * `.artifacts/calc-d1.json` under `baseDir`.
  */
 export async function runCalc(baseDir: string = process.cwd()): Promise<CalcResult> {
   const datasets = await loadDatasets(baseDir);
@@ -188,10 +188,10 @@ export async function runCalc(baseDir: string = process.cwd()): Promise<CalcResu
       `contractor fixed price total: ${formatRub(result.contractor.fixedPrice.totalRub)} ₽\n`,
   );
 
-  const outDir = path.join(baseDir, 'out');
+  const outDir = path.join(baseDir, '.artifacts');
   await mkdir(outDir, { recursive: true });
   await writeFile(path.join(outDir, 'calc-d1.json'), `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-  stdout.write('\nout/calc-d1.json written\n');
+  stdout.write('\n.artifacts/calc-d1.json written\n');
 
   return result;
 }

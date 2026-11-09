@@ -1,16 +1,16 @@
 # DATA_MODEL — сущности, поля, связи
 
-Модель данных задана **zod-схемами** в `packages/contract/src/` — это и runtime-
+Модель данных задана **zod-схемами** в `../../packages/contract/src/` — это и runtime-
 валидация, и TypeScript-типы (`z.infer`). Никакой другой источник истины для
 формы данных не используется: API, файлы, моки и экспорт проходят через те же
 схемы.
 
-- Примитивы: `packages/contract/src/primitives.ts`
-- Задачи и декомпозиция: `packages/contract/src/entities/task.ts`
-- Стоимость/риски/ставки: `packages/contract/src/entities/costing.ts`
-- Аналоги и формула-дерево: `packages/contract/src/entities/analogue.ts`
-- Вердикт/confidence/Estimate: `packages/contract/src/entities/decision.ts`
-- Единая точка экспорта: `packages/contract/src/index.ts`
+- Примитивы: `../../packages/contract/src/primitives.ts`
+- Задачи и декомпозиция: `../../packages/contract/src/entities/task.ts`
+- Стоимость/риски/ставки: `../../packages/contract/src/entities/costing.ts`
+- Аналоги и формула-дерево: `../../packages/contract/src/entities/analogue.ts`
+- Вердикт/confidence/Estimate: `../../packages/contract/src/entities/decision.ts`
+- Единая точка экспорта: `../../packages/contract/src/index.ts`
 
 ## 1. Основная цепочка
 
@@ -39,7 +39,7 @@ Estimate (aggregate root)
 ## 2. Task
 
 Схема: `TaskSchema` (`entities/task.ts`). Наследуется от брифа HelpDesk
-(`docs/05` §5).
+(`../../docs/05` §5).
 
 | Поле | Тип | Обяз. | Смысл |
 |---|---|---|---|
@@ -66,7 +66,7 @@ Estimate (aggregate root)
 | `defaultUsed` | boolean | Использовано значение по умолчанию |
 
 `status: 'auto'` блокирует экспорт: `buildExportBundle` требует, чтобы все
-параметры были `confirmed` (`packages/export/src/bundle.ts`).
+параметры были `confirmed` (`../../packages/export/src/bundle.ts`).
 
 ### WorkItem
 
@@ -95,7 +95,7 @@ Estimate (aggregate root)
 | `taskId` | string | Ссылка на `Task` |
 | `scenario` | `inhouse \| contractor \| hybrid \| peak` | Сценарий |
 | `currency` | literal `'RUB'` | Валюта |
-| `datasetVersion` | string | Хеш датасетов из `data/manifest.json` |
+| `datasetVersion` | string | Хеш датасетов из `../../data/manifest.json` |
 | `inputHash` | string | sha256 входа |
 | `seed` | int | Seed Монте-Карло |
 | `methodWeights` | `{a,b,c}` | Сумма = 1 (`0.5/0.2/0.3`) |
@@ -186,20 +186,20 @@ licence?, type (primary|secondary|proxy|assumption)`.
 
 ## 4. Датасеты
 
-Код загрузки: `packages/data/src/loaders.ts`, список файлов —
-`packages/data/src/files.ts`, типы сырых строк — `packages/data/src/types.ts`,
-валидация — `packages/data/src/validators.ts`.
+Код загрузки: `../../packages/data/src/loaders.ts`, список файлов —
+`../../packages/data/src/files.ts`, типы сырых строк — `../../packages/data/src/types.ts`,
+валидация — `../../packages/data/src/validators.ts`.
 
 | Файл | Что содержит | Версия |
 |---|---|---|
-| `data/datasets/rate_cards.json` | 14 ролей × 4 грейда, fully loaded ₽/ч и ₽/мес | `data/manifest.json` |
-| `data/datasets/contractor_rate_cards.json` | 224 полосы `(geo, role, grade)` | `data/manifest.json` |
-| `data/datasets/work_archetypes.json` | архетипы, O/M/P, роль-микс, typical units | `data/manifest.json` |
-| `data/datasets/analogue_corpus.json` | 49 аналогов + строки ЕИС | `data/manifest.json` |
-| `data/datasets/coefficients.json` | коэффициенты, налоги, WACC, политики | `data/manifest.json` |
-| `data/datasets/tmk_it_contracts.json` | 60 контрактов ТМК | `data/manifest.json` |
+| `../../data/datasets/rate_cards.json` | 14 ролей × 4 грейда, fully loaded ₽/ч и ₽/мес | `../../data/manifest.json` |
+| `../../data/datasets/contractor_rate_cards.json` | 224 полосы `(geo, role, grade)` | `../../data/manifest.json` |
+| `../../data/datasets/work_archetypes.json` | архетипы, O/M/P, роль-микс, typical units | `../../data/manifest.json` |
+| `../../data/datasets/analogue_corpus.json` | 49 аналогов + строки ЕИС | `../../data/manifest.json` |
+| `../../data/datasets/coefficients.json` | коэффициенты, налоги, WACC, политики | `../../data/manifest.json` |
+| `../../data/datasets/tmk_it_contracts.json` | 60 контрактов ТМК | `../../data/manifest.json` |
 
-`data/manifest.json` — версия каждого файла, SHA-256, число строк, дата и
+`../../data/manifest.json` — версия каждого файла, SHA-256, число строк, дата и
 источник; `datasetVersion` — хеш манифеста. Пересборка: `npm run data:manifest`,
 проверка: `npm run data:check`.
 
@@ -207,10 +207,10 @@ licence?, type (primary|secondary|proxy|assumption)`.
 
 | Файл | Формат | Назначение |
 |---|---|---|
-| `data/eval/briefs.json` | `EvalBrief[]` | 12 брифов с метками для intake |
-| `data/cache/jev-responses.json` | `{version, entries[]}` | Кэш ответов Jev по хешу брифа |
-| `data/seeds/control.json` | `{tolerance, tasks[]}` | Ожидаемые P50 ±15 % и вердикт D1–D3 |
-| `out/control.json` | `E2EControlFile` | Фактические метрики e2e (генерируется, gitignored) |
+| `../../data/eval/briefs.json` | `EvalBrief[]` | 12 брифов с метками для intake |
+| `../../data/cache/jev-responses.json` | `{version, entries[]}` | Кэш ответов Jev по хешу брифа |
+| `../../data/seeds/control.json` | `{tolerance, tasks[]}` | Ожидаемые P50 ±15 % и вердикт D1–D3 |
+| `.artifacts/control.json` | `E2EControlFile` | Фактические метрики e2e (генерируется, gitignored) |
 
 ## 5. Правила целостности
 

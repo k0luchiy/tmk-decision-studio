@@ -30,7 +30,7 @@ const rows = report.datasets.map((dataset) => [
 
 stdout.write(`${formatTable(headers, rows)}\n`);
 
-const outDir = path.join(baseDir, 'out');
+const outDir = path.join(baseDir, '.artifacts');
 await mkdir(outDir, { recursive: true });
 await writeFile(
   path.join(outDir, 'data-quality.json'),
@@ -39,7 +39,7 @@ await writeFile(
 );
 
 stdout.write(
-  `\nout/data-quality.json written: datasetVersion ${report.datasetVersion}, ` +
+  `\n.artifacts/data-quality.json written: datasetVersion ${report.datasetVersion}, ` +
     `errors=${report.aggregate.errors}, warnings=${report.aggregate.warnings}\n`,
 );
 

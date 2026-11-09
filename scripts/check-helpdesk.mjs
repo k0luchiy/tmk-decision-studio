@@ -11,7 +11,7 @@ import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const entryPoint = path.join(root, 'packages', 'data', 'src', 'cli-helpdesk.ts');
-const outDir = path.join(root, 'out');
+const outDir = path.join(root, '.artifacts');
 const outFile = path.join(outDir, '.helpdesk-check.cjs');
 
 await mkdir(outDir, { recursive: true });

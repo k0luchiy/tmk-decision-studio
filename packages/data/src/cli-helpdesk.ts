@@ -23,7 +23,7 @@ async function main(): Promise<void> {
     stdout.write(`  dropped row ${dropped.row}: ${dropped.reason}\n`);
   }
 
-  const outDir = path.join(baseDir, 'out');
+  const outDir = path.join(baseDir, '.artifacts');
   await mkdir(outDir, { recursive: true });
   await writeFile(
     path.join(outDir, 'helpdesk.json'),
@@ -31,7 +31,7 @@ async function main(): Promise<void> {
     'utf8',
   );
   stdout.write(
-    `\nout/helpdesk.json written: ${result.tasks.length} tasks, ${result.workItems.length} work items\n`,
+    `\n.artifacts/helpdesk.json written: ${result.tasks.length} tasks, ${result.workItems.length} work items\n`,
   );
 }
 

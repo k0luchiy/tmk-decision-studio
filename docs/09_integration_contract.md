@@ -55,7 +55,7 @@ import d1ScenariosJson from '../packages/contract/mock/d1.scenarios.json' assert
 const scenarios: Estimate[] = EstimateSchema.array().parse(d1ScenariosJson);
 ```
 
-Компилируемый пример: `examples/contract-usage.ts` (проверяется `npm run typecheck`).
+Компилируемый пример: `packages/contract/examples/contract-usage.ts` (проверяется `npm run typecheck`).
 
 ## 2. Поле → что рисует фронт
 

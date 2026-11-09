@@ -2,9 +2,9 @@
 
 _Сгенерировано `scripts/test-report.mjs`; не редактировать вручную._
 
-- Дата генерации: 2026-11-09T15:24:37.989Z
+- Дата генерации: 2026-11-09T16:00:53.830Z
 - Версия датасетов: `47a8fb6b9e9ed54c08019d8ca66d79e587fb08b7d5f3e4d80a56068c389c39c7`
-- Точка входа e2e: `out/control.json` (есть)
+- Точка входа e2e: `.artifacts/control.json` (есть)
 
 ## 1. Контрольные задачи D1–D3
 
@@ -38,7 +38,7 @@ _Сгенерировано `scripts/test-report.mjs`; не редактиров
 | total | 12 |
 | missing_labels | 0 |
 
-Источник: `out/intake-eval.json`, набор `data/eval/briefs.json` (12 брифов, 3 с метками для контроля).
+Источник: `.artifacts/intake-eval.json`, набор `data/eval/briefs.json` (12 брифов, 3 с метками для контроля).
 
 ## 4. Калибровка и MAPE
 

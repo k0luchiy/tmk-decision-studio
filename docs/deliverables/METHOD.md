@@ -3,7 +3,7 @@
 Документ описывает **как именно** считается оценка. Каждая формула привязана к
 реальному файлу кода; коэффициенты — к датасету и источнику. Если код и этот
 документ расходятся, правится и то, и другое в одном коммите
-(`docs/03_estimation_model.md`, `docs/05_architecture_data.md` §7).
+(`../../docs/03_estimation_model.md`, `../../docs/05_architecture_data.md` §7).
 
 ## 1. Цепочка расчёта
 
@@ -22,14 +22,14 @@ Task → WBS (метод A) ─┐
                               └→ buildFormulaTree → дерево «формула по клику»
 ```
 
-Точка входа: `estimateTask` в `packages/core/src/pipeline.ts`. Она возвращает три
+Точка входа: `estimateTask` в `../../packages/core/src/pipeline.ts`. Она возвращает три
 полных `Estimate` (`inhouse`, `contractor`, `hybrid`), общий вердикт, confidence,
 `EffortGrid` и `FormulaNode`. Все результаты валидируются `EstimateSchema` из
-`packages/contract/src/entities/decision.ts`.
+`../../packages/contract/src/entities/decision.ts`.
 
 ## 2. Метод A — WBS из архетипов
 
-Код: `packages/core/src/sizing/wbs.ts`, доли этапов — `packages/core/src/sizing/stageShares.ts`.
+Код: `../../packages/core/src/sizing/wbs.ts`, доли этапов — `../../packages/core/src/sizing/stageShares.ts`.
 
 - Тип работы определяется по параметрам брифа, затем по ключевым словам
   (`resolveWorkType`), и маппится на архетип (`WORK_TYPE_TO_ARCHETYPE`).
@@ -46,13 +46,13 @@ E = (O + 4·M + P) / 6
 
 - Этапы 1–6 масштабируются долями `STAGE_SHARES`; поддержка (`category:
   support`) — одна работа этапа 7 на весь объём.
-- Источник параметров: `data/datasets/work_archetypes.json`
+- Источник параметров: `../../data/datasets/work_archetypes.json`
   (`three_point`, `default_role_mix_pct`, `typical_unit_count`,
   `productivity_basis.sources`).
 
 ## 3. Метод B — FP-lite
 
-Код: `packages/core/src/sizing/fpLite.ts`.
+Код: `../../packages/core/src/sizing/fpLite.ts`.
 
 ```
 FP = Σ count(type) × weight(type)
@@ -61,12 +61,12 @@ effortHours = FP × PDR(platform)
 
 Веса (упрощённый IFPUG, Москва-2018): `ilf 11`, `eif 8`, `ei 5`, `eo 5`, `eq 4`.
 PDR по платформам: `traditional 8.3`, `java 8.7`, `lowcode 1.8`, `sap 16.7`,
-`mobile 12`, `gov 9.7` часов на FP. Источник — `docs/03_estimation_model.md` §3,
-`research/05_methodology_estimation.md`.
+`mobile 12`, `gov 9.7` часов на FP. Источник — `../../docs/03_estimation_model.md` §3,
+`../../research/05_methodology_estimation.md`.
 
 ## 4. Метод C — аналоги
 
-Код: `packages/core/src/sizing/analogues.ts`.
+Код: `../../packages/core/src/sizing/analogues.ts`.
 
 ```
 base        = price_mid, иначе (price_low + price_high) / 2
@@ -82,26 +82,26 @@ K_age       = 1.08 ^ (targetYear − year), если year ≤ targetYear
 - Для перевода цены в часы используется hours-weighted fully loaded rate из
   `rate_cards.json`; если тип работы не имеет аналогового типа (например,
   поддержка), метод C совпадает с A.
-- Источник: `data/datasets/analogue_corpus.json`,
-  `research/15_sector_analogues.md`.
+- Источник: `../../data/datasets/analogue_corpus.json`,
+  `../../research/15_sector_analogues.md`.
 
 ## 5. Триангуляция A/B/C
 
-Код: `packages/core/src/sizing/combine.ts`.
+Код: `../../packages/core/src/sizing/combine.ts`.
 
 ```
 effort = 0.5·A + 0.2·B + 0.3·C
 divergence = max(A,B,C) / min(A,B,C) − 1
 ```
 
-Веса — `DEFAULT_WEIGHTS = { a: 0.5, b: 0.2, c: 0.3 }` (`docs/03` §3). Если
+Веса — `DEFAULT_WEIGHTS = { a: 0.5, b: 0.2, c: 0.3 }` (`../../docs/03` §3). Если
 `divergence > 0.3` (30 %), добавляется предупреждение `method_divergence`; это
 предупреждение, а не ошибка. `estimateTask` масштабирует WBS так, чтобы
 `p50` совпадал с триангулированной трудоёмкостью.
 
 ## 6. Сетка трудоёмкости
 
-Код: `packages/core/src/cost/stageGrid.ts`.
+Код: `../../packages/core/src/cost/stageGrid.ts`.
 
 ```
 p50 = Σ expectedHours
@@ -112,11 +112,11 @@ p90 = p50 + 1.2816·σ
 ```
 
 `byStage` — часы по этапам с разбивкой по ролям; `byRole` — агрегат по ролям.
-`totalHours = p50`. Источник квантилей — нормальное приближение (`docs/03` §4).
+`totalHours = p50`. Источник квантилей — нормальное приближение (`../../docs/03` §4).
 
 ## 7. Стоимость «своей команды»
 
-Код: `packages/core/src/cost/inhouse.ts`.
+Код: `../../packages/core/src/cost/inhouse.ts`.
 
 - Труд: `часы × fully_loaded_hour` из `rate_cards.json` (`status: 'fact'`).
   Ставка **не пересчитывается** — берётся `fully_loaded_hour` строки файла.
@@ -127,13 +127,13 @@ p90 = p50 + 1.2816·σ
 - Текучесть: `billable × turnover × 0.5 × (avg fully_loaded_month × 12)`,
   `turnover = 0.13`.
 - `avg fully_loaded_month` — среднее по часам ролей.
-- Источник: `data/datasets/rate_cards.json` (`source`,
-  `derivation`), `research/07_benchmarks_rates_data.md`,
-  `research/05_methodology_estimation.md` §5.3.
+- Источник: `../../data/datasets/rate_cards.json` (`source`,
+  `derivation`), `../../research/07_benchmarks_rates_data.md`,
+  `../../research/05_methodology_estimation.md` §5.3.
 
 ## 8. Стоимость подрядчика
 
-Код: `packages/core/src/cost/contractor.ts`.
+Код: `../../packages/core/src/cost/contractor.ts`.
 
 - Труд: `часы × rate_mid` из `contractor_rate_cards.json` (geo RU).
 - Координация: `Σlabor × 0.15`.
@@ -141,12 +141,12 @@ p90 = p50 + 1.2816·σ
 - Риск-премия: `Σlabor × 0.20` только для `fixed_price`, иначе 0.
 - НДС: `(labor + coordination + acceptance + risk) × 0.20` при `vat: true`.
 - Другие geo не конвертируются: `UnsupportedGeoError` (нет FX).
-- Источники: `data/datasets/contractor_rate_cards.json`
-  (`fixed_price_risk_load_pct: [15,30]`), `research/10_product_concept.md` §2-L4.
+- Источники: `../../data/datasets/contractor_rate_cards.json`
+  (`fixed_price_risk_load_pct: [15,30]`), `../../research/10_product_concept.md` §2-L4.
 
 ## 9. Сценарии, TCO и break-even
 
-Код: `packages/core/src/scenarios/scenarios.ts`.
+Код: `../../packages/core/src/scenarios/scenarios.ts`.
 
 - `inhouse` — всё внутри; `contractor` — всё подрядчиком; `hybrid` —
   подрядчик владеет этапом 3 («Разработка»), остальное внутри:
@@ -157,11 +157,11 @@ p90 = p50 + 1.2816·σ
   Монте-Карло квантиль; вероятностный P80 — в `risk/monteCarlo.ts`.
 - Break-even: месяц `0..36`, когда накопленный кэшфлоу сценария становится
   строго меньше in-house.
-- Источник: `docs/03_estimation_model.md` §5.3, §6.
+- Источник: `../../docs/03_estimation_model.md` §5.3, §6.
 
 ## 10. Монте-Карло
 
-Код: `packages/core/src/risk/monteCarlo.ts`, PRNG — `risk/prng.ts`.
+Код: `../../packages/core/src/risk/monteCarlo.ts`, PRNG — `risk/prng.ts`.
 
 ```
 μ = (ln p10 + ln p90) / 2
@@ -178,7 +178,7 @@ z' = ρ·zg + √(1 − ρ²)·zi
 
 ## 11. Срок и критический путь
 
-Код: `packages/core/src/schedule/schedule.ts`, календарь — `schedule/calendar.ts`.
+Код: `../../packages/core/src/schedule/schedule.ts`, календарь — `schedule/calendar.ts`.
 
 ```
 HPPW = 120 × 12 / 52 ≈ 27.69 продуктивных часов/нед на FTE
@@ -195,7 +195,7 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 ## 12. Вердикт
 
-Код: `packages/core/src/decision/verdict.ts`, тексты — `decision/templates.ts`.
+Код: `../../packages/core/src/decision/verdict.ts`, тексты — `decision/templates.ts`.
 
 Правила применяются по порядку:
 
@@ -210,7 +210,7 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 ## 13. Уверенность (Confidence Score)
 
-Код: `packages/core/src/decision/confidence.ts`.
+Код: `../../packages/core/src/decision/confidence.ts`.
 
 | Компонент | Вес | Что измеряет |
 |---|---:|---|
@@ -221,11 +221,11 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 `score = round(100 × Σ w·v)`; `level`: `high ≥ 70`, `medium ≥ 40`, иначе `low`.
 Для класса `order_of_magnitude` score ограничен 60. Веса — явное допущение
-(`docs/03` §9).
+(`../../docs/03` §9).
 
 ## 14. Формула-дерево
 
-Код: `packages/core/src/decision/formulaTree.ts`.
+Код: `../../packages/core/src/decision/formulaTree.ts`.
 
 Корень `cost_p50` = сумма строк сметы; дети — `effort` (P50 часы), `reserve`
 (P80 − P50) и группы статей (`labor`, `coordination`, `risk`, `vat`, `hiring`,
@@ -236,26 +236,26 @@ p10 = max(1, p50 − 1.2816σ), p80 = p50 + 0.8416σ, p90 = p50 + 1.2816σ
 
 | Допущение | Значение | Источник |
 |---|---:|---|
-| Загрузка команды | 0.7 | `research/05` §5.3 |
-| Продуктивных часов в месяц | 120 | `docs/03` §5.1 |
-| Найм | 1.5 месячных fully loaded | `research/05` §5.3 |
-| Ramp-up | 2 мес × 50 % | `research/05` §5.3 |
-| Текучесть | 13 %/год, замена 0.5 года | `research/05` §5.3 |
-| Координация подрядчика | 15 % | `docs/03` §5.2 |
-| Приёмка | 5 % | `docs/03` §5.2 |
-| Риск fixed price | 20 % (диапазон 15–30 %) | `research/10` §2-L4 |
-| НДС | 20 % | `research/10` §2-L4 |
-| Поддержка in-house / contractor | 12 % / 18 % в год | `docs/03` §5.3 |
-| Резерв P80 | 18 % (политика) | `docs/03` §6 |
-| Горизонт break-even | 36 месяцев | `docs/03` §6 |
-| Горизонт TCO | 3 года | `docs/03` §5.3 |
-| Корреляция Монте-Карло | ρ = 0.5 | `docs/03` §8 |
+| Загрузка команды | 0.7 | `../../research/05` §5.3 |
+| Продуктивных часов в месяц | 120 | `../../docs/03` §5.1 |
+| Найм | 1.5 месячных fully loaded | `../../research/05` §5.3 |
+| Ramp-up | 2 мес × 50 % | `../../research/05` §5.3 |
+| Текучесть | 13 %/год, замена 0.5 года | `../../research/05` §5.3 |
+| Координация подрядчика | 15 % | `../../docs/03` §5.2 |
+| Приёмка | 5 % | `../../docs/03` §5.2 |
+| Риск fixed price | 20 % (диапазон 15–30 %) | `../../research/10` §2-L4 |
+| НДС | 20 % | `../../research/10` §2-L4 |
+| Поддержка in-house / contractor | 12 % / 18 % в год | `../../docs/03` §5.3 |
+| Резерв P80 | 18 % (политика) | `../../docs/03` §6 |
+| Горизонт break-even | 36 месяцев | `../../docs/03` §6 |
+| Горизонт TCO | 3 года | `../../docs/03` §5.3 |
+| Корреляция Монте-Карло | ρ = 0.5 | `../../docs/03` §8 |
 
 ## 16. Границы методики
 
 - Это **оценка порядка, а не смета**; на экране и в PDF есть дисклеймер.
 - MAPE/PRED(25) **не считаются**: в выгрузке HelpDesk 4 строки, нужно ≥ 10 пар
-  план/факт (`research/20`, `TEST_REPORT.md` §4).
+  план/факт (`../../research/20`, `TEST_REPORT.md` §4).
 - Аналоги не конвертируются из USD: нет источника FX.
 - Ставки подрядчика — только RU; другие geo не поддерживаются.
 - Все числа детерминированы при фиксированных `inputHash + datasetVersion +

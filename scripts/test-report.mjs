@@ -1,7 +1,7 @@
 // Generates TEST_REPORT.md from real artefacts:
-// - out/control.json        — observed D1–D3 P50 / verdict (written by `npm run e2e`)
+// - .artifacts/control.json        — observed D1–D3 P50 / verdict (written by `npm run e2e`)
 // - data/seeds/control.json — expected baselines and tolerance
-// - out/intake-eval.json    — intake metrics (generated on demand)
+// - .artifacts/intake-eval.json    — intake metrics (generated on demand)
 // - a fresh `vitest run --reporter=json` for the unit/property summary
 //
 // The report is generated, never hand-written: it cannot drift from the code.
@@ -13,7 +13,7 @@ import path from 'node:path';
 import process, { cwd, stdout } from 'node:process';
 
 const root = process.env.REPORT_ROOT ?? cwd();
-const outDir = path.join(root, 'out');
+const outDir = path.join(root, '.artifacts');
 mkdirSync(outDir, { recursive: true });
 
 function readJson(file) {
@@ -128,7 +128,7 @@ for (const expected of expectedControl.tasks ?? []) {
 }
 
 // --------------------------------------------------------------------------- //
-// Intake metrics: generate out/intake-eval.json when it is missing.
+// Intake metrics: generate .artifacts/intake-eval.json when it is missing.
 // --------------------------------------------------------------------------- //
 const intakePath = path.join(outDir, 'intake-eval.json');
 if (!existsSync(intakePath)) {
@@ -160,7 +160,7 @@ lines.push('_Сгенерировано `scripts/test-report.mjs`; не реда
 lines.push('');
 lines.push(`- Дата генерации: ${new Date().toISOString()}`);
 lines.push(`- Версия датасетов: \`${expectedControl.datasetVersion ?? 'unknown'}\``);
-lines.push(`- Точка входа e2e: \`out/control.json\` (${actualControl === null ? 'нет файла' : 'есть'})`);
+lines.push(`- Точка входа e2e: \`.artifacts/control.json\` (${actualControl === null ? 'нет файла' : 'есть'})`);
 lines.push('');
 lines.push('## 1. Контрольные задачи D1–D3');
 lines.push('');
@@ -192,7 +192,7 @@ for (const [key, value] of intakeRows) {
   lines.push(`| ${key} | ${value} |`);
 }
 lines.push('');
-lines.push('Источник: `out/intake-eval.json`, набор `data/eval/briefs.json` (12 брифов, 3 с метками для контроля).');
+lines.push('Источник: `.artifacts/intake-eval.json`, набор `data/eval/briefs.json` (12 брифов, 3 с метками для контроля).');
 lines.push('');
 lines.push('## 4. Калибровка и MAPE');
 lines.push('');
@@ -204,7 +204,7 @@ lines.push('- Реальная калибровка MAPE/PRED(25): данных 
 lines.push('- Playwright-сценарий браузерного кокпита: на текущем этапе e2e идёт от брифа до PDF через Node-пайплайн (`npm run e2e`).');
 lines.push('');
 
-const reportPath = path.join(root, 'TEST_REPORT.md');
+const reportPath = path.join(root, 'docs', 'deliverables', 'TEST_REPORT.md');
 writeFileSync(reportPath, `${lines.join('\n')}\n`, 'utf8');
 
 stdout.write(`TEST_REPORT.md written\n`);

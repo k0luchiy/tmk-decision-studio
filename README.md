@@ -16,9 +16,9 @@
 npm ci
 npm run data:check     # валидация датасетов и манифеста
 npm run test           # unit + property + data + export tests
-npm run calc           # демо D1: таблица этапов и две базы стоимости → out/calc-d1.json
-npm run e2e            # D1–D3: бриф → estimateTask → JSON/XLSX/PDF в out/
-npm run report         # TEST_REPORT.md из out/control.json и npm test
+npm run calc           # демо D1: таблица этапов и две базы стоимости → .artifacts/calc-d1.json
+npm run e2e            # D1–D3: бриф → estimateTask → JSON/XLSX/PDF в .artifacts/
+npm run report         # docs/deliverables/TEST_REPORT.md из .artifacts/control.json и npm test
 ```
 
 Требуется Node.js 22+ (см. `package.json`, `target: node22`).
@@ -30,29 +30,41 @@ npm run report         # TEST_REPORT.md из out/control.json и npm test
 
 | Скрипт | Что делает | Выход |
 |---|---|---|
-| `npm run typecheck` | `tsc --noEmit` по всем пакетам и `examples/` | код возврата |
+| `npm run typecheck` | `tsc --noEmit` по всем пакетам и `packages/*/examples` | код возврата |
 | `npm test` | Vitest: unit, property (invariants), data, export | 210+ тестов |
-| `npm run lint` | ESLint по `packages`, `scripts`, `examples` | код возврата |
+| `npm run lint` | ESLint по `packages`, `scripts` | код возврата |
 | `npm run data:manifest` | пересобирает `data/manifest.json` и `datasetVersion` | `data/manifest.json` |
-| `npm run data:check` | проверяет датасеты, схемы, порядок ставок | отчёт в `out/` |
-| `npm run calc` | демо-расчёт D1 по этапам | `out/calc-d1.json` |
-| `npm run e2e` | D1–D3 от брифа до экспорта | 9 файлов в `out/` + `out/control.json` |
-| `npm run report` | генерирует `TEST_REPORT.md` | `TEST_REPORT.md` |
-| `npm run intake:eval` | метрики правил/кэша Jev на 12 брифах | `out/intake-eval.json` |
-| `npm run helpdesk:check` | импорт и качество выгрузки HelpDesk | `out/helpdesk.json` |
+| `npm run data:check` | проверяет датасеты, схемы, порядок ставок | отчёт в `.artifacts/` |
+| `npm run calc` | демо-расчёт D1 по этапам | `.artifacts/calc-d1.json` |
+| `npm run e2e` | D1–D3 от брифа до экспорта | 9 файлов в `.artifacts/` + `.artifacts/control.json` |
+| `npm run report` | генерирует `docs/deliverables/TEST_REPORT.md` | `docs/deliverables/TEST_REPORT.md` |
+| `npm run intake:eval` | метрики правил/кэша Jev на 12 брифах | `.artifacts/intake-eval.json` |
+| `npm run helpdesk:check` | импорт и качество выгрузки HelpDesk | `.artifacts/helpdesk.json` |
 
-`out/` — gitignored: артефакты генерируются, а не коммитятся.
+`.artifacts/` — gitignored: артефакты генерируются, а не коммитятся.
 
 ## Что где лежит
 
+В корне — только `README.md`, `LICENSE`, конфиги (`package.json`, `tsconfig*.json`,
+`eslint.config.js`, `vitest.config.ts`, `.prettierrc`, …), `apps/`, `packages/`,
+`data/`, `docs/`, `research/`, `scripts/`.
+
 ```
 ├── README.md                 # этот файл
-├── METHOD.md                 # формулы, коэффициенты, источники, допущения
-├── DATA_MODEL.md             # сущности, поля, связи, схемы
-├── ARCHITECTURE.md           # Mermaid: пакеты и поток данных
-├── TEST_REPORT.md            # генерируемый отчёт D1–D3 + тесты + intake
-├── docs/                     # проектная документация (см. docs/README.md)
-├── research/                 # архив исследования и исходников (не runtime-зависимость)
+├── LICENSE                   # MIT
+├── package.json              # workspace-скрипты (typecheck, test, lint, …)
+├── tsconfig.json             # корневая проверка типов
+├── eslint.config.js          # ESLint
+├── apps/
+│   ├── web/                  # React/Vite кокпит
+│   └── api/                  # Fastify backend-for-frontend
+├── packages/
+│   ├── contract/             # zod-схемы и типы (единый контракт) + examples/contract-usage.ts
+│   ├── data/                 # загрузка, валидация, импорт HelpDesk
+│   ├── core/                 # чистый расчёт: sizing, cost, risk, schedule, decision, pipeline
+│   ├── intake/               # правила + Jev-адаптер + кэш
+│   ├── export/               # JSON-снимок, XLSX, PDF, export gate
+│   └── cli/                  # e2e-сценарий D1–D3
 ├── data/                     # версионируемые рабочие данные запуска
 │   ├── datasets/             # 6 рабочих JSON-датасетов (ставки, архетипы, аналоги, коэффициенты, контракты)
 │   ├── schemas/              # helpdesk_import_schema.json
@@ -61,19 +73,16 @@ npm run report         # TEST_REPORT.md из out/control.json и npm test
 │   ├── cache/               # кэш ответов Jev
 │   ├── seeds/control.json    # ожидания D1–D3 (регрессия)
 │   └── manifest.json         # версия датасетов
-├── apps/
-│   ├── web/                  # React/Vite кокпит (добавляет второй разработчик)
-│   └── api/                  # Fastify backend-for-frontend
-├── packages/
-│   ├── contract/             # zod-схемы и типы (единый контракт)
-│   ├── data/                 # загрузка, валидация, импорт HelpDesk
-│   ├── core/                 # чистый расчёт: sizing, cost, risk, schedule, decision, pipeline
-│   ├── intake/               # правила + Jev-адаптер + кэш
-│   ├── export/               # JSON-снимок, XLSX, PDF, export gate
-│   └── cli/                  # e2e-сценарий D1–D3
+├── docs/                     # проектная документация (см. docs/README.md)
+│   └── deliverables/         # METHOD.md, DATA_MODEL.md, ARCHITECTURE.md, TEST_REPORT.md
+├── research/                 # архив исследования и исходников (не runtime-зависимость)
 ├── scripts/                  # esbuild-обёртки и генераторы отчётов
-└── examples/contract-usage.ts# компилируемый пример контракта
+└── .artifacts/               # генерируемые артефакты (gitignored)
 ```
+
+Deliverables (итоговые документы поставки) лежат в `docs/deliverables/`,
+артефакты прогонов — в gitignored `.artifacts/`, `research/` — архив исходных
+материалов.
 
 `research/` — архив исходных материалов для провенанса, а **не** runtime-зависимость:
 код читает рабочие копии из `data/`, а исходные пути зафиксированы в
@@ -84,11 +93,11 @@ npm run report         # TEST_REPORT.md из out/control.json и npm test
 | Роль | Ответственность | Блоки |
 |---|---|---|
 | R1 Техлид / ядро | архитектура, `packages/core`, интеграция, ревью | Архитектура и код |
-| R2 Расчёт | формулы, Монте-Карло, аналоги, `METHOD.md` | Рыночная оценка, объяснимость |
-| R3 Данные | загрузчики, валидаторы, HelpDesk, `DATA_MODEL.md` | Данные и интеграции |
+| R2 Расчёт | формулы, Монте-Карло, аналоги, `docs/deliverables/METHOD.md` | Рыночная оценка, объяснимость |
+| R3 Данные | загрузчики, валидаторы, HelpDesk, `docs/deliverables/DATA_MODEL.md` | Данные и интеграции |
 | R4 UI/UX | кокпит, графики, формула-дерево, PDF/XLSX | Прототип, удобство |
 | R5 Intake / Jev | правила, адаптер, кэш, таблица ревью | Объяснимость |
-| R6 Качество | тесты, `TEST_REPORT.md`, `DECISIONS.md`, README | Тесты, защита |
+| R6 Качество | тесты, `docs/deliverables/TEST_REPORT.md`, `DECISIONS.md`, README | Тесты, защита |
 
 ## Документы
 
@@ -96,16 +105,17 @@ npm run report         # TEST_REPORT.md из out/control.json и npm test
 - `docs/03_estimation_model.md` — расчётная модель.
 - `docs/05_architecture_data.md` — архитектура, модель данных, импорт.
 - `docs/09_integration_contract.md` — контракт фронта, включая React/Vite.
-- `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md` — сжатая выжимка с ссылками
-  на реальные файлы кода.
-- `TEST_REPORT.md` — контрольные D1–D3, unit/property, intake.
+- `docs/deliverables/METHOD.md`, `docs/deliverables/DATA_MODEL.md`,
+  `docs/deliverables/ARCHITECTURE.md` — сжатая выжимка с ссылками на реальные
+  файлы кода.
+- `docs/deliverables/TEST_REPORT.md` — контрольные D1–D3, unit/property, intake.
 - `DECISIONS.md` — журнал решений.
 
 ## Границы и честность
 
 - Оценка — **порядок, а не смета**; дисклеймер есть в UI и PDF.
 - MAPE/PRED(25) **не считаются**: в HelpDesk всего 4 строки, нужно ≥ 10 пар
-  план/факт (`TEST_REPORT.md` §4).
+  план/факт (`docs/deliverables/TEST_REPORT.md` §4).
 - Датасеты — публичные/синтетические, без персональных данных и внутренних
   ставок заказчика.
 - Лицензия: MIT (`LICENSE`); сторонние пакеты — MIT/Apache/BSD/ISC.
