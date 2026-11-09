@@ -10,7 +10,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { cwd, stdout } from 'node:process';
+import process, { cwd, stdout } from 'node:process';
 
 const root = process.env.REPORT_ROOT ?? cwd();
 const outDir = path.join(root, 'out');
