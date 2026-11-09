@@ -1,23 +1,66 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  AlertTriangle, CheckCircle2, Database, FileJson, FileSpreadsheet, FileText,
-  Info, Search, ShieldCheck, Upload,
+  AlertTriangle, CheckCircle2, Database, FileJson, FileText, Info, Search,
+  ShieldCheck, Upload,
 } from 'lucide-react';
 import { Button, Pill, SectionHead } from '../components/ui.jsx';
+import { mapManifest } from '../core/datasets.js';
+import { fetchDatasets, importHelpdesk } from '../core/api.js';
 
-const DATASETS = [
-  { name: 'benchmark_rates.json', rows: '113', version: 'v0.3 · 9f2a1c', updated: '09.11.2026', status: 'Валидирован', tone: 'good', text: 'Ставки, роли и производительность' },
-  { name: 'tmk_it_contracts.json', rows: '60', version: 'v0.2 · 8b17d4', updated: '09.11.2026', status: 'Валидирован', tone: 'good', text: 'Публичные контракты ТМК, НМЦК' },
-  { name: 'analogue_corpus.json', rows: '49', version: 'v0.2 · 31ac09', updated: '09.11.2026', status: 'Проверка', tone: 'warn', text: 'Опубликованные рыночные якоря' },
-  { name: 'helpdesk_schema.json', rows: '4 поля', version: 'v1.0 · a91d2e', updated: '08.11.2026', status: 'Схема', tone: 'info', text: 'План / факт / заквотированные часы' },
-  { name: 'risk_factors.json', rows: '27', version: 'v0.1 · 6c2f10', updated: '08.11.2026', status: 'Проверка', tone: 'warn', text: 'Шаблоны рисков по категориям' },
-];
+const reasonsText = (report) => {
+  const dropped = report?.rowsDropped ?? [];
+  if (!dropped.length) return '—';
+  return dropped.slice(0, 3).map((item) => item.reason ?? item.row ?? 'ошибка').join(', ');
+};
 
 export default function DataPage() {
   const [query, setQuery] = useState('');
-  const [imported, setImported] = useState(null);
+  const [manifest, setManifest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [report, setReport] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState('');
   const inputRef = useRef(null);
-  const filtered = DATASETS.filter((item) => item.name.toLowerCase().includes(query.toLowerCase()));
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    fetchDatasets()
+      .then((data) => {
+        if (!alive) return;
+        setManifest(mapManifest(data));
+        setError('');
+      })
+      .catch((err) => {
+        if (alive) setError(err.message ?? 'API недоступен');
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const upload = async (file) => {
+    if (!file) return;
+    setImporting(true);
+    setImportError('');
+    setReport(null);
+    try {
+      const data = await importHelpdesk(file);
+      setReport(data.report ?? null);
+    } catch (err) {
+      setImportError(err.message ?? 'Не удалось импортировать файл');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const files = manifest?.files ?? [];
+  const filtered = files.filter((item) => item.name.toLowerCase().includes(query.toLowerCase()));
+  const count = manifest?.datasetCount ?? 0;
 
   return (
     <div className="page-stack">
@@ -29,22 +72,30 @@ export default function DataPage() {
         </div>
         <div className="page-heading-side">
           <Pill tone="good"><ShieldCheck size={12} /> Прослеживаемость</Pill>
-          <span className="heading-note">5 активных наборов</span>
+          <span className="heading-note">
+            {loading ? 'Загрузка манифеста…' : error ? 'API недоступен' : `${count} активных наборов`}
+          </span>
         </div>
       </div>
 
+      {error && (
+        <div className="inline-hint warn">
+          <AlertTriangle size={14} /> Манифест недоступен: {error}. Значения не подставлены.
+        </div>
+      )}
+
       <div className="data-kpis">
-        <div><span>ДАТАСЕТОВ</span><b>05</b><small>активных наборов</small></div>
-        <div><span>ЗАПИСЕЙ</span><b>253</b><small>в демонстрационном контуре</small></div>
-        <div><span>ВАЛИДАЦИЯ</span><b>09.11</b><small>2026 · 10:42 UTC+5</small></div>
-        <div><span>КАЧЕСТВО</span><b>94,2%</b><small>в пределах правил</small></div>
+        <div><span>ДАТАСЕТОВ</span><b>{String(count).padStart(2, '0')}</b><small>активных наборов</small></div>
+        <div><span>ЗАПИСЕЙ</span><b>{manifest?.totalRows ?? '—'}</b><small>в рабочем контуре</small></div>
+        <div><span>ВЕРСИЯ</span><b className="mono">{manifest?.versionShort ?? '—'}</b><small>datasetVersion</small></div>
+        <div><span>ОБНОВЛЕНО</span><b>{manifest?.date ?? '—'}</b><small>дата манифеста</small></div>
       </div>
 
       <section className="panel">
         <SectionHead
           eyebrow="РЕЕСТР"
           title="Наборы данных"
-          description="Версии, статус валидации и назначение"
+          description="Версии, хеши, статус валидации и назначение"
           actions={
             <label className="search-field">
               <Search size={14} />
@@ -53,14 +104,14 @@ export default function DataPage() {
           }
         />
         <div className="dataset-table">
-          <div className="dataset-head"><span>НАБОР</span><span>ЗАПИСЕЙ</span><span>ВЕРСИЯ / HASH</span><span>ОБНОВЛЁН</span><span>СТАТУС</span></div>
+          <div className="dataset-head"><span>НАБОР</span><span>ЗАПИСЕЙ</span><span>SHA256</span><span>ОБНОВЛЁН</span><span>СТАТУС</span></div>
           {filtered.map((item) => (
-            <div className="dataset-row" key={item.name}>
-              <div className="dataset-name"><FileJson size={15} /><div><b>{item.name}</b><small>{item.text}</small></div></div>
+            <div className="dataset-row" key={item.path || item.name}>
+              <div className="dataset-name"><FileJson size={15} /><div><b>{item.name}</b><small>{item.source}</small></div></div>
               <span>{item.rows}</span>
-              <span className="mono">{item.version}</span>
-              <span>{item.updated}</span>
-              <Pill tone={item.tone}>{item.status}</Pill>
+              <span className="mono">{item.sha256}</span>
+              <span>{item.date}</span>
+              <Pill tone="good">{item.status}</Pill>
             </div>
           ))}
         </div>
@@ -71,7 +122,7 @@ export default function DataPage() {
           <SectionHead
             eyebrow="ИНТЕГРАЦИЯ"
             title="Импорт план/факт из HelpDesk"
-            description="CSV или JSON · проверка структуры, пустых значений, дубликатов и нулевого плана"
+            description="XLSX или CSV · проверка структуры, пустых значений, дубликатов и нулевого плана"
           />
           <div
             className="import-dropzone"
@@ -79,43 +130,49 @@ export default function DataPage() {
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault();
-              const file = event.dataTransfer.files?.[0];
-              if (file) setImported(file.name);
+              upload(event.dataTransfer.files?.[0]);
             }}
             role="button"
             tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') inputRef.current?.click();
+            }}
           >
             <input
               ref={inputRef}
               type="file"
-              accept=".csv,.json"
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) setImported(file.name);
-              }}
+              accept=".xlsx,.csv"
+              onChange={(event) => upload(event.target.files?.[0])}
             />
             <span className="import-icon"><Upload size={20} /></span>
-            <b>{imported ? `Файл выбран: ${imported}` : 'Перетащите CSV или JSON'}</b>
+            <b>{importing ? 'Отправляем на сервер…' : 'Перетащите XLSX или CSV'}</b>
             <span>или выберите файл на устройстве</span>
-            <small>Файл обрабатывается локально. Не загружайте персональные данные.</small>
+            <small>Файл уходит на POST /api/import/helpdesk. Не загружайте персональные данные.</small>
           </div>
-          <Button
-            variant="primary"
-            icon={FileSpreadsheet}
-            onClick={() => setImported((old) => old || 'helpdesk_export_demo.csv')}
-          >
-            Проверить демо-выгрузку
+          <Button variant="primary" disabled={importing} onClick={() => inputRef.current?.click()}>
+            Выбрать файл HelpDesk
           </Button>
+          {importError && (
+            <div className="inline-hint warn">
+              <AlertTriangle size={14} /> Импорт не выполнен: {importError}
+            </div>
+          )}
           <div className="quality-report">
-            <div className="quality-head"><b>Отчёт о качестве</b><Pill tone={imported ? 'good' : 'neutral'}>{imported ? 'Проверено' : 'Ожидает файл'}</Pill></div>
-            <div><span>Принято строк</span><strong>{imported ? '4' : '—'}</strong></div>
-            <div><span>Отклонено строк</span><strong>{imported ? '1' : '—'}</strong></div>
-            <div><span>Причина</span><strong>{imported ? 'Плановые часы = 0' : '—'}</strong></div>
-            <div><span>Дубликаты</span><strong>{imported ? '0' : '—'}</strong></div>
+            <div className="quality-head">
+              <b>Отчёт о качестве</b>
+              <Pill tone={report ? 'good' : importing ? 'info' : 'neutral'}>
+                {report ? 'Проверено' : importing ? 'Загрузка' : 'Ожидает файл'}
+              </Pill>
+            </div>
+            <div><span>Всего строк</span><strong>{report?.rowsTotal ?? '—'}</strong></div>
+            <div><span>Принято строк</span><strong>{report?.rowsOk ?? '—'}</strong></div>
+            <div><span>Отклонено строк</span><strong>{report ? (report.rowsDropped?.length ?? 0) : '—'}</strong></div>
+            <div><span>Предупреждений</span><strong>{report ? (report.warnings?.length ?? 0) : '—'}</strong></div>
+            <div><span>Причины</span><strong>{reasonsText(report)}</strong></div>
           </div>
           <div className="inline-note">
             <Info size={15} />
-            <span>В демо импорт не отправляет данные на сервер. В production — валидация, версионирование и запись в контур.</span>
+            <span>Отчёт формирует backend: структура, дубликаты, пустые значения и нулевой план.</span>
           </div>
         </section>
 
@@ -133,7 +190,7 @@ export default function DataPage() {
           </div>
           <div className="source-card-mini">
             <Database size={16} />
-            <div><b>Версия модели: 2.0</b><span>Датасеты связаны с estimate_id и версией методики</span></div>
+            <div><b>Версия датасетов: {manifest?.versionShort ?? '—'}</b><span>GET /api/datasets · data/manifest.json</span></div>
           </div>
           <div className="source-card-mini">
             <FileText size={16} />
@@ -150,7 +207,7 @@ export default function DataPage() {
         <CheckCircle2 size={16} />
         <div>
           <b>Единая модель данных</b>
-          <span>Task → WorkItem → Estimate → CostLine → Risk/Source: импорт источника, валидация и отчёт о качестве связаны одним estimate_id.</span>
+          <span>Task → WorkItem → Estimate → CostLine → Assumption/Risk/Source: импорт источника, валидация и отчёт о качестве связаны одним estimate_id.</span>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ import { recommendedRationale } from '../core/calc.js';
 
 const SENSITIVITY_TONE = { Высокая: 'warn', Средняя: 'info', Низкая: 'neutral' };
 
-export default function Justification({ model, goTab, onExportJSON, onExportCSV, onPrint }) {
+export default function Justification({ model, goTab, onExportJSON, onExportCSV, onExportPDF, onExportXLSX }) {
   const meta = model.meta;
   const recId = model.recommended;
   const rec = model.scenarios[recId];
@@ -58,12 +58,13 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
             <li><Check size={13} /> Формулы и источники</li>
             <li><Check size={13} /> Дата, версия и ID оценки</li>
           </ul>
-          <Button variant="primary" icon={Printer} onClick={onPrint}>Сформировать PDF</Button>
+          <Button variant="primary" icon={Printer} onClick={onExportPDF}>Сформировать PDF</Button>
           <div className="export-row">
             <Button variant="dark-ghost" icon={FileJson} onClick={onExportJSON}>JSON</Button>
-            <Button variant="dark-ghost" icon={FileSpreadsheet} onClick={onExportCSV}>CSV</Button>
+            <Button variant="dark-ghost" icon={FileSpreadsheet} onClick={onExportXLSX}>XLSX</Button>
+            <Button variant="dark-ghost" icon={FileText} onClick={onExportCSV}>CSV</Button>
           </div>
-          <div className="export-note">PDF формируется через диалог печати браузера. JSON и CSV скачиваются локально.</div>
+          <div className="export-note">PDF и XLSX формирует сервер при наличии оценки; иначе PDF — печать браузера, JSON/CSV — локально.</div>
         </aside>
       </div>
 
@@ -88,7 +89,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
             ))}
           </div>
           <div className="confidence-formula">
-            <code>Score = 0,30 × бриф + 0,25 × данные + 0,25 × аналоги + 0,20 × согласие методов</code>
+            <code>Score = 0,30 × бриф + 0,30 × согласие методов + 0,20 × аналоги + 0,20 × данные</code>
             <span>Confidence — индикатор качества входных данных, а не вероятность точной стоимости.</span>
           </div>
           <div className="confidence-drivers">

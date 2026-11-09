@@ -13,9 +13,9 @@ const GROUP_LABELS = {
 };
 const CONFIDENCE_COMPONENTS = [
   { id: 'brief', key: 'brief', label: 'Полнота брифа', weight: 0.3 },
-  { id: 'data', key: 'data', label: 'Качество данных', weight: 0.25 },
-  { id: 'analog', key: 'analogues', label: 'Рыночные аналоги', weight: 0.25 },
-  { id: 'method', key: 'methods', label: 'Согласие методов', weight: 0.2 },
+  { id: 'method', key: 'methods', label: 'Согласие методов', weight: 0.3 },
+  { id: 'analog', key: 'analogues', label: 'Рыночные аналоги', weight: 0.2 },
+  { id: 'data', key: 'data', label: 'Качество данных', weight: 0.2 },
 ];
 export class ApiError extends Error {
   constructor(code, message, details) { super(message); Object.assign(this, { name: 'ApiError', code, details }); }
@@ -110,7 +110,7 @@ function buildConfidence(response) {
     const raw = Number(byKey.get(item.key)?.value) || 0;
     return { id: item.id, label: item.label, weight: item.weight, value: Math.round(raw <= 1 ? raw * 100 : raw) };
   });
-  return { score: Math.round(components.reduce((acc, item) => acc + item.value * item.weight, 0)), components };
+  return { score: Number.isFinite(Number(response.confidence?.score)) ? Number(response.confidence?.score) : 0, components };
 }
 function supportFor(estimate) {
   const rows = new Map((estimate.tco ?? []).map((row) => [row.year, row]));

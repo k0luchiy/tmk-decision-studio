@@ -11,8 +11,9 @@ import DataPage from '../pages/DataPage.jsx';
 export default function Cockpit(props) {
   const {
     model, state, activeTab, goTab, activeScenario, setActiveScenario, onCaseChange,
-    onExportJSON, onExportCSV, onPrint, rationale, theme, toggleTheme, onDeadlineChange, goHome,
-    params, confirmParam, rejectParam, reparse, parsed, files, addFiles, removeFile,
+    onExportJSON, onExportCSV, onExportPDF, onExportXLSX, rationale, theme, toggleTheme,
+    onDeadlineChange, goHome,
+    params, confirmParam, rejectParam, reparse, parsed, intakeSource, files, addFiles, removeFile,
     update, updateStage, removeStage, addStage, updateExtra, removeExtra, addExtra,
     apiStatus,
   } = props;
@@ -28,7 +29,8 @@ export default function Cockpit(props) {
         onCaseChange={onCaseChange}
         onExportJSON={onExportJSON}
         onExportCSV={onExportCSV}
-        onPrint={onPrint}
+        onExportPDF={onExportPDF}
+        onExportXLSX={onExportXLSX}
         theme={theme}
         toggleTheme={toggleTheme}
         apiStatus={apiStatus}
@@ -61,6 +63,7 @@ export default function Cockpit(props) {
             rejectParam={rejectParam}
             reparse={reparse}
             parsed={parsed}
+            intakeSource={intakeSource}
             files={files}
             addFiles={addFiles}
             removeFile={removeFile}
@@ -90,7 +93,8 @@ export default function Cockpit(props) {
             goTab={goTab}
             onExportJSON={onExportJSON}
             onExportCSV={onExportCSV}
-            onPrint={onPrint}
+            onExportPDF={onExportPDF}
+            onExportXLSX={onExportXLSX}
           />
         )}
         {activeTab === 'method' && <Methodology goTab={goTab} />}

@@ -135,7 +135,7 @@ function CaseSwitcher({ model, onCaseChange }) {
   );
 }
 
-export function WorkspaceBar({ model, onCaseChange, onExportJSON, onExportCSV, onPrint, theme, toggleTheme, apiStatus }) {
+export function WorkspaceBar({ model, onCaseChange, onExportJSON, onExportCSV, onExportPDF, onExportXLSX, theme, toggleTheme, apiStatus }) {
   return (
     <div className="workspace-bar">
       <div className="workspace-case">
@@ -155,9 +155,14 @@ export function WorkspaceBar({ model, onCaseChange, onExportJSON, onExportCSV, o
           <button type="button" className="icon-button" onClick={onExportCSV} title="Скачать CSV этапов" aria-label="Скачать CSV этапов">
             <FileSpreadsheet size={16} />
           </button>
-          <button type="button" className="icon-button" onClick={onPrint} title="Печать / PDF" aria-label="Печать или PDF">
+          <button type="button" className="icon-button" onClick={onExportPDF} title="Сформировать PDF" aria-label="Сформировать PDF">
             <Printer size={16} />
           </button>
+          {model.estimateId && (
+            <button type="button" className="icon-button" onClick={onExportXLSX} title="Скачать XLSX" aria-label="Скачать XLSX">
+              <FileSpreadsheet size={16} />
+            </button>
+          )}
           <button type="button" className="icon-button theme-icon" onClick={toggleTheme} title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} aria-label="Переключить тему">
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>

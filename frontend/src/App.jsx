@@ -6,6 +6,7 @@ import { Toast } from './components/ui.jsx';
 import { CASES } from './data/cases.js';
 import { computeModel, createCaseState, recommendedRationale } from './core/calc.js';
 import { buildModelFromApi, exportApiEstimate, fetchApiModel } from './core/apiModel.js';
+import { fetchIntake, confirmIntake, mapIntakeToParams } from './core/api.js';
 import { applyParam, parseBrief } from './core/parseBrief.js';
 
 const buildParams = (state) => [
@@ -79,6 +80,7 @@ export default function App() {
   const [toast, setToast] = useState('');
   const [model, setModel] = useState(() => computeModel(createCaseState(initialCaseId)));
   const [apiStatus, setApiStatus] = useState('idle');
+  const [intakeSource, setIntakeSource] = useState(null);
   const apiErrorNotified = useRef(false);
 
   const rationale = useMemo(() => recommendedRationale(model), [model]);
@@ -133,6 +135,21 @@ export default function App() {
 
   const notify = (message) => setToast(message);
 
+  const parseViaApi = async (brief) => {
+    try {
+      const response = await fetchIntake(brief, 'cache');
+      const mapped = mapIntakeToParams(response?.params);
+      if (mapped.length) {
+        setIntakeSource(response.status === 'jev-cache' ? 'Jev-кэш' : 'правила');
+        return mapped;
+      }
+    } catch {
+      // Backend intake is optional: fall through to the local parser.
+    }
+    setIntakeSource(null);
+    return parseBrief(brief);
+  };
+
   const goTab = (tab) => {
     setPage('cockpit');
     setActiveTab(tab);
@@ -158,13 +175,14 @@ export default function App() {
     notify(`Загружен кейс ${id}: ${CASES[id].name}`);
   };
 
-  const startAssessment = ({ brief, files: incomingFiles }) => {
+  const startAssessment = async ({ brief, files: incomingFiles }) => {
     let next = state;
     if (brief && brief.trim()) {
-      next = { ...state, description: brief.trim() };
-      const parsedParams = parseBrief(brief.trim());
+      const text = brief.trim();
+      next = { ...state, description: text, confirmedParams: 0, rejectedParams: 0 };
+      setState(next);
+      const parsedParams = await parseViaApi(text);
       setParams(parsedParams.length ? parsedParams : buildParams(next));
-      next = { ...next, confirmedParams: 0, rejectedParams: 0 };
       setParsed(true);
     } else {
       setParams(buildParams(next));
@@ -268,7 +286,9 @@ export default function App() {
       const applied = applyParam(old, param);
       return { ...applied, confirmedParams: Math.min(4, (old.confirmedParams || 0) + 1) };
     });
-    setParams((old) => old.map((item) => (item.id === param.id ? { ...item, status: 'confirmed' } : item)));
+    const nextParams = params.map((item) => (item.id === param.id ? { ...item, status: 'confirmed' } : item));
+    setParams(nextParams);
+    confirmIntake(nextParams).catch(() => {});
     notify(`Параметр «${param.label}» подтверждён`);
   };
 
@@ -278,8 +298,8 @@ export default function App() {
     notify(`Параметр «${param.label}» отклонён — уверенность снижена`);
   };
 
-  const reparse = () => {
-    const extracted = parseBrief(state.description);
+  const reparse = async () => {
+    const extracted = state.description?.trim() ? await parseViaApi(state.description) : [];
     setParams(extracted.length ? extracted : buildParams(state));
     setState((old) => ({ ...old, confirmedParams: 0, rejectedParams: 0 }));
     setParsed(true);
@@ -363,8 +383,33 @@ export default function App() {
     notify('CSV-таблица этапов подготовлена');
   };
 
-  const print = () => {
+  const exportPDF = async () => {
+    if (model.estimateId) {
+      try {
+        const { blob, filename } = await exportApiEstimate(model.estimateId, 'pdf');
+        download(blob, filename);
+        notify('PDF получен из API');
+        return;
+      } catch (error) {
+        notify(`PDF API недоступен: ${error.message}. Открываю печать`);
+      }
+    }
     window.print();
+  };
+
+  const exportXLSX = async () => {
+    if (model.estimateId) {
+      try {
+        const { blob, filename } = await exportApiEstimate(model.estimateId, 'xlsx');
+        download(blob, filename);
+        notify('XLSX получен из API');
+        return;
+      } catch (error) {
+        notify(`XLSX API недоступен: ${error.message}`);
+        return;
+      }
+    }
+    notify('XLSX доступно в API-режиме');
   };
 
   return (
@@ -385,7 +430,8 @@ export default function App() {
           onCaseChange={loadCase}
           onExportJSON={exportJSON}
           onExportCSV={exportCSV}
-          onPrint={print}
+          onExportPDF={exportPDF}
+          onExportXLSX={exportXLSX}
           rationale={rationale}
           theme={theme}
           toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -395,6 +441,7 @@ export default function App() {
           rejectParam={rejectParam}
           reparse={reparse}
           parsed={parsed}
+          intakeSource={intakeSource}
           files={files}
           addFiles={addFiles}
           removeFile={removeFile}

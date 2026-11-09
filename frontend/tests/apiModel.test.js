@@ -52,8 +52,13 @@ test('confidence, stage rows and effort are adapted for the UI', () => {
   assert.equal(model.confidence.components.length, 4);
   assert.deepEqual(
     model.confidence.components.map((item) => item.id),
-    ['brief', 'data', 'analog', 'method'],
+    ['brief', 'method', 'analog', 'data'],
   );
+  assert.deepEqual(
+    model.confidence.components.map((item) => item.weight),
+    [0.3, 0.3, 0.2, 0.2],
+  );
+  assert.equal(model.confidence.score, apiResponse().confidence.score);
   assert.ok(model.confidence.score >= 0 && model.confidence.score <= 100);
 
   assert.equal(model.stageRows.length, 7);

@@ -20,8 +20,8 @@ const OWNER_OPTIONS = [
 ];
 
 export default function Parameters({
-  state, update, params, confirmParam, rejectParam, reparse, parsed, files, addFiles, removeFile,
-  model, goTab, activeScenario, setActiveScenario,
+  state, update, params, confirmParam, rejectParam, reparse, parsed, intakeSource,
+  files, addFiles, removeFile, model, goTab, activeScenario, setActiveScenario,
 }) {
   const [unit, setUnit] = useState('weeks');
   const deadlineValue = weeksToUnit(state.deadlineWeeks, unit);
@@ -132,8 +132,8 @@ export default function Parameters({
             </div>
           )}
           <div className="brief-footnote">
-            <Layers3 size={15} />
-            <span>В демо параметры извлекаются по ключевым словам и числам. В production — с цитатой и ссылкой на фрагмент брифа.</span>
+            {intakeSource ? <Pill tone="info"><Sparkles size={11} /> Источник: {intakeSource}</Pill> : <Layers3 size={15} />}
+            <span>В API-режиме параметры приходят из intake с цитатой; локальный fallback — по ключевым словам и числам.</span>
           </div>
         </section>
 

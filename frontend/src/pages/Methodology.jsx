@@ -6,7 +6,7 @@ import {
 import { Button, LinkButton, Pill, SectionHead } from '../components/ui.jsx';
 
 const FLOW = [
-  { n: '01', title: 'Декомпозиция', text: 'Задача → 7 этапов → работы. Один шаблон для команды и подрядчика.' },
+  { n: '01', title: 'Декомпозиция', text: 'Задача → 6 этапов + сопровождение. Один шаблон для команды и подрядчика.' },
   { n: '02', title: 'Трудоёмкость', text: 'Часы по этапам и ролям, диапазон P10–P90, коэффициент сложности.' },
   { n: '03', title: 'Внутренняя стоимость', text: 'Fully loaded ставка: оклад → gross → взносы → накладные → АРМ.' },
   { n: '04', title: 'Рыночная оценка', text: '≥ 3 аналога, нормализация, медиана, диапазон подрядчика.' },
@@ -17,20 +17,20 @@ const FORMULAS = [
   {
     id: 'internal',
     title: 'Внутренняя стоимость',
-    formula: 'C_team = (Σ часыᵢ × ставкаᵢ + внешние статьи + найм + bench) × Kсложности × (1 + резерв) × Kсжатия',
-    text: 'Ставка — fully loaded: оклад → gross → страховые взносы → накладные → рабочее место и ПО. Найм добавляет 420 тыс. ₽ и 2 недели, bench — 6% от стоимости работ.',
+    formula: 'C_team = Σ(часыᵢ × fully_loaded_hourᵢ) + найм + ramp-up + bench + текучесть',
+    text: 'Ставки берутся из rate_cards.json: 14 ролей × 4 грейда, fully loaded. Отдельной ставки 4 200 ₽/ч в бэке нет — UI может передать только override средней ставки.',
   },
   {
     id: 'rate',
-    title: 'Ставка часа: цепочка',
-    formula: 'C_мес = (S_нетто / 0,87) × (1 + τ_взносы) × (1 + τ_накладные) + АРМ + лицензии;   C_час = C_мес / 120',
-    text: 'НДФЛ 13% переводит net в gross. Взносы — 30% до порога 2 979 000 ₽/год, 15,1% выше. Накладные — офис, поддержка, управление. 120 — нормативные часы в месяц.',
+    title: 'Ставки из rate_cards',
+    formula: 'C_час = fully_loaded_hour[роль, грейд];   C_мес = (S_нетто / 0,87) × (1 + взносы) × (1 + накладные) + АРМ;   C_час = C_мес / 120',
+    text: '14 ролей × 4 грейда в rate_cards.json и contractor_rate_cards.json. Ставка не пересчитывается: берётся готовая fully_loaded_hour строки датасета.',
   },
   {
     id: 'vendor',
     title: 'Стоимость подрядчика',
-    formula: 'C_vendor = (Σ смета этапов + внешние статьи + тендер) × (1 + надзор) × K_fixed × Kсложности × (1 + резерв) × Kсжатия',
-    text: 'Надзор — 5–25% на контроль архитектуры, кода и приёмку. Fixed Price добавляет 15% риск-премии. Тендер и контрактация — 180 тыс. ₽.',
+    formula: 'C_vendor = Σ(часы × rate_mid) + 15% координация + 5% приёмка + 20% риск-премия (fixed_price) [+ НДС 20%]',
+    text: 'Труд — по contractor_rate_cards.json (geo RU). Координация 15%, приёмка 5%, риск-премия фиксированно 20% только для fixed_price. НДС 20% — по флагу vat.',
   },
   {
     id: 'hybrid',
@@ -42,13 +42,13 @@ const FORMULAS = [
     id: 'range',
     title: 'Диапазон P10 / P50 / P90',
     formula: 'μ = (ln P10 + ln P90) / 2;   σ = (ln P90 − ln P10) / (2 × 1,2816);   резерв = P80 − P50',
-    text: 'Логнормальное распределение, 10 000 итераций Монте-Карло, корреляция ролей ≥ 0,5. В демо диапазон задан детерминированными коэффициентами.',
+    text: 'Логнормальные маргиналы, 4 000 итераций Монте-Карло на сценарий, корреляция ρ = 0,5 и обязательный seed. Резерв — это P80 − P50, а не процент.',
   },
   {
     id: 'decision',
     title: 'Рекомендация и confidence',
-    formula: 'Score = 0,45 × стоимость + 0,25 × срок + 0,20 × риск + 0,10 × гибкость;   Confidence = 0,30 × бриф + 0,25 × данные + 0,25 × аналоги + 0,20 × методы',
-    text: 'Стоимость и срок нормируются относительно лучшего варианта. Риск и гибкость — экспертные шкалы, зависящие от категории работ. Confidence — качество входа, а не вероятность.',
+    formula: 'Score = 0,45 × стоимость + 0,25 × срок + 0,20 × риск + 0,10 × гибкость;   Confidence = 0,30 × бриф + 0,30 × методы + 0,20 × аналоги + 0,20 × данные',
+    text: 'Стоимость и срок нормируются относительно лучшего варианта. Риск и гибкость — экспертные шкалы, зависящие от категории работ. Score приходит из API и не пересчитывается на фронте.',
   },
   {
     id: 'tco',
@@ -60,26 +60,25 @@ const FORMULAS = [
 
 const DATA_MODEL = [
   { name: 'Task', text: 'Бриф, тип, сложность, интеграции, пользователи', icon: FileText },
-  { name: 'WorkItem', text: '7 этапов: часы, ставка, смета подрядчика, дни', icon: Layers3 },
-  { name: 'Estimate', text: 'Три сценария, диапазоны, срок, уверенность', icon: Calculator },
-  { name: 'CostLine', text: 'Работы, инфраструктура, лицензии, найм, резерв', icon: Database },
-  { name: 'Assumption / Risk', text: 'Значение, диапазон, источник, P × I', icon: AlertTriangle },
-  { name: 'Source', text: 'Версия, дата, метод, ссылка на происхождение', icon: ShieldCheck },
+  { name: 'WorkItem', text: '6 этапов + сопровождение: часы, роли, P10–P90', icon: Layers3 },
+  { name: 'Estimate', text: 'Три сценария, диапазоны, срок, вердикт, уверенность', icon: Calculator },
+  { name: 'CostLine', text: 'labor, coordination, risk, vat, hiring, rampup, bench', icon: Database },
+  { name: 'Assumption / Risk / Source', text: 'Значение, диапазон, P × I, версия и ссылка на источник', icon: ShieldCheck },
 ];
 
 const RATE_CHAIN = [
-  { label: 'Net зарплата', value: '200 000 ₽/мес', note: 'на руки' },
-  { label: 'Gross + НДФЛ 13%', value: '230 588 ₽/мес', note: 'до вычета' },
-  { label: 'Взносы 30%', value: '299 765 ₽/мес', note: 'до порога' },
-  { label: 'Накладные + АРМ', value: '≈ 360 000 ₽/мес', note: 'офис, ПО, поддержка' },
-  { label: 'Ставка часа', value: '≈ 3 000 ₽/ч', note: 'при 120 ч/мес' },
+  { label: 'rate_cards.json', value: '14 ролей', note: 'внутренняя команда' },
+  { label: 'Грейды', value: '4 на роль', note: 'junior → lead' },
+  { label: 'fully_loaded_hour', value: 'из датасета', note: 'не пересчитывается' },
+  { label: 'contractor_rate_cards', value: 'rate_mid', note: 'только geo RU' },
+  { label: 'Координация / приёмка', value: '15% / 5%', note: 'от труда подрядчика' },
 ];
 
 const SOURCES = [
-  { name: 'Benchmark dataset', version: 'v0.3', date: '09.11.2026', status: 'Демо', text: '56 строк: 14 ролей × 4 грейда, полная цепочка net → gross → взносы → ставка.' },
-  { name: 'Корпус закупок ТМК', version: 'v0.2', date: '09.11.2026', status: 'Демо', text: '60 контрактов, медиана НМЦК 18,58 млн ₽, нормализация по объёму и региону.' },
-  { name: 'Аналоги ИТ-проектов', version: 'v0.2', date: '09.11.2026', status: 'Проверка', text: '49 опубликованных якорей. Требуют ручной валидации перед production.' },
-  { name: 'Схема HelpDesk', version: 'v1.0', date: '08.11.2026', status: 'Схема', text: '16 полей: план, факт и заквотированная трудоёмкость на уровне активности.' },
+  { name: 'data/datasets/rate_cards.json', version: '14 ролей × 4 грейда', date: '09.11.2026', status: 'Демо', text: 'Fully loaded ставки внутренней команды; берутся как есть из датасета.' },
+  { name: 'data/datasets/contractor_rate_cards.json', version: 'geo RU', date: '09.11.2026', status: 'Демо', text: 'Ставки подрядчика, риск-премия fixed_price 15–30%, НДС-флаг.' },
+  { name: 'data/datasets/analogue_corpus.json', version: '49 якорей', date: '09.11.2026', status: 'Проверка', text: 'Опубликованные аналоги с нормализацией; требуют ручной валидации.' },
+  { name: 'data/manifest.json', version: '47a8fb6b…', date: '09.11.2026', status: 'Демо', text: 'Версия датасетов и SHA256 шести файлов для воспроизводимости.' },
 ];
 
 export default function Methodology({ goTab }) {
@@ -87,7 +86,7 @@ export default function Methodology({ goTab }) {
     <div className="page-stack">
       <section className="method-hero">
         <div>
-          <div className="eyebrow light">МЕТОДИКА · ВЕРСИЯ 1.0 · 09.11.2026</div>
+          <div className="eyebrow light">МЕТОДИКА · ВЕРСИЯ 1.0 · DATASET 47A8FB6B…</div>
           <h1>Каждая цифра должна иметь объяснение</h1>
           <p>
             Decision Studio считает три сценария из одной декомпозиции. Показываем формулу, исходные параметры,
@@ -111,7 +110,7 @@ export default function Methodology({ goTab }) {
         <SectionHead
           eyebrow="ФОРМУЛЫ"
           title="Как считается оценка"
-          description="Семь формул, которые связывают входные данные и результат"
+          description="Формулы, которые связывают входные данные и результат из API"
           actions={<Pill tone="good"><ShieldCheck size={12} /> Проверяемо</Pill>}
         />
         <div className="formula-grid">
@@ -146,7 +145,7 @@ export default function Methodology({ goTab }) {
           </div>
           <div className="rate-note">
             <Info size={15} />
-            <span>В демо используется ставка 4 200 ₽/ч для интеграции и 3 900–4 400 ₽/ч для других кейсов. Её можно изменить в параметрах.</span>
+            <span>Единой ставки 4 200 ₽/ч нет: API берёт fully_loaded_hour из rate_cards по роли и грейду. UI может передать только override средней ставки.</span>
           </div>
         </section>
 
@@ -154,7 +153,7 @@ export default function Methodology({ goTab }) {
           <SectionHead
             eyebrow="МОДЕЛЬ ДАННЫХ"
             title="Одна цепочка происхождения"
-            description="Task → WorkItem → Estimate → CostLine → Assumption / Risk"
+            description="Task → WorkItem → Estimate → CostLine → Assumption / Risk / Source"
           />
           <div className="data-model">
             {DATA_MODEL.map((item, index) => (

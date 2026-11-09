@@ -75,7 +75,7 @@ export default function StartScreen({ onStart, onLoadCase, saved }) {
           </div>
           <div className="preview-foot">
             <span><Sparkles size={13} /> Уверенность {preview.confidence.score}%</span>
-            <span>Единая модель · 7 этапов</span>
+            <span>Единая модель · 6 этапов + сопровождение</span>
           </div>
         </aside>
       </section>
@@ -161,7 +161,7 @@ export default function StartScreen({ onStart, onLoadCase, saved }) {
             <h3>Не дашборд ради дашборда</h3>
           </div>
           <div className="start-benefits">
-            <div><span><Layers3 size={16} /></span><div><b>Одна декомпозиция</b><small>7 этапов, две базы затрат — сравнение честное</small></div></div>
+            <div><span><Layers3 size={16} /></span><div><b>Одна декомпозиция</b><small>6 этапов + сопровождение, две базы затрат — сравнение честное</small></div></div>
             <div><span><ShieldCheck size={16} /></span><div><b>Уверенность и риски</b><small>4 фактора confidence, реестр рисков, P10–P90</small></div></div>
             <div><span><Database size={16} /></span><div><b>Источники и аналоги</b><small>≥ 3 аналога с нормализацией и датой</small></div></div>
             <div><span><FileText size={16} /></span><div><b>Экспорт для согласования</b><small>JSON, CSV и PDF с формулами и допущениями</small></div></div>

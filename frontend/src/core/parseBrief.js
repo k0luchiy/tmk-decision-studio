@@ -89,13 +89,27 @@ export const parseBrief = (text) => {
   return params;
 };
 
+const WORK_TYPE_LABELS = {
+  integration: 'Интеграция систем',
+  development: 'Разработка ПО',
+  cv: 'Computer Vision',
+  support: 'Сопровождение',
+  default: 'ИТ-инициатива',
+};
+
+const toNumber = (value, fallback) => Number(String(value).replace(/\D/g, '')) || fallback;
+
 export const applyParam = (state, param) => {
   const next = { ...state, stages: state.stages.map((stage) => ({ ...stage })), extras: state.extras.map((item) => ({ ...item })) };
-  if (param.id === 'type') next.type = param.value;
-  if (param.id === 'integrations') next.integrations = Number(String(param.value).replace(/\D/g, '')) || state.integrations;
-  if (param.id === 'screens') next.screens = Number(String(param.value).replace(/\D/g, '')) || 0;
-  if (param.id === 'users') next.users = Number(String(param.value).replace(/\D/g, '')) || state.users;
-  if (param.id === 'deadline') {
+  const id = param.id;
+  if (id === 'type' || id === 'work_type') {
+    next.type = id === 'work_type' ? (WORK_TYPE_LABELS[String(param.value)] ?? String(param.value)) : param.value;
+  }
+  if (id === 'integrations' || id === 'flows') next.integrations = toNumber(param.value, state.integrations);
+  if (id === 'screens') next.screens = toNumber(param.value, 0);
+  if (id === 'users') next.users = toNumber(param.value, state.users);
+  if (id === 'complexity') next.complexity = String(param.value);
+  if (id === 'deadline' || id === 'duration_weeks') {
     const value = Number(String(param.value).replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
     const weeks = /мес/i.test(param.value) ? value * 4.345 : /дн/i.test(param.value) ? value / 5 : value;
     if (weeks) next.deadlineWeeks = Math.round(weeks);
