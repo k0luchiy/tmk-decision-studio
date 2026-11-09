@@ -24,3 +24,9 @@ export type {
   RawAnalogue,
   UsedAnalogue,
 } from './sizing/analogues.js';
+export {
+  combineMethods,
+  DEFAULT_DIVERGENCE_THRESHOLD,
+  DEFAULT_WEIGHTS,
+} from './sizing/combine.js';
+export type { CombineMethodsInput, CombineMethodsResult, MethodWeights } from './sizing/combine.js';
