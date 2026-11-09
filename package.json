@@ -15,6 +15,7 @@
     "format:check": "prettier --check \"packages/**/*.{ts,json}\" \"*.{ts,js,json,md}\"",
     "data:manifest": "node scripts/build-manifest.mjs",
     "data:check": "node scripts/check-data.mjs",
+    "calc": "node scripts/calc.mjs",
     "helpdesk:check": "node scripts/check-helpdesk.mjs"
   },
   "devDependencies": {

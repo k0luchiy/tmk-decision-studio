@@ -58,3 +58,24 @@ export type {
   ContractorInput,
   ContractorOptions,
 } from './cost/contractor.js';
+export { costExtras } from './cost/extras.js';
+export type { CostExtra } from './cost/extras.js';
+export {
+  P10_Z,
+  P80_Z,
+  allocateCostByStage,
+  toStageGrid,
+} from './cost/stageGrid.js';
+export type { StageCost } from './cost/stageGrid.js';
+export { D1_FLOWS, d1Task } from './fixtures/d1.js';
+export {
+  computeCalcD1,
+  formatCalcTable,
+  runCalc,
+} from './cli/calc.js';
+export type {
+  CalcEffort,
+  CalcResult,
+  CalcScenario,
+  CalcStageRow,
+} from './cli/calc.js';
