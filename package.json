@@ -17,6 +17,7 @@
     "data:check": "node scripts/check-data.mjs",
     "calc": "node scripts/calc.mjs",
     "e2e": "node scripts/e2e.mjs",
+    "report": "node scripts/test-report.mjs",
     "helpdesk:check": "node scripts/check-helpdesk.mjs",
     "intake:eval": "node scripts/intake-eval.mjs"
   },

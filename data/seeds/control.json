@@ -1,0 +1,25 @@
+{
+  "description": "Ожидаемые диапазоны контрольных задач D1-D3: P50 ±15% и вердикт. Базовая линия снята с текущего движка (out/control.json), это регрессия, а не независимый прогноз.",
+  "tolerance": 0.15,
+  "datasetVersion": "604ca50330fc5794e8659f5a33350120a70f6f5ad022ac47d94e3438e0680293",
+  "tasks": [
+    {
+      "id": "d1",
+      "verdict": "inhouse",
+      "p50Rub": 7678000,
+      "weeks": 13
+    },
+    {
+      "id": "d2",
+      "verdict": "inhouse",
+      "p50Rub": 9540000,
+      "weeks": 12
+    },
+    {
+      "id": "d3",
+      "verdict": "inhouse",
+      "p50Rub": 9704000,
+      "weeks": 16
+    }
+  ]
+}
