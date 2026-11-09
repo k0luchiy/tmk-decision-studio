@@ -42,3 +42,19 @@ export {
   costInhouse,
 } from './cost/inhouse.js';
 export type { EffortByRole, InhouseInput, InhouseOptions } from './cost/inhouse.js';
+export {
+  DEFAULT_ACCEPTANCE_PCT,
+  DEFAULT_COORDINATION_PCT,
+  DEFAULT_FIXED_PRICE_RISK_PCT,
+  MissingBandError,
+  UnsupportedGeoError,
+  VAT_RATE,
+  costContractor,
+} from './cost/contractor.js';
+export type {
+  ContractModel,
+  ContractorEffort,
+  ContractorGeo,
+  ContractorInput,
+  ContractorOptions,
+} from './cost/contractor.js';
