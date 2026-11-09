@@ -19,6 +19,7 @@
 | [08_open_questions.md](08_open_questions.md) | Открытые вопросы и решения, которые нужно принять командой |
 | [09_integration_contract.md](09_integration_contract.md) | Контракт для фронтенда: пакеты, функции, мок D1 |
 | [10_api_contract.md](10_api_contract.md) | Связка frontend ↔ backend: REST API, эндпоинты, dev/prod, ошибки |
+| [11_frontend_integration_analysis.md](11_frontend_integration_analysis.md) | Разбор прототипа фронта, сопоставление моделей, пробелы и план интеграции |
 | [DECISIONS.md](DECISIONS.md) | Журнал решений (требование регламента: ≥ 8 записей, ведётся по ходу) |
 | [deliverables/](deliverables/) | Итоговые документы поставки: `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `TEST_REPORT.md` |
 
