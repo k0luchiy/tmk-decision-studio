@@ -25,7 +25,9 @@
     "report": "node scripts/test-report.mjs",
     "helpdesk:check": "node scripts/check-helpdesk.mjs",
     "intake:eval": "node scripts/intake-eval.mjs",
-    "benchmark": "tsx scripts/benchmark.ts"
+    "benchmark": "tsx scripts/benchmark.ts",
+    "setup": "npm ci && npm --prefix frontend ci",
+    "check": "npm run typecheck && npm test && npm --prefix backend run test && npm --prefix frontend test && npm --prefix frontend run build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

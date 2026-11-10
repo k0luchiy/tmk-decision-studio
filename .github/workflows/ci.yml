@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm --prefix frontend ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm --prefix backend run typecheck
+      - run: npm --prefix backend run test
+      - run: npm --prefix frontend test
+      - run: npm --prefix frontend run build
+      - run: npm run data:check
+      - run: npm run e2e
+      - run: npm run benchmark

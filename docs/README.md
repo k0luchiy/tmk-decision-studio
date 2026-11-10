@@ -1,6 +1,6 @@
 # РадиоХак 4.0 · трек ТМК++ «Сделать или заказать»
 
-Рабочая документация проекта. Статус: **черновик v0.1 для обсуждения команды** (9 ноября 2026).
+Рабочая документация проекта. Статус: **версия для сдачи** (10 ноября 2026).
 
 Документы в этой папке — источник истины по тому, **что мы строим и зачем**. Исследование лежит в `research/`, здесь — проектные решения.
 
@@ -21,7 +21,8 @@
 | [10_api_contract.md](10_api_contract.md) | Связка frontend ↔ backend: REST API, эндпоинты, dev/prod, ошибки |
 | [11_frontend_integration_analysis.md](11_frontend_integration_analysis.md) | Разбор прототипа фронта, сопоставление моделей, пробелы и план интеграции |
 | [DECISIONS.md](DECISIONS.md) | Журнал решений (требование регламента: ≥ 8 записей, ведётся по ходу) |
-| [deliverables/](deliverables/) | Итоговые документы поставки: `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `DATA_HUB.md`, `BENCHMARK_REPORT.md`, `BENCHMARK_FAILURES.md`, `TEST_REPORT.md` |
+| [deliverables/](deliverables/) | Итоговые документы поставки: `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `DATA_HUB.md`, `DEPLOYMENT.md`, `DIAGRAMS.md`, `COMPLIANCE.md`, `PRESENTATION.md`, `BENCHMARK_REPORT.md`, `BENCHMARK_FAILURES.md`, `TEST_REPORT.md` |
+| [TEAM.md](TEAM.md) | Роли, зоны ответственности и артефакты |
 
 ## Одной фразой
 

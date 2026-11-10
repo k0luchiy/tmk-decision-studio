@@ -20,13 +20,25 @@ UI **не считает** финансы сам: в режиме `api` моде
 `frontend/src/core/apiModel.js`. Локальный `frontend/src/core/calc.js`
 остаётся демо-фолбэком, если API недоступен.
 
-## Быстрый старт
+## Скриншоты
+
+| Старт | Обзор |
+|<img src="docs/screenshots/01-start.png" width="420" />|<img src="docs/screenshots/02-overview.png" width="420" />|
+| **Параметры** | **Аналитика** |
+|<img src="docs/screenshots/03-parameters.png" width="420" />|<img src="docs/screenshots/04-analytics.png" width="420" />|
+| **Обоснование** | **Данные и Data Hub** |
+|<img src="docs/screenshots/05-justification.png" width="420" />|<img src="docs/screenshots/06-data.png" width="420" />|
+| **Календарные допущения** | |
+|<img src="docs/screenshots/02b-overview-calendar.png" width="420" />| |
+
+Все изображения — в [`docs/screenshots/`](docs/screenshots/).
+
+## Локальный запуск
 
 Требуется Node.js 22+.
 
 ```bash
-npm ci
-(cd frontend && npm ci)
+npm run setup      # npm ci для root и frontend
 
 npm run dev:api        # Fastify на :3001
 npm run dev:frontend   # Vite на :5173 (strictPort; освободите порт)
@@ -38,14 +50,57 @@ npm run dev
 Vite не переедет молча на другой. В dev Vite проксирует `/api` на `:3001`,
 поэтому CORS в браузере не нужен.
 
-Минимальная проверка без браузера:
+Проверка без браузера:
 
 ```bash
+npm run check          # typecheck + все тесты + build
 npm run data:check     # валидация датасетов и манифеста
 npm test               # unit + property + data + export
+npm --prefix backend run test
+npm --prefix frontend test
 npm run e2e            # D1–D3: бриф → estimateTask → JSON/XLSX/PDF
 npm run report         # docs/deliverables/TEST_REPORT.md
+npm run benchmark      # 20 промптов из benchmarks/TEST_PROMPTS.md
 ```
+
+## Docker
+
+Требуется Docker 24+ и Docker Compose v2. Из корня репозитория:
+
+```bash
+cp .env.example .env          # при необходимости добавьте OPENCODE_API_KEY
+docker compose up --build
+```
+
+Открыть: **http://localhost:8080**. Backend API — `http://localhost:3001`.
+
+Что поднимается:
+
+- `frontend` — Nginx + собранный React;
+- `backend` — Fastify BFF;
+- Nginx проксирует `/api` в backend;
+- `INTAKE_MODE=cache` работает без ключа Jev;
+- для `live` добавьте в `.env`:
+
+```dotenv
+OPENCODE_API_KEY=...
+JEV_MODEL=jev-1.13-free
+INTAKE_MODE=live
+```
+
+Остановить:
+
+```bash
+docker compose down
+```
+
+Проверить compose без сборки:
+
+```bash
+docker compose config
+```
+
+Подробнее: [`docs/deliverables/DEPLOYMENT.md`](docs/deliverables/DEPLOYMENT.md).
 
 ## Jev
 
@@ -107,6 +162,8 @@ OPENCODE_API_KEY='...' JEV_MODEL=jev-1.13-free INTAKE_MODE=live npm run dev:api
 
 | Скрипт | Что делает | Выход |
 |---|---|---|
+| `npm run setup` | `npm ci` для root и frontend | зависимости |
+| `npm run check` | typecheck + root/backend/frontend тесты + build | код возврата |
 | `npm run typecheck` | `tsc --noEmit` по всем пакетам и `shared/*/examples` | код возврата |
 | `npm test` | Vitest: unit, property (invariants), data, export | 259 тестов |
 | `npm run lint` | ESLint по `shared`, `scripts` | код возврата |
@@ -130,6 +187,24 @@ npm --prefix frontend run build      # vite build
 
 `.artifacts/` — gitignored: артефакты генерируются, а не коммитятся.
 
+## Архитектура
+
+```mermaid
+flowchart LR
+  U[Эксперт] --> W[React SPA]
+  W -->|/api| B[Fastify BFF]
+  B --> I[Intake: rules + Jev]
+  B --> C[Core: WBS / FP / аналоги / cost / risk / schedule]
+  B --> D[Data: 6 датасетов + manifest]
+  B --> E[Export: PDF / XLSX / JSON]
+  C --> M[(datasetVersion)]
+  D --> M
+  I -. cache/live .-> J[Jev]
+```
+
+Полные схемы: [`docs/deliverables/DIAGRAMS.md`](docs/deliverables/DIAGRAMS.md).
+Архитектура: [`docs/deliverables/ARCHITECTURE.md`](docs/deliverables/ARCHITECTURE.md).
+
 ## Структура
 
 ```
@@ -151,7 +226,10 @@ npm --prefix frontend run build      # vite build
 │   ├── seeds/control.json    # ожидания D1–D3 (регрессия)
 │   └── manifest.json         # версия датасетов
 ├── docs/                     # проектная документация (см. docs/README.md)
+│   ├── screenshots/          # скриншоты интерфейса
 │   └── deliverables/         # METHOD.md, DATA_MODEL.md, ARCHITECTURE.md, TEST_REPORT.md
+├── benchmarks/               # TEST_PROMPTS.md + отчёт по 20 прогонам
+├── analytics/                # аналитические материалы и методология (не runtime)
 ├── research/                 # архив исследования (не runtime-зависимость)
 ├── scripts/                  # esbuild-обёртки и генераторы отчётов
 └── .artifacts/               # генерируемые артефакты (gitignored)
@@ -172,7 +250,11 @@ npm --prefix frontend run build      # vite build
 - `docs/deliverables/METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md` — сжатая
   выжимка с ссылками на реальные файлы кода.
 - `docs/deliverables/DATA_HUB.md` — обновление данных, ревью и версионирование.
+- `docs/deliverables/DIAGRAMS.md` — контекст, поток расчёта, Docker, данные.
+- `docs/deliverables/COMPLIANCE.md` — карта критериев рубрики и артефактов.
+- `docs/deliverables/PRESENTATION.md` — 6 слайдов и сценарий демо.
 - `docs/deliverables/TEST_REPORT.md` — контрольные D1–D3, unit/property, intake.
+- `docs/TEAM.md` — роли и зоны ответственности.
 - `docs/DECISIONS.md` — журнал решений.
 
 ## Границы и честность
