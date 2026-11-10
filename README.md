@@ -255,6 +255,16 @@ flowchart LR
 - `docs/TEAM.md` — роли и зоны ответственности.
 - `docs/DECISIONS.md` — журнал решений.
 
+## Команда
+
+| Участник | Роль |
+|---|---|
+| **Кириченко Дана Константиновна** ([@kattywife](https://github.com/kattywife)) | Frontend + Backend |
+| **Осипов Антон Юрьевич** ([@k0luchiy](https://github.com/k0luchiy)) | Backend + Modeling + AI (JEV) |
+| **Быкова Дарья Евгеньевна** ([@Daria92886](https://github.com/Daria92886)) | Analytics + Presentation |
+
+Подробно: [`docs/TEAM.md`](docs/TEAM.md).
+
 ## Границы и честность
 
 - Оценка — **порядок, а не смета**; дисклеймер есть в UI и PDF.
