@@ -12,8 +12,8 @@ import {
 
 export function validateAnalogues(data: Datasets, issues: ValidationIssue[]): void {
   const analogues = asArray<AnalogueRow>(data.analogues?.analogues);
-  if (analogues.length !== 49) {
-    issue(issues, 'ANALOGUE_COUNT', 'analogues.analogues', `expected 49 analogues, got ${analogues.length}`);
+  if (analogues.length < 49) {
+    issue(issues, 'ANALOGUE_COUNT', 'analogues.analogues', `expected at least 49 analogues, got ${analogues.length}`);
   }
   const tmkRows = asArray<unknown>(data.analogues?.tmk_eis_rows);
   if (tmkRows.length !== 60) {

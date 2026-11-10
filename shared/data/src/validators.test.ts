@@ -94,6 +94,16 @@ describe('validateDatasets', () => {
     });
   });
 
+  it('allows Data Hub to grow the analogue corpus beyond 49 rows', async () => {
+    const data = cloneDatasets(await loadRealDatasets());
+    const first = requireFirst(data.analogues.analogues);
+    data.analogues.analogues.push({ ...first, id: 'published-test' });
+
+    const issues = validateDatasets(data);
+
+    expect(issues.filter((issue) => issue.code === 'ANALOGUE_COUNT')).toEqual([]);
+  });
+
   it('flags an analogue with an empty source', async () => {
     const data = cloneDatasets(await loadRealDatasets());
     requireFirst(data.analogues.analogues).source = '';
