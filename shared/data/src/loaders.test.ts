@@ -11,7 +11,7 @@ describe('loadDatasets', () => {
 
     expect(datasets.rateCards.roles).toHaveLength(14);
     expect(datasets.contractorRates.bands).toHaveLength(224);
-    expect(datasets.archetypes.archetypes).toHaveLength(22);
+    expect(datasets.archetypes.archetypes).toHaveLength(23);
     expect(datasets.analogues.analogues).toHaveLength(49);
     expect(datasets.analogues.tmk_eis_rows).toHaveLength(60);
     expect(datasets.contracts).toHaveLength(60);

@@ -3263,6 +3263,62 @@
       "confidence": "Proxy",
       "source": "https://www.isbsg.org/wp-content/uploads/2022/05/Short-Paper-2021-10-Use-of-Output-Based-KPIs-in-AD-Contracts.pdf",
       "provenance_file": "research/05_methodology_estimation.md"
+    },
+    {
+      "id": "predictive_maintenance",
+      "name_ru": "Предиктивная аналитика оборудования",
+      "name_en": "Industrial predictive maintenance",
+      "category": "ai",
+      "unit": "asset",
+      "unit_definition": "One monitored industrial asset with telemetry, a degradation model, alerting and maintenance-system integration.",
+      "p50_hours_per_unit": 60,
+      "three_point": {
+        "optimistic": 30,
+        "most_likely": 60,
+        "pessimistic": 150
+      },
+      "productivity_basis": {
+        "method": "Planning WBS proxy",
+        "derivation": "Industrial PdM engagement: 10-20 monitored assets, 40-80 planning hours per asset including data preparation, model validation, alerting and CMMS integration.",
+        "sources": [
+          "research/05_methodology_estimation.md"
+        ],
+        "confidence": "Proxy"
+      },
+      "default_role_mix_pct": {
+        "analyst_ba_sa": 8,
+        "data_engineer": 30,
+        "backend": 20,
+        "frontend": 7,
+        "qa_auto": 10,
+        "devops_sre": 10,
+        "pm": 10,
+        "architect": 5
+      },
+      "complexity_drivers": [],
+      "risk_template_ids": [
+        "scope_creep",
+        "data_quality",
+        "adoption",
+        "vendor_lockin"
+      ],
+      "typical_unit_count": {
+        "low": 5,
+        "mid": 15,
+        "high": 40
+      },
+      "secondary_units": [],
+      "notes": "Generic PdM planning archetype. Replace hours per asset with the client's own telemetry and model-maintenance history.",
+      "pert": {
+        "expected_hours": 70,
+        "sigma_hours": 20,
+        "formula": "E=(O+4M+P)/6; SD=(P-O)/6",
+        "source": "research/05 section 3.1"
+      },
+      "risk_templates": [],
+      "confidence": "Proxy",
+      "source": "planning estimate; research/05_methodology_estimation.md",
+      "provenance_file": "research/05_methodology_estimation.md"
     }
   ],
   "risk_library": {
@@ -3411,5 +3467,5 @@
       "id": "platform_constraint"
     }
   },
-  "archetype_count": 22
+  "archetype_count": 23
 }

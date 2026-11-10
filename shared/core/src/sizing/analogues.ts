@@ -22,6 +22,7 @@ export const ANALOGUE_TYPE_BY_WORK_TYPE: Record<string, string> = {
   support: 'support',
   erp: 'erp_1c',
   data: 'dwh_bi',
+  pdm: 'predictive_maintenance',
   default: 'erp_1c',
 };
 

@@ -75,11 +75,15 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     WORK_TYPE_TO_ARCHETYPE[workType] ?? WORK_TYPE_TO_ARCHETYPE.default ?? 'functional_extension_1c';
   const unitsCount = resolveUnitsCount(task, archetypeId, datasets);
 
-  const baseItems = buildWbs(
-    task,
-    datasets.archetypes.archetypes,
-    unitsCount === undefined ? undefined : { unitsCount },
-  );
+  const supportCoverage =
+    workType === 'support' && /24\s*\/\s*7|круглосуточ/i.test(`${task.title} ${task.descriptionRaw}`)
+      ? 2.5
+      : 1;
+  const wbsOptions = {
+    ...(unitsCount === undefined ? {} : { unitsCount }),
+    ...(supportCoverage === 1 ? {} : { coverageFactor: supportCoverage }),
+  };
+  const baseItems = buildWbs(task, datasets.archetypes.archetypes, wbsOptions);
   const baseGrid = toStageGrid(baseItems);
 
   const { effortGrid: combinedGrid, workItems, combined, analogueEstimateResult } = combineEffort({

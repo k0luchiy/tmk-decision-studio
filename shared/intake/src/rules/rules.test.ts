@@ -14,7 +14,7 @@ describe('classify', () => {
   });
 
   it('Telegram bot → ai, not a generic development task', () => {
-    expect(classify('Мне нужно создать телеграм бота').workType).toBe('ai');
+    expect(classify('Мне нужно создать телеграм бота').workType).toBe('chatbot');
   });
 
   it('plant control and sensor regulation → MES / АСУ ТП', () => {

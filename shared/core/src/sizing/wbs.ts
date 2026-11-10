@@ -22,6 +22,8 @@ export const WORK_TYPE_TO_ARCHETYPE: Record<string, string> = {
   lowcode: 'low_code',
   data: 'dwh_build',
   ai: 'chatbot_assistant',
+  chatbot: 'chatbot_assistant',
+  pdm: 'predictive_maintenance',
   api: 'api_gateway',
   portal: 'portal_gis',
   mobile: 'mobile_app',
@@ -138,7 +140,7 @@ export function resolveWorkType(task: Task): string {
 export function buildWbs(
   task: Task,
   archetypes: Archetype[],
-  params?: { unitsCount?: number; stageShares?: typeof STAGE_SHARES },
+  params?: { unitsCount?: number; stageShares?: typeof STAGE_SHARES; coverageFactor?: number },
 ): WorkItem[] {
   const workType = resolveWorkType(task);
   const archetypeId = WORK_TYPE_TO_ARCHETYPE[workType] ?? WORK_TYPE_TO_ARCHETYPE.default;
@@ -149,6 +151,7 @@ export function buildWbs(
 
   const shares = params?.stageShares ?? STAGE_SHARES;
   const explicitUnits = params?.unitsCount;
+  const coverageFactor = params?.coverageFactor ?? 1;
   const typicalMid = archetype.typical_unit_count.mid;
   const lowVolumeUnits = ['FP', 'intent', 'bot', 'integration_flow'].includes(archetype.unit);
   const fallbackUnits = lowVolumeUnits ? archetype.typical_unit_count.low : typicalMid;
@@ -168,7 +171,7 @@ export function buildWbs(
   const isSupport = archetype.category === 'support';
 
   const makeItem = (stage: number, share: number): WorkItem => {
-    const scale = share * unitsCount;
+    const scale = share * unitsCount * coverageFactor;
     const optimisticHours = threePoint.optimistic * scale;
     const mostLikelyHours = threePoint.most_likely * scale;
     const pessimisticHours = threePoint.pessimistic * scale;

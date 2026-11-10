@@ -53,6 +53,7 @@ export const NUMBER_WORDS: Record<string, number> = {
   сорок: 40,
   пятьдесят: 50,
   сто: 100,
+  сотни: 300,
 };
 
 const LETTER = '[A-Za-zА-Яа-яЁё]';
@@ -61,7 +62,7 @@ const WORD = `${LETTER}+`;
 // потоков" resolve to flows=6 instead of integrations=6.
 const ADJECTIVE = `${LETTER}+(?:ых|их|ый|ий|ой|ая|яя|ое|ее|ые|ие|ого|его|ому|ему|ыми|ими|ую|юю)`;
 const UNIT =
-  'поток[а-яё]*|интеграц[а-яё]*|экран[а-яё]*|отчёт[а-яё]*|отчет[а-яё]*|пользовател[а-яё]*|арм[а-яё]*|роль[а-яё]*|микросервис[а-яё]*|форм[а-яё]*|мес[а-яё]*|недел[а-яё]*|год[а-яё]*|дн[а-яё]*|гб|тб|запис[а-яё]*';
+  'поток[а-яё]*|интеграц[а-яё]*|экран[а-яё]*|отчёт[а-яё]*|отчет[а-яё]*|пользовател[а-яё]*|арм[а-яё]*|роль[а-яё]*|микросервис[а-яё]*|сервер[а-яё]*|машин[а-яё]*|вм|vm|форм[а-яё]*|мес[а-яё]*|недел[а-яё]*|год[а-яё]*|дн[а-яё]*|гб|тб|запис[а-яё]*';
 const QUANTITY_PATTERN = `(${WORD}|\\d+)\\s+(?:${ADJECTIVE}\\s+)?(${UNIT})`;
 
 const UNIT_MAP: { prefix: string; key: string; unit: string }[] = [
@@ -74,6 +75,10 @@ const UNIT_MAP: { prefix: string; key: string; unit: string }[] = [
   { prefix: 'арм', key: 'workstations', unit: 'АРМ' },
   { prefix: 'роль', key: 'roles', unit: 'роль' },
   { prefix: 'микросервис', key: 'microservices', unit: 'микросервис' },
+  { prefix: 'сервер', key: 'servers', unit: 'сервер' },
+  { prefix: 'машин', key: 'servers', unit: 'машина' },
+  { prefix: 'вм', key: 'vms', unit: 'ВМ' },
+  { prefix: 'vm', key: 'vms', unit: 'VM' },
   { prefix: 'форм', key: 'forms', unit: 'форма' },
   { prefix: 'мес', key: 'duration', unit: 'мес' },
   { prefix: 'недел', key: 'duration', unit: 'недель' },

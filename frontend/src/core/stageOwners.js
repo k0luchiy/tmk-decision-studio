@@ -37,12 +37,15 @@ const MATRIX = {
     deployment: 'internal',
   },
   data: DEFAULT_MATRIX,
+  infrastructure: { ...DEFAULT_MATRIX, design: 'internal', testing: 'internal' },
   default: { ...DEFAULT_MATRIX, design: 'internal' },
 };
 
 export const workTypeKey = (value) => {
   const text = String(value ?? '').toLowerCase();
-  if (/искусствен|нейросет|телеграм|telegram|чат-бот|чатбот|\bai\b/.test(text)) return 'ai';
+  if (/предиктив|pdm|вибрац|остаточн|прогноз|rul/.test(text)) return 'pdm';
+  if (/телеграм|telegram|aiogram|чат-бот|чатбот/.test(text)) return 'chatbot';
+  if (/искусствен|нейросет|\bai\b/.test(text)) return 'ai';
   if (/сопровожд|поддержк|support/.test(text)) return 'support';
   if (/мобильн|mobile/.test(text)) return 'mobile';
   if (/интеграц|integration/.test(text)) return 'integration';
@@ -52,6 +55,7 @@ export const workTypeKey = (value) => {
   if (/mes|асутп|завод|датчик|аварийн|регулир|диспетчер|scada|оборудован/.test(text)) return 'mes';
   if (/vision|cv|компьютерн/.test(text)) return 'cv';
   if (/безопасн|security|кии/.test(text)) return 'security';
+  if (/инфраструктур|сервер|виртуализац|\bvm\b|цод/.test(text)) return 'infrastructure';
   if (/разработ|development|веб|web|приложен/.test(text)) return 'development';
   return 'default';
 };

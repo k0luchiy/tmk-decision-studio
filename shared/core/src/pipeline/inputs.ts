@@ -27,6 +27,7 @@ const UNIT_PARAM_KEYS: Record<string, readonly string[]> = {
   control_point: ['control_points'],
   source_system: ['sources'],
   service: ['services'],
+  workload: ['servers', 'vms', 'virtual_machines', 'workloads'],
   FP: ['fp', 'function_points'],
   intent: ['intents', 'scenarios'],
 };

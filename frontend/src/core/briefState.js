@@ -6,9 +6,12 @@ const DEFAULTS = {
   integration: { type: 'Интеграция систем', integrations: 0, screens: 0, users: 100, deadlineWeeks: 10, effort: 360 },
   development: { type: 'Разработка ПО', integrations: 0, screens: 3, users: 100, deadlineWeeks: 10, effort: 360 },
   ai: { type: 'Искусственный интеллект', integrations: 0, screens: 0, users: 100, deadlineWeeks: 8, effort: 320 },
+  chatbot: { type: 'Чат-бот', integrations: 1, screens: 0, users: 100, deadlineWeeks: 6, effort: 180 },
+  pdm: { type: 'Предиктивная аналитика', integrations: 2, screens: 0, users: 150, deadlineWeeks: 24, effort: 900 },
   mobile: { type: 'Мобильная разработка', integrations: 0, screens: 8, users: 100, deadlineWeeks: 12, effort: 600 },
   mes: { type: 'MES / АСУ ТП', integrations: 4, screens: 0, users: 500, deadlineWeeks: 24, effort: 1600 },
   support: { type: 'Сопровождение', integrations: 0, screens: 0, users: 100, deadlineWeeks: 12, effort: 500 },
+  infrastructure: { type: 'ИТ-инфраструктура', integrations: 0, screens: 0, users: 0, deadlineWeeks: 24, effort: 1200, servers: 100 },
   default: { type: 'ИТ-инициатива', integrations: 0, screens: 2, users: 100, deadlineWeeks: 10, effort: 320 },
 };
 
@@ -46,6 +49,7 @@ export const createBriefState = (brief, params = []) => {
   let target = defaults.effort;
   if (key === 'integration') target = Math.max(target, (Number(state.integrations) || 0) * 120);
   if (key === 'development' || key === 'mobile') target = Math.max(target, (Number(state.screens) || 0) * 30);
+  if (key === 'infrastructure') target = Math.max(target, (Number(state.servers) || 0) * 8);
   const factor = target / Math.max(1, sumHours(base.stages));
 
   state.stages = state.stages.map((stage) => ({

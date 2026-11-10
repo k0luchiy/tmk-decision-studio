@@ -32,6 +32,8 @@ const WORK_TYPE_KEYS = new Set([
   'lowcode',
   'data',
   'ai',
+  'chatbot',
+  'pdm',
   'api',
   'portal',
   'mobile',
@@ -47,8 +49,11 @@ const workTypeFor = (type) => {
   if (/интеграц/.test(text)) return 'integration';
   if (/vision|cv|дефект|компьютерн|машинн|зрени/.test(text)) return 'cv';
   if (/сопровожд|поддержк|sla|дежурств/.test(text)) return 'support';
-  if (/телеграм|telegram|чат-бот|чатбот|искусственн|нейросет|llm|nlp/.test(text)) return 'ai';
+  if (/предиктив|pdm|вибрац|остаточн|прогноз|rul/.test(text)) return 'pdm';
+  if (/телеграм|telegram|aiogram|чат-бот|чатбот/.test(text)) return 'chatbot';
+  if (/искусственн|нейросет|llm|nlp/.test(text)) return 'ai';
   if (/завод|датчик|аварийн|регулир|диспетчер|асутп|mes|scada|оборудован/.test(text)) return 'mes';
+  if (/инфраструктур|сервер|виртуализац|\bvm\b|цод/.test(text)) return 'infrastructure';
   if (/разработ|мобильн|приложен/.test(text)) return 'development';
   return 'default';
 };
@@ -145,5 +150,6 @@ export function mapStateToRequest(state, dirty = {}) {
     confirmedParam('duration_weeks', state.deadlineWeeks),
   ];
   if (state.platform) params.push(confirmedParam('platform', state.platform));
+  if (Number(state.servers) > 0) params.push(confirmedParam('servers', Number(state.servers)));
   return { params, options };
 }

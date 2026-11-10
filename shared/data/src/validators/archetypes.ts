@@ -9,8 +9,8 @@ export function validateArchetypes(
   roleIds: Set<string>,
 ): void {
   const archetypes = asArray<Archetype>(data.archetypes?.archetypes);
-  if (archetypes.length !== 22) {
-    issue(issues, 'ARCHETYPE_COUNT', 'archetypes.archetypes', `expected 22 archetypes, got ${archetypes.length}`);
+  if (archetypes.length !== 23) {
+    issue(issues, 'ARCHETYPE_COUNT', 'archetypes.archetypes', `expected 23 archetypes, got ${archetypes.length}`);
   }
 
   archetypes.forEach((archetype, index) => {

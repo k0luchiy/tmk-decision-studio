@@ -8,8 +8,11 @@ const detectType = (text) => {
   const lower = text.toLowerCase();
   if (/(компьютерн|машинн|cv|дефект|видеоаналит|зрени)/.test(lower)) return 'Computer Vision';
   if (/(поддержк|sla|24\/7|дежурств|сопровожд)/.test(lower)) return 'Сопровождение';
-  if (/(телеграм|telegram|чат-бот|чатбот|искусственн|нейросет|llm|nlp)/.test(lower)) return 'Искусственный интеллект';
+  if (/(предиктив|pdm|вибрац|остаточн|прогноз|rul)/.test(lower)) return 'Предиктивная аналитика';
+  if (/(телеграм|telegram|aiogram|чат-бот|чатбот)/.test(lower)) return 'Чат-бот';
+  if (/(искусственн|нейросет|llm|nlp)/.test(lower)) return 'Искусственный интеллект';
   if (/(завод|датчик|аварийн|регулир|диспетчер|асутп|mes|scada|оборудован)/.test(lower)) return 'MES / АСУ ТП';
+  if (/(инфраструктур|сервер|виртуализац|\bvm\b|цод)/.test(lower)) return 'ИТ-инфраструктура';
   if (/(интеграц|api|обмен|шлюз|wms|1с)/.test(lower)) return 'Интеграция систем';
   if (/(мобильн|приложен|кабинет|интерфейс)/.test(lower)) return 'Разработка ПО';
   return 'ИТ-инициатива';
@@ -97,7 +100,10 @@ const WORK_TYPE_LABELS = {
   cv: 'Computer Vision',
   support: 'Сопровождение',
   ai: 'Искусственный интеллект',
+  chatbot: 'Чат-бот',
+  pdm: 'Предиктивная аналитика',
   mes: 'MES / АСУ ТП',
+  infrastructure: 'ИТ-инфраструктура',
   rpa: 'RPA',
   mobile: 'Мобильная разработка',
   bi: 'BI и аналитика',
@@ -113,6 +119,7 @@ export const applyParam = (state, param) => {
     next.type = id === 'work_type' ? (WORK_TYPE_LABELS[String(param.value)] ?? String(param.value)) : param.value;
   }
   if (id === 'platform') next.platform = String(param.value);
+  if (id === 'servers' || id === 'vms') next.servers = toNumber(param.value, state.servers ?? 0);
   if (id.startsWith('stage_owner_')) {
     const stageId = id.slice('stage_owner_'.length);
     const owner = String(param.value);
