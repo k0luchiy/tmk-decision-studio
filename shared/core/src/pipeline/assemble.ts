@@ -32,13 +32,15 @@ import { HYBRID_CONTRACTOR_STAGES } from './types.js';
 export function hybridShare(
   byStage: EffortGrid['byStage'],
   stages: readonly number[] = HYBRID_CONTRACTOR_STAGES,
+  shares?: Record<string, number>,
 ): number {
   let total = 0;
   let selected = 0;
   const owned = new Set(stages);
   for (const row of byStage) {
     total += row.hours;
-    if (owned.has(row.stage)) selected += row.hours;
+    const share = shares?.[row.stage] ?? (owned.has(row.stage) ? 1 : 0);
+    selected += row.hours * share;
   }
   return total > 0 ? selected / total : 0;
 }

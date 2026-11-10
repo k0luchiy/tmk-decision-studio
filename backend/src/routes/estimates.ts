@@ -57,6 +57,7 @@ const OptionsSchema = z
     reservePct: z.number().min(0).max(0.5).optional(),
     oversightPct: z.number().min(0).max(0.5).optional(),
     contractorStages: z.array(z.number().int().min(1).max(7)).optional(),
+    contractorStageShares: z.record(z.string().regex(/^\d+$/), z.number().min(0).max(1)).optional(),
     stageHours: z.record(z.string().regex(/^\d+$/), z.number().gt(0)).optional(),
     targetWeeks: z.number().int().min(1).max(104).optional(),
     extras: z.array(ExtraSchema).max(20).optional(),

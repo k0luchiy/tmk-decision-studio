@@ -78,6 +78,15 @@ describe('buildScenarios', () => {
     }
   });
 
+  it('applies fractional contractor stage shares to the hybrid', () => {
+    const base = d1ScenarioInput();
+    const full = buildScenarios(base).hybrid.p50Rub;
+    const half = buildScenarios({ ...base, contractorStageShares: { '3': 0.5 } }).hybrid.p50Rub;
+
+    expect(half).not.toBe(full);
+    expect(half).toBeGreaterThan(0);
+  });
+
   it('starts TCO at year 0 and keeps the cumulative non-decreasing', () => {
     const scenarios = buildScenarios(d1ScenarioInput());
 

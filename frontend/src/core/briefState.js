@@ -1,5 +1,6 @@
 import { createCaseState } from './calc.js';
 import { applyParam } from './parseBrief.js';
+import { assignStageOwners, workTypeKey } from './stageOwners.js';
 
 const DEFAULTS = {
   integration: { type: 'Интеграция систем', integrations: 0, screens: 0, users: 100, deadlineWeeks: 10, effort: 360 },
@@ -10,19 +11,9 @@ const DEFAULTS = {
   default: { type: 'ИТ-инициатива', integrations: 0, screens: 2, users: 100, deadlineWeeks: 10, effort: 320 },
 };
 
-const typeKey = (value) => {
-  const text = String(value ?? '').toLowerCase();
-  if (/искусствен|нейросет|телеграм|telegram|чат-бот|чатбот|\bai\b/.test(text)) return 'ai';
-  if (/сопровожд|поддержк|support/.test(text)) return 'support';
-  if (/мобильн|mobile/.test(text)) return 'mobile';
-  if (/интеграц|integration/.test(text)) return 'integration';
-  if (/разработ|development|веб|web|приложен/.test(text)) return 'development';
-  return 'default';
-};
-
 const paramsType = (params) => {
   const param = params.find((item) => item.id === 'work_type' || item.id === 'type');
-  return param ? typeKey(param.value) : 'default';
+  return param ? workTypeKey(param.value) : 'default';
 };
 
 const sumHours = (stages) => stages.reduce((acc, stage) => acc + (Number(stage.hours) || 0), 0);
@@ -44,6 +35,7 @@ export const createBriefState = (brief, params = []) => {
     hybridSplit: 58,
     confirmedParams: 0,
     rejectedParams: 0,
+    ownersTouched: false,
     stages: base.stages.map((stage) => ({ ...stage })),
     extras: base.extras.map((item) => ({ ...item, internal: 0, external: 0, hybrid: 0 })),
   };
@@ -61,5 +53,6 @@ export const createBriefState = (brief, params = []) => {
     external: Math.round(stage.external * factor),
     days: Math.max(1, Math.round(stage.days * factor)),
   }));
+  state.stages = assignStageOwners(state.stages, state.type);
   return state;
 };

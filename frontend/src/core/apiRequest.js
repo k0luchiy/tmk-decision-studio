@@ -83,6 +83,17 @@ export function mapContractorStages(stages = []) {
   return result.length ? result : [3];
 }
 
+export function mapContractorStageShares(stages = []) {
+  const shares = {};
+  stages.forEach((stage) => {
+    const number = STAGE_NUMBER[stage.id];
+    if (number === undefined) return;
+    const share = stage.owner === 'vendor' ? 1 : stage.owner === 'split' ? 0.5 : 0;
+    if (share > 0) shares[number] = Math.max(shares[number] ?? 0, share);
+  });
+  return shares;
+}
+
 /** Hours-weighted average rate when stage rates differ; otherwise the team rate. */
 export function weightedTeamRate(state) {
   const stages = state.stages ?? [];
@@ -119,6 +130,7 @@ export function mapStateToRequest(state, dirty = {}) {
     reservePct: (Number(state.reserve) || 0) / 100,
     oversightPct: (Number(state.oversight) || 0) / 100,
     contractorStages: mapContractorStages(state.stages),
+    contractorStageShares: mapContractorStageShares(state.stages),
     extras: mapExtras(state.extras),
   };
   if (dirty.rateDirty) options.teamRate = weightedTeamRate(state);

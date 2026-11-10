@@ -51,6 +51,7 @@ export interface ScenarioInput {
   byStage: { stage: number; hours: number }[];
   /** Stages the contractor performs in the hybrid scenario. Default `[3]`. */
   contractorStages?: number[];
+  contractorStageShares?: Record<string, number>;
   /** Risk reserve in `[0, 0.5]`; scales implementation and P80 by `1 + reservePct`. */
   reservePct?: number;
   /** Annual in-house support share of labour. Default `0.12`. */
@@ -138,16 +139,19 @@ function buildTco(
 }
 
 /** Share of all hours that falls into the contractor-owned stages. */
-function hybridShare(byStage: { stage: number; hours: number }[], stages: number[]): number {
+function hybridShare(
+  byStage: { stage: number; hours: number }[],
+  stages: number[],
+  shares?: Record<string, number>,
+): number {
   const selected = new Set(stages);
   let totalHours = 0;
   let selectedHours = 0;
   for (const row of byStage) {
     assertFiniteNonNegative(`byStage.${row.stage}.hours`, row.hours);
     totalHours += row.hours;
-    if (selected.has(row.stage)) {
-      selectedHours += row.hours;
-    }
+    const share = shares?.[row.stage] ?? (selected.has(row.stage) ? 1 : 0);
+    selectedHours += row.hours * share;
   }
   if (totalHours <= 0) {
     return 0;
@@ -214,7 +218,7 @@ export function buildScenarios(input: ScenarioInput): {
   const inhouseLabor = sumLabor(input.inhouseLines);
   const contractorLabor = sumLabor(input.contractorLines);
 
-  const share = hybridShare(input.byStage, contractorStages);
+  const share = hybridShare(input.byStage, contractorStages, input.contractorStageShares);
   const inhouseImpl = inhouseBase * reserveFactor;
   const contractorImpl = contractorBase * reserveFactor;
   const hybridImpl = (contractorBase * share + inhouseBase * (1 - share)) * reserveFactor;

@@ -131,6 +131,9 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     contractorLines,
     byStage,
     contractorStages,
+    ...(options.contractorStageShares === undefined
+      ? {}
+      : { contractorStageShares: options.contractorStageShares }),
     ...(options.reservePct === undefined ? {} : { reservePct: options.reservePct }),
   });
 
@@ -146,7 +149,7 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
   });
   const durations = scenarioDurations(scheduleResult.duration, options.hiring === true);
 
-  const share = hybridShare(effortGrid.byStage, contractorStages);
+  const share = hybridShare(effortGrid.byStage, contractorStages, options.contractorStageShares);
   const hybridLines = blendLines(inhouseLines, contractorLines, share);
   const adjusted = adjustScenarios({
     scenarios: scenarioResult,

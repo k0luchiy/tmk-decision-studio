@@ -32,6 +32,20 @@ test('a short Telegram-bot brief starts from a small scope, not from D1', () => 
   assert.ok(model.scenarios.internal.p50 < 5_000_000, `bot cost ${model.scenarios.internal.p50}`);
 });
 
+test('stage owners follow the brief type instead of the D1 template', () => {
+  const telegram = createBriefState('Мне нужно разработать телеграм бота', [
+    { id: 'type', value: 'Искусственный интеллект' },
+  ]);
+  const erp = createBriefState('Внедрение ERP', [{ id: 'type', value: 'ERP' }]);
+  const owners = (state) => Object.fromEntries(state.stages.map((stage) => [stage.id, stage.owner]));
+
+  assert.equal(owners(telegram).discovery, 'internal');
+  assert.equal(owners(telegram).development, 'vendor');
+  assert.equal(owners(telegram).testing, 'internal');
+  assert.equal(owners(erp).design, 'internal');
+  assert.equal(owners(erp).development, 'vendor');
+});
+
 test('a vague integration starts small and grows with explicit flows', () => {
   const small = createBriefState('Интеграция 1С с базой данных', [
     { id: 'type', value: 'Интеграция систем' },

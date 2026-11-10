@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildModelFromApi, mapContractorStages, mapStateToRequest } from '../src/core/apiModel.js';
-import { mapExtras, weightedTeamRate } from '../src/core/apiRequest.js';
+import { mapContractorStageShares, mapExtras, weightedTeamRate } from '../src/core/apiRequest.js';
 import { createCaseState } from '../src/core/calc.js';
 
 const mock = JSON.parse(
@@ -175,6 +175,18 @@ test('methodDivergence becomes methodDiff and warns above 30%', () => {
 
   const missing = buildModelFromApi(apiResponse({ methodDivergence: undefined }), createCaseState('D1'));
   assert.equal(missing.methodDiff, 0);
+});
+
+test('mapContractorStageShares keeps partial ownership per stage', () => {
+  assert.deepEqual(
+    mapContractorStageShares([
+      { id: 'discovery', owner: 'internal' },
+      { id: 'design', owner: 'split' },
+      { id: 'development', owner: 'vendor' },
+      { id: 'integration', owner: 'split' },
+    ]),
+    { 2: 0.5, 3: 1 },
+  );
 });
 
 test('mapContractorStages maps vendor/split stages and falls back to [3]', () => {

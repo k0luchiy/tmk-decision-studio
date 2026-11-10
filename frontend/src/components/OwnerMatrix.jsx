@@ -19,7 +19,7 @@ export default function OwnerMatrix({ state, model, onOwnerChange, compact = fal
     <section className={`panel owner-matrix ${compact ? 'compact' : ''}`}>
       <SectionHead
         eyebrow="ГИБРИД"
-        title="Кто что делает"
+        title="Распределение обязанностей"
         description="Распределите ответственность по этапам — стоимость и срок гибрида обновятся сразу."
         actions={<Pill tone="info"><GitMerge size={12} /> {state.stages.length} этапов</Pill>}
       />

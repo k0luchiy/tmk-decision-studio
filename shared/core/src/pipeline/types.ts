@@ -47,6 +47,7 @@ export interface EstimateTaskOptions {
   oversightPct?: number;
   /** Stages handed to the contractor in the hybrid scenario. Default `[3]`. */
   contractorStages?: number[];
+  contractorStageShares?: Record<string, number>;
   /** Target hours per stage 1..7; overrides the WBS after triangulation. */
   stageHours?: Record<number, number>;
   /** Deadline in weeks (`>= 1`); compresses the schedule via Putnam. */

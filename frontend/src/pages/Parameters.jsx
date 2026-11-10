@@ -42,6 +42,7 @@ export default function Parameters({
   const setStageOwner = (stageId, owner, split) => {
     update({
       stages: state.stages.map((stage) => (stage.id === stageId ? { ...stage, owner, split } : stage)),
+      ownersTouched: true,
     });
   };
 
@@ -85,7 +86,7 @@ export default function Parameters({
           value={activeScenario}
           onChange={setActiveScenario}
         />
-        <span className="scenario-picker-note">«Кто что делает» настраивается для гибрида</span>
+        <span className="scenario-picker-note">Распределение обязанностей настраивается для гибрида</span>
       </div>
 
       <div className="parameter-layout">
@@ -299,7 +300,7 @@ export default function Parameters({
         <section className="panel hybrid-panel">
           <SectionHead
             eyebrow="ГИБРИД"
-            title="Кто что делает"
+            title="Распределение обязанностей"
             description="Распределите ответственность по этапам. Это меняет стоимость и срок гибридного сценария."
             actions={<Pill tone="info"><GitMerge size={12} /> {state.stages.length} этапов</Pill>}
           />
@@ -340,7 +341,7 @@ export default function Parameters({
             <b>Распределение ответственности — только для гибрида</b>
             <p>
               Сейчас для детального просмотра выбрана модель «{SCENARIO_META[activeScenario].name}».
-              Раздел «Кто что делает» появится, когда вы выберете гибридный сценарий.
+              Раздел «Распределение обязанностей» появится, когда вы выберете гибридный сценарий.
             </p>
           </div>
           <Button variant="secondary" onClick={() => setActiveScenario('hybrid')}>Настроить гибрид</Button>

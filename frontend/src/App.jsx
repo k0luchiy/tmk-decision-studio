@@ -9,6 +9,7 @@ import { buildModelFromApi, exportApiEstimate, fetchApiModel } from './core/apiM
 import { fetchIntake, confirmIntake, mapIntakeToParams, fetchEstimates, fetchEstimate } from './core/api.js';
 import { applyParam, parseBrief } from './core/parseBrief.js';
 import { createBriefState } from './core/briefState.js';
+import { assignStageOwners } from './core/stageOwners.js';
 
 const INTAKE_SOURCES = { rules: 'правила', 'jev-cache': 'Jev-кэш', 'jev-live': 'Jev live' };
 const savedName = (brief) => {
@@ -276,6 +277,10 @@ export default function App() {
         const factor = Number(patch.teamRate) / Number(old.teamRate);
         next.stages = old.stages.map((stage) => ({ ...stage, rate: Math.round(stage.rate * factor) }));
       }
+      const affectsScope = ['type', 'integrations', 'screens', 'complexity', 'hiring'].some((key) => key in patch);
+      if (old.ownersTouched === false && affectsScope && patch.stages === undefined) {
+        next.stages = assignStageOwners(next.stages, next.type);
+      }
       return next;
     });
     if (Object.prototype.hasOwnProperty.call(patch, 'teamRate')) setRateDirty(true);
@@ -289,6 +294,7 @@ export default function App() {
     if (key === 'rate') setRateDirty(true);
     setState((old) => ({
       ...old,
+      ...(key === 'owner' ? { ownersTouched: true } : {}),
       stages: old.stages.map((stage) => {
         if (stage.id !== id) return stage;
         if (key === 'owner') {
