@@ -115,6 +115,9 @@ describe('estimates', () => {
       expect(body.estimates[key].scenario).toBe(key);
     }
     expect(body.effortGrid.totalHours).toBeGreaterThan(0);
+    expect(body.sensitivity.length).toBeGreaterThan(0);
+    expect(body.distribution).toHaveLength(11);
+    expect(body.distribution.reduce((sum, bin) => sum + bin.count, 0)).toBe(4000);
   });
 
   it('GET /api/estimates/:id returns the stored snapshot', async () => {

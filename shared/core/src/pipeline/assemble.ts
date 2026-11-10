@@ -23,10 +23,10 @@ import type { AnalogueEstimateResult } from '../sizing/analogues.js';
 import type { CombineMethodsResult, MethodWeights } from '../sizing/combine.js';
 import type { ScenarioResult } from '../scenarios/scenarios.js';
 import type { ScheduleResult } from '../schedule/schedule.js';
-import { simulate, type Quantiles } from '../risk/monteCarlo.js';
+import type { Quantiles } from '../risk/monteCarlo.js';
 import { confidence } from '../decision/confidence.js';
 import { buildFormulaTree } from '../decision/formulaTree.js';
-import { HYBRID_CONTRACTOR_STAGES, SIMULATION_CORRELATION, SIMULATION_ITERATIONS } from './types.js';
+import { HYBRID_CONTRACTOR_STAGES } from './types.js';
 
 /** Stage-hours share owned by the contractor in the hybrid scenario. */
 export function hybridShare(
@@ -83,55 +83,6 @@ export function blendLines(
 export function lastCumulative(rows: { cumulativeRub: number }[]): number {
   const last = rows[rows.length - 1];
   return last === undefined ? 0 : last.cumulativeRub;
-}
-
-/**
- * Simulates a cost distribution centred on the deterministic implementation
- * cost: `simulate` supplies the shape, the scale pins P50 to the line sum.
- */
-export function simulateCost(
-  implementationRub: number,
-  totalHours: number,
-  grid: EffortGrid,
-  duration: Duration,
-  seed: number,
-  salt: number,
-): Quantiles {
-  if (implementationRub <= 0 || totalHours <= 0) {
-    return {
-      p10: implementationRub,
-      p50: implementationRub,
-      p80: implementationRub,
-      p90: implementationRub,
-    };
-  }
-
-  const rate = implementationRub / totalHours;
-  const p50Hours = Math.max(1e-6, grid.p50Hours);
-  const p10Hours = grid.p10Hours > 0 ? grid.p10Hours : p50Hours * 0.6;
-  const p90Hours = Math.max(grid.p90Hours, p50Hours);
-  const p10Weeks = Math.max(1e-6, duration.p10Weeks);
-  const p50Weeks = Math.max(p10Weeks, duration.p50Weeks);
-  const p90Weeks = Math.max(p50Weeks, duration.p90Weeks);
-
-  const result = simulate({
-    effortHours: { p10: p10Hours, p50: p50Hours, p90: p90Hours },
-    costPerHour: { p10: rate * 0.85, p50: rate, p90: rate * 1.15 },
-    durationWeeks: { p10: p10Weeks, p50: p50Weeks, p90: p90Weeks },
-    correlation: SIMULATION_CORRELATION,
-    n: SIMULATION_ITERATIONS,
-    seed: seed + salt,
-  });
-
-  const simulatedP50 = result.costRub.p50;
-  const scale = simulatedP50 > 0 ? implementationRub / simulatedP50 : 1;
-
-  return {
-    p10: result.costRub.p10 * scale,
-    p50: implementationRub,
-    p80: result.costRub.p80 * scale,
-    p90: result.costRub.p90 * scale,
-  };
 }
 
 export function makeEstimate(

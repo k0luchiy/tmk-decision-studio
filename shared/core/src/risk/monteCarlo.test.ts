@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_CORRELATION,
   DEFAULT_ITERATIONS,
+  HISTOGRAM_BINS,
   type MonteCarloInput,
   type Quantiles,
   simulate,
@@ -115,6 +116,23 @@ describe('simulate', () => {
     const withDefault = simulate({ ...d1Input(), correlation: undefined });
     const explicit = simulate(d1Input({ correlation: DEFAULT_CORRELATION }));
     expect(withDefault).toEqual(explicit);
+  });
+
+  it('returns an 11-bin cost histogram between P10 and P90', () => {
+    const { histogram, costRub, iterations } = simulate(d1Input());
+
+    expect(histogram).toHaveLength(HISTOGRAM_BINS);
+    expect(histogram.reduce((sum, bin) => sum + bin.count, 0)).toBe(iterations);
+    expect(histogram[0]?.low).toBeCloseTo(costRub.p10, 6);
+    expect(histogram[HISTOGRAM_BINS - 1]?.high).toBeCloseTo(costRub.p90, 6);
+    const edgeTolerance = (costRub.p90 - costRub.p10) * 0.01;
+    expect(histogram[0]?.low).toBeGreaterThanOrEqual(costRub.p10 - edgeTolerance);
+    expect(histogram[HISTOGRAM_BINS - 1]?.high).toBeLessThanOrEqual(costRub.p90 + edgeTolerance);
+
+    histogram.forEach((bin, index) => {
+      expect(bin.low).toBeLessThan(bin.high);
+      if (index > 0) expect(bin.low).toBeCloseTo(histogram[index - 1]?.high ?? 0, 6);
+    });
   });
 
   it('reports the iterations and seed it ran with', () => {

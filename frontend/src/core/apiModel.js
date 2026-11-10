@@ -205,24 +205,26 @@ export function buildModelFromApi(response, state) {
     vendor: round3((scenarios.vendor.cost + scenarios.vendor.supportMonthly * 12 * year) / 1000),
     hybrid: round3((scenarios.hybrid.cost + scenarios.hybrid.supportMonthly * 12 * year) / 1000),
   }));
-  const baseCost = scenarios[recommended].p50;
+  const rec = scenarios[recommended];
+  const baseCost = rec.p50;
   const reserve = (Number(state.reserve) || 0) / 100;
-  const sensitivity = [
+  const syntheticSensitivity = [
     { name: 'Ставка внутренней команды', low: -0.18, high: 0.22 },
     { name: 'Стоимость подрядчика', low: -0.16, high: 0.24 },
     { name: 'Объём работ (часы)', low: -0.14, high: 0.18 },
     { name: 'Резерв на риск', low: -Math.min(0.2, reserve), high: 0.1 },
     { name: 'Сжатие срока', low: -0.04, high: 0.2 },
   ].map((factor) => ({ ...factor, lowValue: baseCost * (1 + factor.low), highValue: baseCost * (1 + factor.high) }));
-  const rec = scenarios[recommended];
+  const sensitivity = Array.isArray(response.sensitivity) && response.sensitivity.length ? response.sensitivity : syntheticSensitivity;
   const sigma = Math.max(1, (rec.p90 - rec.p10) / 2.563);
   const min = rec.p10 * 0.96;
   const max = rec.p90 * 1.04;
-  const distribution = Array.from({ length: 11 }, (_, index) => {
+  const syntheticDistribution = Array.from({ length: 11 }, (_, index) => {
     const x = min + ((max - min) * index) / 10;
     return { value: x, label: (x / 1_000_000).toFixed(1).replace('.', ','),
       count: Math.round(Math.exp(-0.5 * ((x - rec.p50) / sigma) ** 2) * 100 + (index === 0 ? 2 : 0)) };
   });
+  const distribution = Array.isArray(response.distribution) && response.distribution.length ? response.distribution : syntheticDistribution;
   const methodDiff = response.methodDivergence ?? 0;
   const warnings = (inhouse.warnings ?? []).map((warning) => ({
     tone: warning.severity === 'error' ? 'bad' : warning.severity === 'warning' ? 'warn' : 'info',

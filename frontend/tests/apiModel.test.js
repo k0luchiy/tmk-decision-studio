@@ -74,6 +74,26 @@ test('confidence, stage rows and effort are adapted for the UI', () => {
   assert.ok(model.meta.analogs.length > 0);
 });
 
+test('uses API sensitivity and distribution when present', () => {
+  const sensitivity = Array.from({ length: 5 }, (_, index) => ({
+    name: `Фактор ${index}`, low: -0.1, high: 0.1, lowValue: 900, highValue: 1100,
+  }));
+  const distribution = Array.from({ length: 11 }, (_, index) => ({ value: index * 1000, label: `${index},0`, count: index }));
+  const model = buildModelFromApi(apiResponse({ sensitivity, distribution }), createCaseState('D1'));
+
+  assert.deepEqual(model.sensitivity, sensitivity);
+  assert.deepEqual(model.distribution, distribution);
+});
+
+test('falls back to synthetic arrays only when the API omits them', () => {
+  const model = buildModelFromApi(apiResponse(), createCaseState('D1'));
+
+  assert.equal(model.sensitivity.length, 5);
+  assert.equal(model.distribution.length, 11);
+  assert.ok(model.sensitivity.every((factor) => typeof factor.lowValue === 'number'));
+  assert.ok(model.distribution.every((bin) => typeof bin.count === 'number'));
+});
+
 test('mapStateToRequest sends confirmed params and options', () => {
   const state = createCaseState('D1');
   const clean = mapStateToRequest(state);

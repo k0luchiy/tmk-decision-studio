@@ -32,6 +32,7 @@ import {
   makeEstimate,
 } from './assemble.js';
 import { adjustScenarios, simulateScenarios } from './adjust.js';
+import { buildDistribution, buildSensitivity, winnerKey } from './insights.js';
 import { buildAssumptions, buildRisks, toContractAnalogues } from './dataBridge.js';
 import {
   combineEffort,
@@ -47,7 +48,7 @@ import type {
   EstimateTaskResult,
 } from './types.js';
 
-export type { EstimateTaskInput, EstimateTaskOptions, EstimateTaskResult } from './types.js';
+export type { DistributionBin, EstimateTaskInput, EstimateTaskOptions, EstimateTaskResult, SensitivityFactor } from './types.js';
 
 /**
  * Runs the full estimation pipeline for one task.
@@ -230,12 +231,16 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     inhouseCost.hybrid,
   );
 
+  const winnerCode = winnerKey(verdict.code);
+  const winnerCost = inhouseCost[winnerCode];
   return {
     estimates: { inhouse, contractor, hybrid },
     verdict,
     confidence: confidenceScore,
     effortGrid,
     formulaTree: inhouse.formulaTree,
+    sensitivity: buildSensitivity(adjusted.lines[winnerCode], winnerCost.p50),
+    distribution: buildDistribution(winnerCost.histogram),
     methodDivergence: combined.divergence,
   };
 }

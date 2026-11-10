@@ -45,6 +45,16 @@ export interface Quantiles {
   p90: number;
 }
 
+/** One bucket of a cost histogram: `low <= value < high`. */
+export interface HistogramBin {
+  low: number;
+  high: number;
+  count: number;
+}
+
+/** Number of histogram bins between P10 and P90 (`docs/03_estimation_model.md` §8). */
+export const HISTOGRAM_BINS = 11;
+
 /** Inputs of a Monte Carlo run. `seed` is mandatory for reproducibility. */
 export interface MonteCarloInput {
   effortHours: EstimateRange;
@@ -63,6 +73,8 @@ export interface MonteCarloResult {
   effortHours: Quantiles;
   costRub: Quantiles;
   durationWeeks: Quantiles;
+  /** Cost histogram from P10 to P90; `Σ count === iterations`. */
+  histogram: HistogramBin[];
   iterations: number;
   seed: number;
 }
@@ -95,14 +107,37 @@ function nearestRank(sorted: number[], percentile: number): number {
   return value === undefined ? Number.NaN : value;
 }
 
-function quantilesOf(values: number[]): Quantiles {
-  const sorted = [...values].sort((a, b) => a - b);
+function quantilesOfSorted(sorted: number[]): Quantiles {
   return {
     p10: nearestRank(sorted, 10),
     p50: nearestRank(sorted, 50),
     p80: nearestRank(sorted, 80),
     p90: nearestRank(sorted, 90),
   };
+}
+
+function quantilesOf(values: number[]): Quantiles {
+  return quantilesOfSorted([...values].sort((a, b) => a - b));
+}
+
+/**
+ * Bins samples between the P10 and P90 edges. Values outside the range land in
+ * the edge bins, so the counts always add up to the sample size.
+ */
+function histogramOfSorted(sorted: number[], p10: number, p90: number): HistogramBin[] {
+  const span = p90 - p10;
+  const width = span > 0 ? span / HISTOGRAM_BINS : 0;
+  const counts = new Array<number>(HISTOGRAM_BINS).fill(0);
+  for (const value of sorted) {
+    const raw = width > 0 ? Math.floor((value - p10) / width) : Math.floor(HISTOGRAM_BINS / 2);
+    const index = Math.min(Math.max(raw, 0), HISTOGRAM_BINS - 1);
+    counts[index] = (counts[index] ?? 0) + 1;
+  }
+  return counts.map((count, index) => ({
+    low: p10 + width * index,
+    high: p10 + width * (index + 1),
+    count,
+  }));
 }
 
 /**
@@ -166,10 +201,13 @@ export function simulate(input: MonteCarloInput): MonteCarloResult {
     durationSamples[i] = durationValue;
   }
 
+  const sortedCost = [...costSamples].sort((a, b) => a - b);
+  const costRub = quantilesOfSorted(sortedCost);
   return {
     effortHours: quantilesOf(effortSamples),
-    costRub: quantilesOf(costSamples),
+    costRub,
     durationWeeks: quantilesOf(durationSamples),
+    histogram: histogramOfSorted(sortedCost, costRub.p10, costRub.p90),
     iterations,
     seed,
   };

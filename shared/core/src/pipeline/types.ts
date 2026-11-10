@@ -64,6 +64,22 @@ export interface EstimateTaskInput {
   options?: EstimateTaskOptions;
 }
 
+/** One tornado factor: relative swing `low..high` and its P50 extremes. */
+export interface SensitivityFactor {
+  name: string;
+  low: number;
+  high: number;
+  lowValue: number;
+  highValue: number;
+}
+
+/** One chart point of the cost distribution: a bin centre and its count. */
+export interface DistributionBin {
+  value: number;
+  label: string;
+  count: number;
+}
+
 /** Result of {@link estimateTask}. */
 export interface EstimateTaskResult {
   estimates: {
@@ -75,6 +91,10 @@ export interface EstimateTaskResult {
   confidence: ConfidenceScore;
   effortGrid: EffortGrid;
   formulaTree: FormulaNode;
+  /** Tornado factors of the winning scenario, widest swing first. */
+  sensitivity: SensitivityFactor[];
+  /** Cost histogram of the winning scenario, 11 bins between P10 and P90. */
+  distribution: DistributionBin[];
   /** Relative spread `max / min − 1` between methods A/B/C. */
   methodDivergence: number;
 }

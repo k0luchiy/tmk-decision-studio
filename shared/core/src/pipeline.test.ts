@@ -3,6 +3,7 @@ import { EstimateSchema, type Task } from '@app/contract';
 import { loadDatasets } from '@app/data';
 import { d1Task } from './fixtures/d1.js';
 import { estimateTask } from './pipeline.js';
+import { SIMULATION_ITERATIONS } from './pipeline/types.js';
 
 async function datasets() {
   return loadDatasets();
@@ -77,6 +78,14 @@ describe('estimateTask', () => {
     expect(['inhouse', 'contractor', 'hybrid', 'parity']).toContain(result.verdict.code);
     expect(result.confidence.score).toBeGreaterThanOrEqual(0);
     expect(result.confidence.score).toBeLessThanOrEqual(100);
+    expect(result.sensitivity.length).toBeGreaterThan(0);
+    expect(result.distribution).toHaveLength(11);
+    expect(result.distribution.reduce((sum, bin) => sum + bin.count, 0)).toBe(
+      SIMULATION_ITERATIONS,
+    );
+    const winner = result.estimates[result.verdict.code === 'contractor' ? 'contractor' : result.verdict.code === 'inhouse' ? 'inhouse' : 'hybrid'];
+    expect(result.distribution[5]?.value).toBeGreaterThan(0);
+    expect(winner.cost.p50Rub).toBeGreaterThan(0);
   });
 
   it('is deterministic for the same input and seed', async () => {

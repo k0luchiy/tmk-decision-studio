@@ -8,9 +8,8 @@
  */
 
 import type { CostLine, Duration, EffortGrid } from '@app/contract';
-import type { Quantiles } from '../risk/monteCarlo.js';
 import { RISK_PREMIUM_PCT, breakevenMonth, type ScenarioResult } from '../scenarios/scenarios.js';
-import { simulateCost } from './assemble.js';
+import { simulateCost, type SimulatedCost } from './simulate.js';
 import type { EstimateExtra, ExtraTarget } from './types.js';
 
 export interface ScenarioSet {
@@ -176,8 +175,8 @@ export function simulateScenarios(
   effortGrid: EffortGrid,
   duration: Duration,
   seed: number,
-): { inhouse: Quantiles; contractor: Quantiles; hybrid: Quantiles } {
-  const run = (code: keyof ScenarioSet, salt: number): Quantiles =>
+): { inhouse: SimulatedCost; contractor: SimulatedCost; hybrid: SimulatedCost } {
+  const run = (code: keyof ScenarioSet, salt: number): SimulatedCost =>
     simulateCost(
       scenarios[code].implementationRub,
       effortGrid.totalHours,

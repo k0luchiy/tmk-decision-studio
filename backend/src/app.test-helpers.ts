@@ -34,6 +34,8 @@ export interface EstimateDto {
     { scenario: string; cost: { p50Rub: number } }
   >;
   effortGrid: { totalHours: number };
+  sensitivity: { name: string; low: number; high: number; lowValue: number; highValue: number }[];
+  distribution: { value: number; label: string; count: number }[];
 }
 
 export function loadD1Text(): string {

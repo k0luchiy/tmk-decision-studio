@@ -79,9 +79,15 @@ export {
 } from './schedule/schedule.js';
 export type { ScheduleInput, ScheduleResult, TeamMember } from './schedule/schedule.js';
 export { mulberry32, normalPair } from './risk/prng.js';
-export { DEFAULT_CORRELATION, DEFAULT_ITERATIONS, simulate } from './risk/monteCarlo.js';
+export {
+  DEFAULT_CORRELATION,
+  DEFAULT_ITERATIONS,
+  HISTOGRAM_BINS,
+  simulate,
+} from './risk/monteCarlo.js';
 export type {
   EstimateRange,
+  HistogramBin,
   MonteCarloInput,
   MonteCarloResult,
   Quantiles,
@@ -111,9 +117,11 @@ export { buildFormulaTree, leaves, walk } from './decision/formulaTree.js';
 export type { FormulaTreeInput, ProvenanceFormulaNode } from './decision/formulaTree.js';
 export { estimateTask } from './pipeline.js';
 export type {
+  DistributionBin,
   EstimateTaskInput,
   EstimateTaskOptions,
   EstimateTaskResult,
+  SensitivityFactor,
 } from './pipeline.js';
 export { D1_FLOWS, d1Task } from './fixtures/d1.js';
 export { computeCalcD1, formatCalcTable, runCalc } from './cli/calc.js';
