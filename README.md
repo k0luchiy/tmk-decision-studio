@@ -115,6 +115,7 @@ OPENCODE_API_KEY='...' JEV_MODEL=jev-1.13-free INTAKE_MODE=live npm run dev:api
 | `npm run calc` | демо-расчёт D1 по этапам | `.artifacts/calc-d1.json` |
 | `npm run e2e` | D1–D3 от брифа до экспорта | 9 файлов в `.artifacts/` + `.artifacts/control.json` |
 | `npm run report` | генерирует `docs/deliverables/TEST_REPORT.md` | `docs/deliverables/TEST_REPORT.md` |
+| `npm run benchmark` | прогоняет `benchmarks/TEST_PROMPTS.md` через движок | `docs/deliverables/BENCHMARK_REPORT.md` |
 | `npm run intake:eval` | метрики правил/кэша Jev на 12 брифах | `.artifacts/intake-eval.json` |
 | `npm run helpdesk:check` | импорт и качество выгрузки HelpDesk | `.artifacts/helpdesk.json` |
 

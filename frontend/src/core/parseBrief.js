@@ -127,9 +127,19 @@ export const applyParam = (state, param) => {
   if (id === 'screens') next.screens = toNumber(param.value, 0);
   if (id === 'users') next.users = toNumber(param.value, state.users);
   if (id === 'complexity') next.complexity = String(param.value);
-  if (id === 'deadline' || id === 'duration_weeks') {
-    const value = Number(String(param.value).replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
-    const weeks = /мес/i.test(param.value) ? value * 4.345 : /дн/i.test(param.value) ? value / 5 : value;
+  if (id === 'deadline' || id === 'duration' || id === 'duration_weeks') {
+    const raw = String(param.value);
+    const unit = String(param.unit ?? '');
+    const isDays = /^(дн|день|дней)$/i.test(unit) || /дн|день|дней/i.test(raw);
+    if (isDays) return next;
+    const value = Number(raw.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+    const weeks = /мес/i.test(unit) || /мес/i.test(raw)
+      ? value * 4.345
+      : /год|лет/i.test(unit) || /год|лет/i.test(raw)
+        ? value * 52
+        : /нед/i.test(unit) || /нед/i.test(raw)
+          ? value
+          : value;
     if (weeks) next.deadlineWeeks = Math.round(weeks);
   }
   return next;

@@ -260,7 +260,7 @@ export default function App() {
     setState(next);
     setRateDirty(false);
     setStageHoursDirty(false);
-    setDeadlineDirty(parsedParams.some((param) => param.id === 'deadline' || param.id === 'duration_weeks'));
+    setDeadlineDirty(parsedParams.some((param) => (param.id === 'deadline' || param.id === 'duration' || param.id === 'duration_weeks') && !/^(дн|день|дней)$/i.test(param.unit ?? '')));
     setFiles(incomingFiles || []);
     const nextModel = computeModel(next);
     setActiveScenario(nextModel.recommended);
@@ -386,7 +386,7 @@ export default function App() {
     const extracted = state.description?.trim() ? await parseViaApi(state.description, mode) : [];
     setParams(extracted.length ? extracted : buildParams(state));
     setState((old) => createBriefState(old.description ?? '', extracted));
-    setDeadlineDirty(extracted.some((param) => param.id === 'deadline' || param.id === 'duration_weeks'));
+    setDeadlineDirty(extracted.some((param) => (param.id === 'deadline' || param.id === 'duration' || param.id === 'duration_weeks') && !/^(дн|день|дней)$/i.test(param.unit ?? '')));
     setParsed(true);
     notify(`Бриф разобран: найдено ${extracted.length || 4} параметров`);
   };

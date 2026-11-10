@@ -24,7 +24,8 @@
     "e2e": "node scripts/e2e.mjs",
     "report": "node scripts/test-report.mjs",
     "helpdesk:check": "node scripts/check-helpdesk.mjs",
-    "intake:eval": "node scripts/intake-eval.mjs"
+    "intake:eval": "node scripts/intake-eval.mjs",
+    "benchmark": "tsx scripts/benchmark.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
