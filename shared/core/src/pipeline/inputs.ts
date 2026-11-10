@@ -206,7 +206,7 @@ export function combineEffort(input: {
   // blended in-house rate). C falls back to A when there is no corpus type.
   const methodA = baseGrid.p50Hours;
   const fp = fpLite({ counts: fpCounts(task), platform: platformPdr(task) });
-  const methodB = fp.fp > 0 ? fp.effortHours : methodA;
+  const methodB = fp.fp >= 20 ? fp.effortHours : methodA;
   const scopeKeys = ['flows', 'integrations', 'screens', 'reports', 'intents', 'scenarios', 'fp', 'function_points', 'control_points', 'sources', 'services'];
   const hasScope = workType === 'support' || scopeKeys.some((key) => (numericParam(task, key) ?? 0) > 0);
   const analogueType =

@@ -386,13 +386,24 @@ export const recommendedRationale = (model) => {
   const fasterThanInternal = model.scenarios.internal.weeks - s.weeks;
   if (rec === 'hybrid') {
     const premium = ((s.p50 - cheapest.p50) / cheapest.p50) * 100;
+    const contractor = model.scenarios.vendor;
+    const tcoDelta = contractor.tco3 - s.tco3;
     const speed = fasterThanInternal > 0
-      ? `на ${fasterThanInternal} нед. быстрее полностью внутренней команды`
-      : 'в тот же календарный срок, что и внутренняя команда, но с меньшей нагрузкой на штат';
+      ? `на ${fasterThanInternal} нед. быстрее внутренней команды`
+      : fasterThanInternal < 0
+        ? `на ${-fasterThanInternal} нед. дольше внутренней команды`
+        : 'в тот же срок, что и внутренняя команда';
+    if (tcoDelta > 0) {
+      const upfront = s.p50 - contractor.p50;
+      const start = upfront > 0
+        ? `Подрядчик дешевле на старте на ${fmtMoney(upfront)}, но гибрид`
+        : `Гибрид дешевле на старте на ${fmtMoney(-upfront)} и`;
+      return `${start} за 3 года выгоднее на ${fmtMoney(tcoDelta)}: ${fmtMoney(s.tco3)} против ${fmtMoney(contractor.tco3)}. Срок — ${s.weeks} нед. (${speed}).`;
+    }
     if (premium <= 1) {
       return `Гибрид — самый дешёвый вариант по P50 и ${speed}. При этом архитектура, данные и приёмка остаются внутри ТМК, а подрядчик закрывает критический путь.`;
     }
-    return `Гибрид даёт лучший баланс: стоимость в пределах ${Math.abs(premium).toFixed(0)}% от самого дешёвого варианта, срок — ${s.weeks} нед. (${speed}), а архитектура, данные и приёмка остаются внутри ТМК.`;
+    return `Гибрид: на старте на ${Math.abs(premium).toFixed(0)}% дороже самого дешёвого варианта, TCO за 3 года — ${fmtMoney(s.tco3)}, срок — ${s.weeks} нед. (${speed}).`;
   }
   if (rec === 'vendor') {
     const isCheapest = cheapest.id === 'vendor';
