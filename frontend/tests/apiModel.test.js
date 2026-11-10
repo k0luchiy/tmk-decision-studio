@@ -99,8 +99,9 @@ test('mapStateToRequest sends confirmed params and options', () => {
   const clean = mapStateToRequest(state);
   assert.ok(!Object.prototype.hasOwnProperty.call(clean.options, 'teamRate'));
   assert.ok(!Object.prototype.hasOwnProperty.call(clean.options, 'stageHours'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(clean.options, 'targetWeeks'));
 
-  const request = mapStateToRequest(state, { rateDirty: true, stageHoursDirty: true });
+  const request = mapStateToRequest(state, { rateDirty: true, stageHoursDirty: true, deadlineDirty: true });
 
   assert.equal(request.params.length, 5);
   for (const param of request.params) {
@@ -116,6 +117,7 @@ test('mapStateToRequest sends confirmed params and options', () => {
   assert.equal(request.options.model, 't_and_m');
   assert.equal(request.options.utilization, 0.7);
   assert.equal(request.options.vat, false);
+  assert.equal(request.options.targetWeeks, state.deadlineWeeks);
   const expectedRate = Math.round(
     state.stages.reduce((acc, stage) => acc + stage.hours * stage.rate, 0) /
       state.stages.reduce((acc, stage) => acc + stage.hours, 0),

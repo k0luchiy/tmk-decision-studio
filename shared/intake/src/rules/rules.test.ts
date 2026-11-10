@@ -13,6 +13,10 @@ describe('classify', () => {
     expect(result.matchedKeywords).toContain('интеграц');
   });
 
+  it('Telegram bot → ai, not a generic development task', () => {
+    expect(classify('Мне нужно создать телеграм бота').workType).toBe('ai');
+  });
+
   it('non-IT text → unknown and low confidence', () => {
     const result = classify('Сделайте что-нибудь');
     expect(result.workType).toBe('unknown');

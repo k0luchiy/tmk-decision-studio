@@ -65,6 +65,7 @@ export function toContractAnalogues(datasets: Datasets, workType: string): Analo
     return supportContractAnalogues(datasets);
   }
 
+  if (workType === 'default') return [];
   const expectedType = ANALOGUE_TYPE_BY_WORK_TYPE[workType];
   if (expectedType === undefined) return [];
 

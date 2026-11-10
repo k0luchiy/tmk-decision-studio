@@ -47,6 +47,7 @@ const workTypeFor = (type) => {
   if (/интеграц/.test(text)) return 'integration';
   if (/vision|cv|дефект|компьютерн|машинн|зрени/.test(text)) return 'cv';
   if (/сопровожд|поддержк|sla|дежурств/.test(text)) return 'support';
+  if (/телеграм|telegram|чат-бот|чатбот|искусственн|нейросет|llm|nlp/.test(text)) return 'ai';
   if (/разработ|мобильн|приложен/.test(text)) return 'development';
   return 'default';
 };
@@ -118,11 +119,11 @@ export function mapStateToRequest(state, dirty = {}) {
     reservePct: (Number(state.reserve) || 0) / 100,
     oversightPct: (Number(state.oversight) || 0) / 100,
     contractorStages: mapContractorStages(state.stages),
-    targetWeeks: state.deadlineWeeks,
     extras: mapExtras(state.extras),
   };
   if (dirty.rateDirty) options.teamRate = weightedTeamRate(state);
   if (dirty.stageHoursDirty) options.stageHours = mapStageHours(state.stages);
+  if (dirty.deadlineDirty) options.targetWeeks = state.deadlineWeeks;
   const params = [
     confirmedParam('work_type', workTypeFor(state.type)),
     confirmedParam('flows', state.integrations),

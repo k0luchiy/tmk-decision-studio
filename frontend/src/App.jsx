@@ -7,7 +7,8 @@ import { CASES } from './data/cases.js';
 import { computeModel, createCaseState, recommendedRationale } from './core/calc.js';
 import { buildModelFromApi, exportApiEstimate, fetchApiModel } from './core/apiModel.js';
 import { fetchIntake, confirmIntake, mapIntakeToParams, fetchEstimates, fetchEstimate } from './core/api.js';
-import { applyAutoParams, applyParam, parseBrief } from './core/parseBrief.js';
+import { applyParam, parseBrief } from './core/parseBrief.js';
+import { createBriefState } from './core/briefState.js';
 
 const INTAKE_SOURCES = { rules: 'правила', 'jev-cache': 'Jev-кэш', 'jev-live': 'Jev live' };
 const savedName = (brief) => {
@@ -87,6 +88,7 @@ export default function App() {
   const [model, setModel] = useState(() => computeModel(createCaseState(initialCaseId)));
   const [rateDirty, setRateDirty] = useState(false);
   const [stageHoursDirty, setStageHoursDirty] = useState(false);
+  const [deadlineDirty, setDeadlineDirty] = useState(false);
   const [apiStatus, setApiStatus] = useState('idle');
   const [intakeSource, setIntakeSource] = useState(null);
   const [intakeMode, setIntakeMode] = useState(() => import.meta.env?.VITE_INTAKE_MODE ?? 'cache');
@@ -109,7 +111,7 @@ export default function App() {
     const controller = new AbortController();
     const timer = setTimeout(() => {
       setApiStatus('loading');
-      fetchApiModel(state, { rateDirty, stageHoursDirty }, { signal: controller.signal })
+      fetchApiModel(state, { rateDirty, stageHoursDirty, deadlineDirty }, { signal: controller.signal })
         .then((response) => {
           const nextModel = buildModelFromApi(response, state);
           setModel(nextModel);
@@ -200,6 +202,7 @@ export default function App() {
       setState(nextState);
       setRateDirty(false);
       setStageHoursDirty(false);
+      setDeadlineDirty(false);
       setParams(buildParams(nextState));
       setParsed(true);
       setModel(nextModel);
@@ -230,6 +233,7 @@ export default function App() {
     setState(next);
     setRateDirty(false);
     setStageHoursDirty(false);
+    setDeadlineDirty(false);
     setParams(buildParams(next));
     setParsed(true);
     setFiles([]);
@@ -242,12 +246,11 @@ export default function App() {
 
   const startAssessment = async ({ brief, files: incomingFiles }) => {
     let next = state;
+    let parsedParams = [];
     if (brief && brief.trim()) {
       const text = brief.trim();
-      next = { ...state, description: text, confirmedParams: 0, rejectedParams: 0 };
-      setState(next);
-      const parsedParams = await parseViaApi(text);
-      next = applyAutoParams(next, parsedParams);
+      parsedParams = await parseViaApi(text);
+      next = createBriefState(text, parsedParams);
       setParams(parsedParams.length ? parsedParams : buildParams(next));
       setParsed(true);
     } else {
@@ -256,6 +259,7 @@ export default function App() {
     setState(next);
     setRateDirty(false);
     setStageHoursDirty(false);
+    setDeadlineDirty(parsedParams.some((param) => param.id === 'deadline' || param.id === 'duration_weeks'));
     setFiles(incomingFiles || []);
     const nextModel = computeModel(next);
     setActiveScenario(nextModel.recommended);
@@ -275,6 +279,7 @@ export default function App() {
       return next;
     });
     if (Object.prototype.hasOwnProperty.call(patch, 'teamRate')) setRateDirty(true);
+    if (Object.prototype.hasOwnProperty.call(patch, 'deadlineWeeks')) setDeadlineDirty(true);
     if (Object.prototype.hasOwnProperty.call(patch, 'description')) setParsed(false);
   };
 
@@ -374,7 +379,8 @@ export default function App() {
   const reparse = async (mode = intakeMode) => {
     const extracted = state.description?.trim() ? await parseViaApi(state.description, mode) : [];
     setParams(extracted.length ? extracted : buildParams(state));
-    setState((old) => applyAutoParams({ ...old, confirmedParams: 0, rejectedParams: 0 }, extracted));
+    setState((old) => createBriefState(old.description ?? '', extracted));
+    setDeadlineDirty(extracted.some((param) => param.id === 'deadline' || param.id === 'duration_weeks'));
     setParsed(true);
     notify(`Бриф разобран: найдено ${extracted.length || 4} параметров`);
   };

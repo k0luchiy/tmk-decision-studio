@@ -3,6 +3,7 @@ import { loadDatasets } from '@app/data';
 import { describe, expect, it } from 'vitest';
 import { STAGE_SHARES, stageSharesSum } from './stageShares.js';
 import { buildWbs, WORK_TYPE_TO_ARCHETYPE } from './wbs.js';
+import { resolveUnitsCount } from '../pipeline/inputs.js';
 
 const datasets = await loadDatasets();
 const archetypes = datasets.archetypes.archetypes;
@@ -69,6 +70,29 @@ describe('buildWbs', () => {
     expect(items[0]?.stage).toBe(7);
     expect(items[0]?.archetypeId).toBe('l2_l3_support');
     expect(items[0]?.expectedHours).toBeGreaterThan(0);
+  });
+
+  it('uses the low typical volume when a brief has no explicit size', () => {
+    expect(buildWbs(makeTask('development'), archetypes)[0]?.unitsCount).toBe(40);
+    expect(buildWbs(makeTask('ai'), archetypes)[0]?.unitsCount).toBe(20);
+    expect(buildWbs(makeTask('integration'), archetypes)[0]?.unitsCount).toBe(2);
+  });
+
+  it('derives function points from screens for an FP archetype', () => {
+    const task = makeTask('development');
+    task.params = [
+      ...(task.params ?? []),
+      {
+        key: 'screens',
+        value: 12,
+        unit: '',
+        confidence: 1,
+        status: 'confirmed',
+        defaultUsed: false,
+      },
+    ];
+
+    expect(resolveUnitsCount(task, 'new_web_app', datasets)).toBe(36);
   });
 
   it('returns zero-hour assumption items for a zero unit count without throwing', () => {

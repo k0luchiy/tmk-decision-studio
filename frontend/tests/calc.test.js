@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { computeModel, createCaseState } from '../src/core/calc.js';
+import { createBriefState } from '../src/core/briefState.js';
 import { parseBrief } from '../src/core/parseBrief.js';
 
 const closeTo = (a, b, tolerance = 0.02) => Math.abs(a - b) <= Math.abs(b) * tolerance;
@@ -16,6 +17,33 @@ test('D1 produces three scenarios with ordered P10/P50/P90 and a recommendation'
   }
   assert.equal(model.recommended, 'hybrid');
   assert.ok(model.confidence.score >= 50 && model.confidence.score <= 100);
+});
+
+test('a short Telegram-bot brief starts from a small scope, not from D1', () => {
+  const state = createBriefState('Мне нужно создать телеграм-бота', [
+    { id: 'type', value: 'Искусственный интеллект' },
+  ]);
+  const model = computeModel(state);
+
+  assert.equal(state.type, 'Искусственный интеллект');
+  assert.equal(state.integrations, 0);
+  assert.equal(state.hiring, false);
+  assert.ok(model.effort < 500, `bot effort ${model.effort}`);
+  assert.ok(model.scenarios.internal.p50 < 5_000_000, `bot cost ${model.scenarios.internal.p50}`);
+});
+
+test('a vague integration starts small and grows with explicit flows', () => {
+  const small = createBriefState('Интеграция 1С с базой данных', [
+    { id: 'type', value: 'Интеграция систем' },
+  ]);
+  const large = createBriefState('Интеграция 1С, 6 потоков', [
+    { id: 'type', value: 'Интеграция систем' },
+    { id: 'integrations', value: '6' },
+  ]);
+
+  assert.equal(small.integrations, 0);
+  assert.equal(large.integrations, 6);
+  assert.ok(computeModel(small).effort < computeModel(large).effort);
 });
 
 test('D3 recommends the vendor for a mature 24/7 support scope', () => {

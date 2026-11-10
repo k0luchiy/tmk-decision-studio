@@ -14,7 +14,6 @@
  */
 export const ANALOGUE_TYPE_BY_WORK_TYPE: Record<string, string> = {
   integration: 'erp_1c',
-  development: 'erp_1c',
   migration: 'sap_migration',
   bi: 'dwh_bi',
   mes: 'mes',
@@ -23,7 +22,6 @@ export const ANALOGUE_TYPE_BY_WORK_TYPE: Record<string, string> = {
   support: 'support',
   erp: 'erp_1c',
   data: 'dwh_bi',
-  ai: 'predictive_maintenance',
   default: 'erp_1c',
 };
 

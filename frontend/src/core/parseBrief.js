@@ -8,6 +8,7 @@ const detectType = (text) => {
   const lower = text.toLowerCase();
   if (/(компьютерн|машинн|cv|дефект|видеоаналит|зрени)/.test(lower)) return 'Computer Vision';
   if (/(поддержк|sla|24\/7|дежурств|сопровожд)/.test(lower)) return 'Сопровождение';
+  if (/(телеграм|telegram|чат-бот|чатбот|искусственн|нейросет|llm|nlp)/.test(lower)) return 'Искусственный интеллект';
   if (/(интеграц|api|обмен|шлюз|wms|1с)/.test(lower)) return 'Интеграция систем';
   if (/(мобильн|приложен|кабинет|интерфейс)/.test(lower)) return 'Разработка ПО';
   return 'ИТ-инициатива';
@@ -94,6 +95,10 @@ const WORK_TYPE_LABELS = {
   development: 'Разработка ПО',
   cv: 'Computer Vision',
   support: 'Сопровождение',
+  ai: 'Искусственный интеллект',
+  rpa: 'RPA',
+  mobile: 'Мобильная разработка',
+  bi: 'BI и аналитика',
   default: 'ИТ-инициатива',
 };
 

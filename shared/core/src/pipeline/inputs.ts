@@ -27,6 +27,22 @@ const UNIT_PARAM_KEYS: Record<string, readonly string[]> = {
   control_point: ['control_points'],
   source_system: ['sources'],
   service: ['services'],
+  FP: ['fp', 'function_points'],
+  intent: ['intents', 'scenarios'],
+};
+
+const FP_PER_SCREEN: Record<string, number> = {
+  new_web_app: 3,
+  mobile_app: 2.5,
+  functional_extension_1c: 2,
+  portal_gis: 3,
+  mes_module: 4,
+  sap_dev: 3,
+  low_code: 2,
+  erp_1c_rollout: 3,
+  legacy_modernization: 3,
+  document_management: 3,
+  observability_monitoring: 2,
 };
 
 export function numericParam(task: Task, key: string): number | undefined {
@@ -46,7 +62,19 @@ export function resolveUnitsCount(
   datasets: Datasets,
 ): number | undefined {
   const archetype = datasets.archetypes.archetypes.find((entry) => entry.id === archetypeId);
-  const keys = archetype ? UNIT_PARAM_KEYS[archetype.unit] : undefined;
+  if (!archetype) return undefined;
+
+  const explicitFp = numericParam(task, 'fp') ?? numericParam(task, 'function_points');
+  if (archetype.unit === 'FP') {
+    if (explicitFp !== undefined && explicitFp > 0) return explicitFp;
+    const screens = numericParam(task, 'screens');
+    if (screens !== undefined && screens > 0) {
+      return Math.max(1, Math.round(screens * (FP_PER_SCREEN[archetype.id] ?? 3)));
+    }
+    return undefined;
+  }
+
+  const keys = UNIT_PARAM_KEYS[archetype.unit];
   if (!keys) return undefined;
   for (const key of keys) {
     const value = numericParam(task, key);
@@ -179,7 +207,10 @@ export function combineEffort(input: {
   const methodA = baseGrid.p50Hours;
   const fp = fpLite({ counts: fpCounts(task), platform: platformPdr(task) });
   const methodB = fp.fp > 0 ? fp.effortHours : methodA;
-  const analogueType = ANALOGUE_TYPE_BY_WORK_TYPE[workType];
+  const scopeKeys = ['flows', 'integrations', 'screens', 'reports', 'intents', 'scenarios', 'fp', 'function_points', 'control_points', 'sources', 'services'];
+  const hasScope = workType === 'support' || scopeKeys.some((key) => (numericParam(task, key) ?? 0) > 0);
+  const analogueType =
+    workType === 'default' || !hasScope ? undefined : ANALOGUE_TYPE_BY_WORK_TYPE[workType];
   const publishedAnalogues = datasets.analogues.analogues.map((row) => ({
     id: row.id,
     project_type: row.project_type,

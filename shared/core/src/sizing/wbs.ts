@@ -150,7 +150,9 @@ export function buildWbs(
   const shares = params?.stageShares ?? STAGE_SHARES;
   const explicitUnits = params?.unitsCount;
   const typicalMid = archetype.typical_unit_count.mid;
-  const unitsCount = explicitUnits ?? (typeof typicalMid === 'number' ? typicalMid : 1);
+  const lowVolumeUnits = ['FP', 'intent', 'bot', 'integration_flow'].includes(archetype.unit);
+  const fallbackUnits = lowVolumeUnits ? archetype.typical_unit_count.low : typicalMid;
+  const unitsCount = explicitUnits ?? (typeof fallbackUnits === 'number' ? fallbackUnits : 1);
   // Typical sizing or a zero-volume brief both count as an explicit assumption.
   const assumption = explicitUnits === undefined || explicitUnits === 0;
 
