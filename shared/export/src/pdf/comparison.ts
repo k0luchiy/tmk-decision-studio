@@ -5,7 +5,7 @@ import { note, sectionTitle } from './components.js';
 import type { PdfContext } from './context.js';
 import type { Fonts } from './fonts.js';
 import { table } from './tables.js';
-import { costIndex, cumulativeTco, millions, num, scenarioName, weeks } from './theme.js';
+import { costIndex, cumulativeTco, millions, num, scenarioName } from './theme.js';
 
 /** Scenarios rendered in the comparison matrix, always in this order. */
 const SCENARIO_ORDER = ['inhouse', 'contractor', 'hybrid'] as const;
@@ -42,7 +42,7 @@ function rowFor(estimate: Estimate, code: Verdict['code']): string[] {
     millions(estimate.cost.p50Rub),
     millions(estimate.cost.p80Rub),
     millions(estimate.cost.p90Rub),
-    weeks(estimate.duration.p50Weeks),
+    String(estimate.duration.p50Weeks),
     tcoCell(estimate),
     num(costIndex(estimate)),
     marker,
@@ -50,15 +50,15 @@ function rowFor(estimate: Estimate, code: Verdict['code']): string[] {
 }
 
 const COLUMNS = [
-  { header: 'Сценарий', width: 118 },
+  { header: 'Сценарий', width: 112 },
   { header: 'P10', width: 34, align: 'right' as const },
   { header: 'P50', width: 34, align: 'right' as const },
   { header: 'P80', width: 34, align: 'right' as const },
   { header: 'P90', width: 34, align: 'right' as const },
-  { header: 'Срок', width: 32, align: 'right' as const },
-  { header: 'TCO 1/3/5, млн', width: 82, align: 'right' as const },
-  { header: '₽/час', width: 42, align: 'right' as const },
-  { header: 'Маркер', width: 85 },
+  { header: 'Срок', width: 38, align: 'right' as const },
+  { header: 'TCO 1/3/5, млн', width: 86, align: 'right' as const },
+  { header: '₽/час', width: 40, align: 'right' as const },
+  { header: 'Маркер', width: 77 },
 ];
 
 /**
@@ -95,7 +95,7 @@ export function comparisonSection(
   return note(
     doc,
     fonts,
-    `${lead} P10–P90 и TCO — млн ₽ (накопительно на 1/3/5 год); ₽/час — стоимость P50 за час.`,
+    `${lead} P10–P90 и TCO — млн ₽ (накопительно на 1/3/5 год); срок — недели; ₽/час — стоимость P50 за час.`,
     y,
   );
 }

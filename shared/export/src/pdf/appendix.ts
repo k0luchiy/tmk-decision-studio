@@ -42,11 +42,11 @@ function assumptionsSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Est
   return table(doc, fonts, {
     y,
     columns: [
-      { header: 'Допущение', width: 160 },
-      { header: 'Значение', width: 72 },
-      { header: 'Диапазон', width: 90 },
-      { header: 'Источник', width: 105 },
-      { header: 'Чувств.', width: 68, align: 'right' },
+      { header: 'Допущение', width: 150 },
+      { header: 'Значение', width: 68 },
+      { header: 'Диапазон', width: 82 },
+      { header: 'Источник', width: 115 },
+      { header: 'Чувств.', width: 70, align: 'right' },
     ],
     rows,
     emptyText: 'Допущения не переданы — расчёт опирается только на нормативные ставки и аналоги.',
@@ -57,11 +57,11 @@ function riskHeader(doc: PDFKit.PDFDocument, fonts: Fonts, y: number): number {
   const x = doc.page.margins.left;
   doc.save().fillColor(COLORS.surface).rect(x, y, contentWidth(doc), 20).fill().restore();
   const headers: [string, number][] = [
-    ['Риск', 160],
-    ['Вероятн.', 60],
+    ['Риск', 180],
+    ['Вероятн.', 55],
     ['Влияние', 85],
-    ['Ожидаемо', 70],
-    ['Уровень', 120],
+    ['Ожидаемо', 65],
+    ['Уровень', 110],
   ];
   let cx = x;
   for (const [text, width] of headers) {
@@ -75,11 +75,11 @@ function riskRow(doc: PDFKit.PDFDocument, fonts: Fonts, risk: Risk, budget: numb
   const x = doc.page.margins.left;
   const level = riskLevel(risk, budget);
   const cells: [string, number, 'left' | 'right'][] = [
-    [risk.label, 160, 'left'],
-    [pct(risk.probability), 60, 'right'],
+    [risk.label, 180, 'left'],
+    [pct(risk.probability), 55, 'right'],
     [moneyShort(risk.impactRub.mid), 85, 'right'],
-    [risk.expectedRub === undefined ? '—' : moneyShort(risk.expectedRub), 70, 'right'],
-    [level.label, 120, 'left'],
+    [risk.expectedRub === undefined ? '—' : moneyShort(risk.expectedRub), 65, 'right'],
+    [level.label, 110, 'left'],
   ];
   let cx = x;
   for (const [text, width, align] of cells) {
@@ -132,12 +132,12 @@ function analoguesSection(doc: PDFKit.PDFDocument, fonts: Fonts, estimate: Estim
   return table(doc, fonts, {
     y,
     columns: [
-      { header: 'Проект', width: 155 },
-      { header: 'Год', width: 34, align: 'right' },
-      { header: 'Цена', width: 80, align: 'right' },
-      { header: 'Коэф.', width: 48, align: 'right' },
-      { header: 'Приведено', width: 82, align: 'right' },
-      { header: 'Источник', width: 96 },
+      { header: 'Проект', width: 165 },
+      { header: 'Год', width: 36, align: 'right' },
+      { header: 'Цена', width: 75, align: 'right' },
+      { header: 'Коэф.', width: 40, align: 'right' },
+      { header: 'Приведено', width: 80, align: 'right' },
+      { header: 'Источник', width: 99 },
     ],
     rows,
     emptyText: 'Аналоги не переданы — раздел не применяется к этому расчёту; приведение цен не выполнялось.',

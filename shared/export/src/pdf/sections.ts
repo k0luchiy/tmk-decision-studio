@@ -173,9 +173,9 @@ export function writeDecisionPages(doc: PDFKit.PDFDocument, fonts: Fonts, contex
   let y = coverHeader(doc, fonts, meta);
   y = verdictSection(doc, fonts, estimate, comparison, y);
   y = comparisonSection(doc, fonts, estimate, comparison, y);
-  costStructureSection(doc, fonts, estimate, y);
+  costStructureSection(doc, fonts, estimate, y + SPACE.md);
   const confidenceY = tcoSection(doc, fonts, estimate);
-  confidenceSection(doc, fonts, comparison?.confidence ?? estimate.confidence, confidenceY);
+  confidenceSection(doc, fonts, comparison?.confidence ?? estimate.confidence, confidenceY + SPACE.xl);
   divider(doc, doc.page.margins.left, doc.page.height - 90, contentWidth(doc), COLORS.border, 0.6);
   doc.font(fonts.body).fontSize(TYPE.micro).fillColor(COLORS.muted).text(
     `Отчёт TMK Decision Studio · ${dateRu(meta.createdAt)} · оценка порядка, не смета`,
