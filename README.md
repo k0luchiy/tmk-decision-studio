@@ -108,7 +108,7 @@ OPENCODE_API_KEY='...' JEV_MODEL=jev-1.13-free INTAKE_MODE=live npm run dev:api
 | Скрипт | Что делает | Выход |
 |---|---|---|
 | `npm run typecheck` | `tsc --noEmit` по всем пакетам и `shared/*/examples` | код возврата |
-| `npm test` | Vitest: unit, property (invariants), data, export | 256 тестов |
+| `npm test` | Vitest: unit, property (invariants), data, export | 259 тестов |
 | `npm run lint` | ESLint по `shared`, `scripts` | код возврата |
 | `npm run data:manifest` | пересобирает `data/manifest.json` и `datasetVersion` | `data/manifest.json` |
 | `npm run data:check` | проверяет датасеты, схемы, порядок ставок | отчёт в `.artifacts/` |

@@ -151,7 +151,7 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     utilization,
     ...(options.targetWeeks === undefined ? {} : { targetWeeks: options.targetWeeks }),
   });
-  const durations = scenarioDurations(scheduleResult.duration, options.hiring === true);
+  const durations = scenarioDurations(scheduleResult.duration, options.hiring === true, workType);
 
   const share = hybridShare(effortGrid.byStage, contractorStages, options.contractorStageShares);
   const hybridLines = blendLines(inhouseLines, contractorLines, share);

@@ -14,10 +14,10 @@
 |---|---:|---|---|
 | In-house cost | 1 016 178 ₽ | 220 000–280 000 ₽ | fail |
 | Contractor cost | 420 271 ₽ | 450 000–650 000 ₽ | fail |
-| In-house time | 1 нед. | 3-4 недели | fail |
-| Contractor time | 1 нед. | 2-3 недели | fail |
+| In-house time | 4 нед. | 3-4 недели | ok |
+| Contractor time | 4 нед. | 2-3 недели | fail |
 
-Провалено: in-house cost, contractor cost, in-house time, contractor time.
+Провалено: in-house cost, contractor cost, contractor time.
 
 ## CASE-01 · simple · Чат-бот
 
@@ -29,10 +29,10 @@
 |---|---:|---|---|
 | In-house cost | 1 016 178 ₽ | 220 000–280 000 ₽ | fail |
 | Contractor cost | 420 271 ₽ | 450 000–650 000 ₽ | fail |
-| In-house time | 1 нед. | 3-4 недели | fail |
-| Contractor time | 1 нед. | 2-3 недели | fail |
+| In-house time | 4 нед. | 3-4 недели | ok |
+| Contractor time | 4 нед. | 2-3 недели | fail |
 
-Провалено: in-house cost, contractor cost, in-house time, contractor time.
+Провалено: in-house cost, contractor cost, contractor time.
 
 ## CASE-02 · pro · observability
 
@@ -44,8 +44,8 @@
 |---|---:|---|---|
 | In-house cost | 6 602 047 ₽ | 600 000–700 000 ₽ | fail |
 | Contractor cost | 7 243 912 ₽ | 1 400 000–2 100 000 ₽ | fail |
-| In-house time | 10 нед. | 6-8 недель | fail |
-| Contractor time | 9 нед. | 4-6 недель | fail |
+| In-house time | 13 нед. | 6-8 недель | fail |
+| Contractor time | 12 нед. | 4-6 недель | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -59,8 +59,8 @@
 |---|---:|---|---|
 | In-house cost | 6 602 047 ₽ | 600 000–700 000 ₽ | fail |
 | Contractor cost | 7 243 912 ₽ | 1 400 000–2 100 000 ₽ | fail |
-| In-house time | 10 нед. | 6-8 недель | fail |
-| Contractor time | 9 нед. | 4-6 недель | fail |
+| In-house time | 13 нед. | 6-8 недель | fail |
+| Contractor time | 12 нед. | 4-6 недель | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -74,8 +74,8 @@
 |---|---:|---|---|
 | In-house cost | 5 150 896 ₽ | 1 100 000–1 300 000 ₽ | fail |
 | Contractor cost | 5 370 796 ₽ | 3 100 000–4 000 000 ₽ | fail |
-| In-house time | 6 нед. | 12-16 недель | fail |
-| Contractor time | 6 нед. | 8-10 недель | fail |
+| In-house time | 18 нед. | 12-16 недель | fail |
+| Contractor time | 16 нед. | 8-10 недель | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -89,8 +89,8 @@
 |---|---:|---|---|
 | In-house cost | 5 150 896 ₽ | 1 100 000–1 300 000 ₽ | fail |
 | Contractor cost | 5 370 796 ₽ | 3 100 000–4 000 000 ₽ | fail |
-| In-house time | 6 нед. | 12-16 недель | fail |
-| Contractor time | 6 нед. | 8-10 недель | fail |
+| In-house time | 18 нед. | 12-16 недель | fail |
+| Contractor time | 16 нед. | 8-10 недель | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -104,8 +104,8 @@
 |---|---:|---|---|
 | In-house cost | 10 507 758 ₽ | 2 400 000–2 800 000 ₽ | fail |
 | Contractor cost | 10 944 417 ₽ | 6 500 000–8 500 000 ₽ | fail |
-| In-house time | 12 нед. | 5-7 месяцев | fail |
-| Contractor time | 11 нед. | 3.5-5 месяцев | fail |
+| In-house time | 32 нед. | 5-7 месяцев | fail |
+| Contractor time | 28 нед. | 3.5-5 месяцев | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -119,8 +119,8 @@
 |---|---:|---|---|
 | In-house cost | 10 507 758 ₽ | 2 400 000–2 800 000 ₽ | fail |
 | Contractor cost | 10 944 417 ₽ | 6 500 000–8 500 000 ₽ | fail |
-| In-house time | 12 нед. | 5-7 месяцев | fail |
-| Contractor time | 11 нед. | 3.5-5 месяцев | fail |
+| In-house time | 32 нед. | 5-7 месяцев | fail |
+| Contractor time | 28 нед. | 3.5-5 месяцев | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -134,10 +134,10 @@
 |---|---:|---|---|
 | In-house cost | 7 396 639 ₽ | 4 800 000–5 500 000 ₽ | fail |
 | Contractor cost | 7 485 702 ₽ | 13 500 000–17 500 000 ₽ | fail |
-| In-house time | 7 нед. | 8-11 месяцев | fail |
-| Contractor time | 6 нед. | 5-7 месяцев | fail |
+| In-house time | 34 нед. | 8-11 месяцев | fail |
+| Contractor time | 29 нед. | 5-7 месяцев | ok |
 
-Провалено: in-house cost, contractor cost, in-house time, contractor time.
+Провалено: in-house cost, contractor cost, in-house time.
 
 ## CASE-05 · simple · Предиктивная аналитика
 
@@ -149,10 +149,10 @@
 |---|---:|---|---|
 | In-house cost | 7 396 639 ₽ | 4 800 000–5 500 000 ₽ | fail |
 | Contractor cost | 7 485 702 ₽ | 13 500 000–17 500 000 ₽ | fail |
-| In-house time | 7 нед. | 8-11 месяцев | fail |
-| Contractor time | 6 нед. | 5-7 месяцев | fail |
+| In-house time | 34 нед. | 8-11 месяцев | fail |
+| Contractor time | 29 нед. | 5-7 месяцев | ok |
 
-Провалено: in-house cost, contractor cost, in-house time, contractor time.
+Провалено: in-house cost, contractor cost, in-house time.
 
 ## CASE-06 · pro · Интеграция систем
 
@@ -164,8 +164,8 @@
 |---|---:|---|---|
 | In-house cost | 2 198 863 ₽ | 1 100 000–1 400 000 ₽ | fail |
 | Contractor cost | 1 547 469 ₽ | 2 800 000–4 000 000 ₽ | fail |
-| In-house time | 3 нед. | 2.5-3.5 месяца | fail |
-| Contractor time | 3 нед. | 1.5-2.5 месяца | fail |
+| In-house time | 5 нед. | 2.5-3.5 месяца | fail |
+| Contractor time | 5 нед. | 1.5-2.5 месяца | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -179,8 +179,8 @@
 |---|---:|---|---|
 | In-house cost | 2 198 863 ₽ | 1 100 000–1 400 000 ₽ | fail |
 | Contractor cost | 1 547 469 ₽ | 2 800 000–4 000 000 ₽ | fail |
-| In-house time | 3 нед. | 2.5-3.5 месяца | fail |
-| Contractor time | 3 нед. | 1.5-2.5 месяца | fail |
+| In-house time | 5 нед. | 2.5-3.5 месяца | fail |
+| Contractor time | 5 нед. | 1.5-2.5 месяца | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -194,10 +194,10 @@
 |---|---:|---|---|
 | In-house cost | 5 150 896 ₽ | 1 900 000–2 400 000 ₽ | fail |
 | Contractor cost | 5 370 796 ₽ | 5 500 000–7 500 000 ₽ | fail |
-| In-house time | 6 нед. | 4-6 месяцев | fail |
-| Contractor time | 6 нед. | 2.5-4 месяца | fail |
+| In-house time | 18 нед. | 4-6 месяцев | ok |
+| Contractor time | 16 нед. | 2.5-4 месяца | ok |
 
-Провалено: in-house cost, contractor cost, in-house time, contractor time.
+Провалено: in-house cost, contractor cost.
 
 ## CASE-07 · simple · Computer Vision
 
@@ -209,10 +209,10 @@
 |---|---:|---|---|
 | In-house cost | 5 150 896 ₽ | 1 900 000–2 400 000 ₽ | fail |
 | Contractor cost | 5 370 796 ₽ | 5 500 000–7 500 000 ₽ | fail |
-| In-house time | 6 нед. | 4-6 месяцев | fail |
-| Contractor time | 6 нед. | 2.5-4 месяца | fail |
+| In-house time | 18 нед. | 4-6 месяцев | ok |
+| Contractor time | 16 нед. | 2.5-4 месяца | ok |
 
-Провалено: in-house cost, contractor cost, in-house time, contractor time.
+Провалено: in-house cost, contractor cost.
 
 ## CASE-08 · pro · Сопровождение
 
@@ -224,8 +224,8 @@
 |---|---:|---|---|
 | In-house cost | 27 327 867 ₽ | 26 000 000–30 000 000 ₽ | ok |
 | Contractor cost | 36 503 045 ₽ | 11 000 000–14 000 000 ₽ | fail |
-| In-house time | 46 нед. | 1 год (развертывание 3-4 мес.) | fail |
-| Contractor time | 40 нед. | 1 год (подключение 3-4 нед.) | fail |
+| In-house time | 52 нед. | 1 год (развертывание 3-4 мес.) | fail |
+| Contractor time | 45 нед. | 1 год (подключение 3-4 нед.) | fail |
 
 Провалено: contractor cost, in-house time, contractor time.
 
@@ -239,10 +239,10 @@
 |---|---:|---|---|
 | In-house cost | 31 926 329 ₽ | 26 000 000–30 000 000 ₽ | fail |
 | Contractor cost | 40 198 321 ₽ | 11 000 000–14 000 000 ₽ | fail |
-| In-house time | 16 нед. | 1 год (развертывание 3-4 мес.) | ok |
-| Contractor time | 14 нед. | 1 год (подключение 3-4 нед.) | fail |
+| In-house time | 52 нед. | 1 год (развертывание 3-4 мес.) | fail |
+| Contractor time | 45 нед. | 1 год (подключение 3-4 нед.) | fail |
 
-Провалено: in-house cost, contractor cost, contractor time.
+Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
 ## CASE-09 · pro · Мобильная разработка
 
@@ -254,8 +254,8 @@
 |---|---:|---|---|
 | In-house cost | 2 684 053 ₽ | 2 000 000–2 500 000 ₽ | fail |
 | Contractor cost | 2 408 349 ₽ | 5 500 000–7 500 000 ₽ | fail |
-| In-house time | 3 нед. | 4-5 месяцев | fail |
-| Contractor time | 3 нед. | 2.5-3.5 месяца | fail |
+| In-house time | 5 нед. | 4-5 месяцев | fail |
+| Contractor time | 5 нед. | 2.5-3.5 месяца | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -269,8 +269,8 @@
 |---|---:|---|---|
 | In-house cost | 2 684 053 ₽ | 2 000 000–2 500 000 ₽ | fail |
 | Contractor cost | 2 408 349 ₽ | 5 500 000–7 500 000 ₽ | fail |
-| In-house time | 3 нед. | 4-5 месяцев | fail |
-| Contractor time | 3 нед. | 2.5-3.5 месяца | fail |
+| In-house time | 5 нед. | 4-5 месяцев | fail |
+| Contractor time | 5 нед. | 2.5-3.5 месяца | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -284,8 +284,8 @@
 |---|---:|---|---|
 | In-house cost | 19 269 267 ₽ | 14 000 000–16 000 000 ₽ | fail |
 | Contractor cost | 24 658 664 ₽ | 39 000 000–52 000 000 ₽ | fail |
-| In-house time | 27 нед. | 12-16 месяцев | fail |
-| Contractor time | 23 нед. | 6-9 месяцев | fail |
+| In-house time | 52 нед. | 12-16 месяцев | fail |
+| Contractor time | 45 нед. | 6-9 месяцев | fail |
 
 Провалено: in-house cost, contractor cost, in-house time, contractor time.
 
@@ -299,8 +299,8 @@
 |---|---:|---|---|
 | In-house cost | 14 730 850 ₽ | 14 000 000–16 000 000 ₽ | ok |
 | Contractor cost | 18 578 483 ₽ | 39 000 000–52 000 000 ₽ | fail |
-| In-house time | 20 нед. | 12-16 месяцев | fail |
-| Contractor time | 17 нед. | 6-9 месяцев | fail |
+| In-house time | 45 нед. | 12-16 месяцев | fail |
+| Contractor time | 39 нед. | 6-9 месяцев | ok |
 
-Провалено: contractor cost, in-house time, contractor time.
+Провалено: contractor cost, in-house time.
 

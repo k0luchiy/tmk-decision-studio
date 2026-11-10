@@ -7,19 +7,19 @@
       "id": "d1",
       "verdict": "parity",
       "p50Rub": 4376925,
-      "weeks": 7
+      "weeks": 11
     },
     {
       "id": "d2",
       "verdict": "parity",
       "p50Rub": 3596844,
-      "weeks": 5
+      "weeks": 7
     },
     {
       "id": "d3",
       "verdict": "hybrid",
       "p50Rub": 25084031,
-      "weeks": 43
+      "weeks": 48
     }
   ]
 }

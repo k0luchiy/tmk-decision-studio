@@ -11,6 +11,7 @@
  */
 
 import type { Duration } from '@app/contract';
+import { calendarAssumption } from '../schedule/assumptions.js';
 
 /** Hiring + onboarding delay added to the in-house schedule, weeks. */
 export const HIRING_WEEKS = 2;
@@ -54,6 +55,19 @@ function inhouseDuration(base: Duration, hiring: boolean): Duration {
   };
 }
 
+function calendarize(base: Duration, workType: string): Duration {
+  const assumption = calendarAssumption(workType);
+  const scale = Math.min(1, Math.max(0, base.p50Weeks / 12));
+  const lag = assumption.stageLagWeeks.reduce((sum, value) => sum + value, 0) * scale;
+  const buffer = Math.ceil(lag + assumption.pilotWeeks);
+  const floor = assumption.supportTermWeeks ?? assumption.minCalendarWeeks;
+  const p50Weeks = Math.max(floor, base.p50Weeks + buffer);
+  const p10Weeks = Math.min(p50Weeks, Math.max(1, base.p10Weeks + buffer));
+  const p80Weeks = Math.max(p50Weeks, base.p80Weeks + buffer);
+  const p90Weeks = Math.max(p80Weeks, base.p90Weeks + buffer);
+  return { p10Weeks, p50Weeks, p80Weeks, p90Weeks, criticalPath: [...base.criticalPath] };
+}
+
 /** Result of {@link scenarioDurations}. */
 export interface ScenarioDurations {
   inhouse: Duration;
@@ -68,11 +82,16 @@ export interface ScenarioDurations {
  * projects; the hybrid median is nudged to at least one week above the
  * contractor so the three scenarios stay distinguishable.
  */
-export function scenarioDurations(base: Duration, hiring: boolean): ScenarioDurations {
-  const contractor = scaledDuration(base, CONTRACTOR_DURATION_FACTOR);
-  const hybrid = scaledDuration(base, HYBRID_DURATION_FACTOR, contractor.p50Weeks + 1);
+export function scenarioDurations(
+  base: Duration,
+  hiring: boolean,
+  workType = 'default',
+): ScenarioDurations {
+  const calendarBase = calendarize(base, workType);
+  const contractor = scaledDuration(calendarBase, CONTRACTOR_DURATION_FACTOR);
+  const hybrid = scaledDuration(calendarBase, HYBRID_DURATION_FACTOR, contractor.p50Weeks + 1);
   return {
-    inhouse: inhouseDuration(base, hiring),
+    inhouse: inhouseDuration(calendarBase, hiring),
     contractor,
     hybrid,
   };
