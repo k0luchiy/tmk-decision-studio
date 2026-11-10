@@ -120,10 +120,10 @@ export default function StartScreen({ onStart, onLoadCase, onOpenSaved, saved })
         <aside className="start-side">
           <div className="start-side-head">
             <div className="eyebrow">РЕЗУЛЬТАТ</div>
-            <h3>Что в отчёте</h3>
+            <h3>Состав отчёта</h3>
           </div>
           <div className="start-benefits">
-            <div><span><Layers3 size={16} /></span><div><b>Три сценария</b><small>Команда, подрядчик и гибрид на одной декомпозиции.</small></div></div>
+            <div><span><Layers3 size={16} /></span><div><b>Три сценария</b><small>Команда, подрядчик и гибрид.</small></div></div>
             <div><span><ShieldCheck size={16} /></span><div><b>Срок и стоимость</b><small>P10–P90, TCO и break-even.</small></div></div>
             <div><span><Database size={16} /></span><div><b>Источники</b><small>Аналоги, ставки и допущения с датой.</small></div></div>
             <div><span><FileText size={16} /></span><div><b>Экспорт</b><small>PDF, XLSX и JSON.</small></div></div>

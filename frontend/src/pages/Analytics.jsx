@@ -384,7 +384,7 @@ export default function Analytics({ model, active, setActive, onDeadlineChange, 
         <div>
           <div className="eyebrow">ШАГ 02 · РАСЧЁТ И СРАВНЕНИЕ</div>
           <h1>Аналитика сценариев</h1>
-          <p>Шесть представлений одной модели: стоимость, сроки, владение, break-even, чувствительность и распределение.</p>
+          <p>Стоимость, сроки, TCO, break-even, чувствительность и распределение.</p>
         </div>
         <div className="page-heading-side">
           <Pill tone="good"><Sparkles size={12} /> Рекомендуем: {SCENARIO_META[model.recommended].shortName}</Pill>

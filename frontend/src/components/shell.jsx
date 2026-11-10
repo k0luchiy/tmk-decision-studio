@@ -178,7 +178,7 @@ export function ScenarioStrip({ model, active, setActive, goTab }) {
       <div className="scenario-strip-head">
         <div>
           <span className="eyebrow">ТРИ ВАРИАНТА РЕАЛИЗАЦИИ</span>
-          <h2>Что предлагаем и что смотрим сейчас</h2>
+          <h2>Сценарии</h2>
         </div>
         <span className="scenario-strip-note">Единая декомпозиция работ · диапазон P10–P90</span>
       </div>
@@ -337,7 +337,7 @@ export function Recommendation({ model, rationale, goTab, onExport, active }) {
         </div>
         <div className="recommendation-actions">
           <Button variant="primary" icon={FileText} onClick={() => goTab('justification')}>
-            {isRecommended ? 'Почему так? Открыть обоснование' : 'К обоснованию рекомендации'}
+            Обоснование
           </Button>
           <Button variant="dark-ghost" icon={ArrowRight} onClick={() => goTab('parameters')}>Изменить условия</Button>
           <button type="button" className="recommendation-export" onClick={onExport}>
@@ -350,7 +350,7 @@ export function Recommendation({ model, rationale, goTab, onExport, active }) {
           <Ring value={model.confidence.score} size={150} />
           <div className="ring-caption">
             <b>Уверенность оценки</b>
-            <span>Индикатор качества входных данных, а не вероятность точности</span>
+            <span>Качество входных данных</span>
           </div>
         </div>
         <div className="confidence-factors">

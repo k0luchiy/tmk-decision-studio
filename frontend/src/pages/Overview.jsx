@@ -31,7 +31,7 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
         <section className="panel">
           <SectionHead
             eyebrow="СТРУКТУРА"
-            title="Из чего складывается оценка"
+            title="Структура оценки"
             description={`${selectedMeta.name}: работы, внешние статьи и резерв`}
             actions={<LinkButton onClick={() => goTab('estimate')}>Все этапы</LinkButton>}
           />
@@ -61,7 +61,7 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
         <section className="panel">
           <SectionHead
             eyebrow="ЛОГИКА ВЫБОРА"
-            title="Что повлияло на рекомендацию"
+            title="Факторы рекомендации"
             description="Взвешенная оценка по четырём факторам"
             actions={<Pill tone="good"><Sparkles size={11} /> {recommendedMeta.shortName}</Pill>}
           />
@@ -94,7 +94,7 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
               </div>
             ))}
           </div>
-          <LinkButton onClick={() => goTab('justification')}>Полная методика выбора и веса факторов</LinkButton>
+          <LinkButton onClick={() => goTab('justification')}>Методика и веса факторов</LinkButton>
         </section>
       </div>
 
@@ -110,7 +110,7 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
       )}
 
       <div className="overview-actions">
-        <div><Users size={16} /><span>Хотите изменить состав команды или ответственность подрядчика?</span></div>
+        <div><Users size={16} /><span>Изменить состав команды и ответственность подрядчика</span></div>
         <Button variant="secondary" rightIcon={ArrowRight} onClick={() => goTab('parameters')}>Настроить сценарии</Button>
         <Button variant="ghost" rightIcon={ArrowRight} onClick={() => goTab('analytics')}>Открыть графики</Button>
       </div>

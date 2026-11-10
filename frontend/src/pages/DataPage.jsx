@@ -68,7 +68,7 @@ export default function DataPage() {
         <div>
           <div className="eyebrow">TMK DECISION STUDIO · DATA GOVERNANCE</div>
           <h1>Данные и источники</h1>
-          <p>Реестр наборов, импорт HelpDesk и контроль качества. Версии фиксируются для воспроизводимости оценки.</p>
+          <p>Наборы данных, импорт HelpDesk и проверка качества. Версии фиксируются.</p>
         </div>
         <div className="page-heading-side">
           <Pill tone="good"><ShieldCheck size={12} /> Прослеживаемость</Pill>

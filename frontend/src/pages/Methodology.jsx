@@ -194,7 +194,7 @@ export default function Methodology({ goTab }) {
 
       <div className="method-bottom">
         <section className="panel limitation-panel">
-          <SectionHead eyebrow="ОГРАНИЧЕНИЯ" title="Что методика не утверждает" description="Честные границы прототипа" />
+          <SectionHead eyebrow="ОГРАНИЧЕНИЯ" title="Границы применимости" description="Ограничения прототипа" />
           <ul className="limitation-list">
             <li><AlertTriangle size={14} /> Не заменяет детальную смету, техническое обследование и коммерческое предложение.</li>
             <li><AlertTriangle size={14} /> Ставки, аналоги и риски — демонстрационные, не подтверждённые данные ТМК.</li>
@@ -205,7 +205,7 @@ export default function Methodology({ goTab }) {
         </section>
         <section className="panel method-cta">
           <Target size={22} />
-          <h3>Проверить на конкретной задаче</h3>
+          <h3>Проверить на задаче</h3>
           <p>Откройте параметры, измените ставку, резерв, срок или доли гибрида — и посмотрите, как меняется рекомендация.</p>
           <div className="method-cta-actions">
             <Button variant="primary" rightIcon={ArrowRight} onClick={() => goTab('parameters')}>К параметрам</Button>

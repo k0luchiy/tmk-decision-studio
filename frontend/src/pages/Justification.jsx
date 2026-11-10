@@ -21,9 +21,9 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
     <div className="page-stack">
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ШАГ 04 · ПРОВЕРЯЕМОСТЬ</div>
+          <div className="eyebrow">ШАГ 04 · ОБОСНОВАНИЕ</div>
           <h1>Обоснование оценки</h1>
-          <p>Откуда взялись цифры, какие допущения использованы и что может изменить результат.</p>
+          <p>Источники цифр, допущения и влияющие факторы.</p>
         </div>
         <div className="page-heading-side">
           <Pill tone="warn"><AlertTriangle size={12} /> Часть данных — демо</Pill>
@@ -49,9 +49,9 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
         </section>
 
         <aside className="export-card">
-          <div className="eyebrow light">РЕЗУЛЬТАТ ДЛЯ СОГЛАСОВАНИЯ</div>
+          <div className="eyebrow light">ЭКСПОРТ</div>
           <h3>Сформировать документ</h3>
-          <p>Вердикт, сценарии, допущения, риски, аналоги и источники — в одном файле.</p>
+          <p>Вердикт, сценарии, допущения, риски и источники.</p>
           <ul>
             <li><Check size={13} /> Рекомендация и диапазоны P10–P90</li>
             <li><Check size={13} /> Допущения и реестр рисков</li>
@@ -72,7 +72,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
         <section className="panel confidence-panel">
           <SectionHead
             eyebrow="CONFIDENCE"
-            title="Из чего сложилась уверенность"
+            title="Факторы уверенности"
             description={`${model.confidence.score}% · ${model.confidence.score >= 75 ? 'средне-высокая' : model.confidence.score >= 60 ? 'средняя' : 'требует уточнения'}`}
             actions={<Ring value={model.confidence.score} size={92} label="score" />}
           />
@@ -90,16 +90,16 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
           </div>
           <div className="confidence-formula">
             <code>Score = 0,30 × бриф + 0,30 × согласие методов + 0,20 × аналоги + 0,20 × данные</code>
-            <span>Confidence — индикатор качества входных данных, а не вероятность точной стоимости.</span>
+            <span>Confidence отражает качество входных данных.</span>
           </div>
           <div className="confidence-drivers">
             <div className="driver good">
               <CheckCircle2 size={15} />
-              <div><b>Что повышает</b><span>{model.confidence.components.slice().sort((a, b) => b.value - a.value)[0].label}: {model.confidence.components.slice().sort((a, b) => b.value - a.value)[0].value}%</span></div>
+              <div><b>Повышает</b><span>{model.confidence.components.slice().sort((a, b) => b.value - a.value)[0].label}: {model.confidence.components.slice().sort((a, b) => b.value - a.value)[0].value}%</span></div>
             </div>
             <div className="driver warn">
               <AlertTriangle size={15} />
-              <div><b>Что снижает</b><span>{model.confidence.components.slice().sort((a, b) => a.value - b.value)[0].label}: {model.confidence.components.slice().sort((a, b) => a.value - b.value)[0].value}%</span></div>
+              <div><b>Снижает</b><span>{model.confidence.components.slice().sort((a, b) => a.value - b.value)[0].label}: {model.confidence.components.slice().sort((a, b) => a.value - b.value)[0].value}%</span></div>
             </div>
           </div>
         </section>
@@ -107,7 +107,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
         <section className="panel assumptions-panel">
           <SectionHead
             eyebrow="ДОПУЩЕНИЯ"
-            title="Что принято на веру"
+            title="Допущения"
             description="Значение, диапазон, источник и чувствительность"
           />
           <div className="assumption-list">
@@ -166,7 +166,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
       <section className="panel analogs-panel">
         <SectionHead
           eyebrow="РЫНОЧНЫЕ АНАЛОГИ"
-          title="С чем сравнили"
+          title="Аналоги"
           description="≥ 3 аналога с источником, датой и коэффициентом приведения к сопоставимому объёму"
           actions={<Pill tone="info">Медиана: {fmtMoney(model.analogMedian)}</Pill>}
         />
@@ -197,8 +197,8 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
         <section className="panel sources-panel">
           <SectionHead
             eyebrow="ИСТОЧНИКИ"
-            title="Происхождение данных"
-            description="Каждый показатель должен иметь версию, дату и метод"
+            title="Источники"
+            description="Версия, дата и метод"
           />
           <div className="source-list">
             <div className="source-row">
@@ -228,8 +228,8 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
         <section className="panel limitation-panel">
           <SectionHead
             eyebrow="ГРАНИЦЫ"
-            title="Чего мы не делаем"
-            description="Честные ограничения прототипа"
+            title="Ограничения"
+            description="Ограничения прототипа"
           />
           <ul className="limitation-list">
             <li><AlertTriangle size={14} /> Не заменяет техническое обследование и коммерческое предложение.</li>
@@ -238,7 +238,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
             <li><AlertTriangle size={14} /> Риски и сроки требуют проверки владельцами задачи.</li>
           </ul>
           <div className="limitation-foot">
-            <b>Что дальше</b>
+            <b>Дальнейшие шаги</b>
             <span>Пилот на 10–15 закрытых проектах: цель MAPE ≤ 30% и покрытие P80 ≥ 80%.</span>
           </div>
           <Button variant="secondary" rightIcon={ArrowRight} onClick={() => goTab('method')}>Открыть методику</Button>
