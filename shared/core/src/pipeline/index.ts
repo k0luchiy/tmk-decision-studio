@@ -33,6 +33,12 @@ import { adjustScenarios, simulateScenarios } from './adjust.js';
 import { buildDistribution, buildSensitivity, winnerKey } from './insights.js';
 import { buildAssumptions, buildRisks, toContractAnalogues } from './dataBridge.js';
 import { scenarioDurations } from './durations.js';
+import {
+  calendarMinWeeks,
+  calendarPilotWeeks,
+  calendarStageLags,
+  calendarSupportTermWeeks,
+} from '../schedule/assumptions.js';
 import { buildScenarioVerdict } from './verdict.js';
 import {
   combineEffort,
@@ -152,6 +158,18 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     ...(options.targetWeeks === undefined ? {} : { targetWeeks: options.targetWeeks }),
   });
   const durations = scenarioDurations(scheduleResult.duration, options.hiring === true, workType);
+  const stageLags = calendarStageLags(workType, scheduleResult.duration.p50Weeks);
+  const calendar = {
+    workType,
+    effortP50Weeks: scheduleResult.duration.p50Weeks,
+    stageLags: stageLags.map((weeks, index) => ({ stage: index + 1, weeks })),
+    lagWeeks: stageLags.reduce((sum, value) => sum + value, 0),
+    pilotWeeks: calendarPilotWeeks(workType),
+    minCalendarWeeks: calendarMinWeeks(workType),
+    ...(calendarSupportTermWeeks(workType) === undefined
+      ? {}
+      : { supportTermWeeks: calendarSupportTermWeeks(workType) }),
+  };
 
   const share = hybridShare(effortGrid.byStage, contractorStages, options.contractorStageShares);
   const hybridLines = blendLines(inhouseLines, contractorLines, share);
@@ -242,5 +260,6 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     sensitivity: buildSensitivity(adjusted.lines[winnerCode], winnerCost.p50),
     distribution: buildDistribution(winnerCost.histogram),
     methodDivergence: combined.divergence,
+    calendar,
   };
 }

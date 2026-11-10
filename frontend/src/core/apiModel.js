@@ -242,6 +242,7 @@ export function buildModelFromApi(response, state) {
     effortRange: { p10: Number(response.effortGrid?.p10Hours) || 0, p90: Number(response.effortGrid?.p90Hours) || 0 },
     stageRows, stageDays, scenarios, recommended, ranking: [...scores].sort((a, b) => b.total - a.total), scores, confidence,
     analogMedian, methodDiff, breakEven, breakEvenSeries, tcoSeries, sensitivity, distribution,
+    calendar: response.calendar ?? null,
     risks, risksTotal: sum(risks, (risk) => risk.expected), warnings, pending: 0,
     rawWeeks: { internal: scenarios.internal.rawWeeks, vendor: scenarios.vendor.rawWeeks, hybrid: scenarios.hybrid.rawWeeks },
     deadline: { weeks: Number(state.deadlineWeeks) || 0, compressedScenarios }, estimateId: response.id, api: true,

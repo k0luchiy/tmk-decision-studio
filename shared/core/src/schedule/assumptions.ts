@@ -34,3 +34,21 @@ export function calendarBufferWeeks(workType: string, effortWeeks: number): numb
   const lag = assumption.stageLagWeeks.reduce((sum, value) => sum + value, 0) * scale;
   return Math.ceil(lag + assumption.pilotWeeks);
 }
+
+export function calendarStageLags(workType: string, effortWeeks: number): number[] {
+  const assumption = calendarAssumption(workType);
+  const scale = Math.min(1, Math.max(0, effortWeeks / 12));
+  return assumption.stageLagWeeks.map((value) => Number((value * scale).toFixed(2)));
+}
+
+export function calendarPilotWeeks(workType: string): number {
+  return calendarAssumption(workType).pilotWeeks;
+}
+
+export function calendarMinWeeks(workType: string): number {
+  return calendarAssumption(workType).minCalendarWeeks;
+}
+
+export function calendarSupportTermWeeks(workType: string): number | undefined {
+  return calendarAssumption(workType).supportTermWeeks;
+}

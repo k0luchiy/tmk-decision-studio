@@ -97,6 +97,26 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
         </section>
       </div>
 
+      {model.calendar && (
+        <section className="panel calendar-note">
+          <div className="calendar-note-head">
+            <span className="calendar-note-icon"><Clock3 size={16} /></span>
+            <div>
+              <b>Календарные допущения</b>
+              <span>Почему срок именно такой: работа + организационные буферы</span>
+            </div>
+            <Pill tone="info">{fmtWeeks(recommended.weeks)} в рекомендации</Pill>
+          </div>
+          <div className="calendar-note-chips">
+            <span>Работа: <b>{fmtWeeks(model.calendar.effortP50Weeks)}</b></span>
+            <span>Лаги этапов: <b>{fmtWeeks(model.calendar.lagWeeks)}</b></span>
+            {model.calendar.pilotWeeks > 0 && <span>Пилот: <b>{fmtWeeks(model.calendar.pilotWeeks)}</b></span>}
+            {model.calendar.supportTermWeeks && <span>Контракт support: <b>{fmtWeeks(model.calendar.supportTermWeeks)}</b></span>}
+            <span>Минимум: <b>{fmtWeeks(model.calendar.minCalendarWeeks)}</b></span>
+          </div>
+        </section>
+      )}
+
       {model.warnings.length > 0 && (
         <div className="overview-alert">
           <AlertTriangle size={16} />

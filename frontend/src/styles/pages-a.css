@@ -427,3 +427,13 @@
 .datahub-format p { margin: 0 0 4px; }
 .datahub-format code { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink); }
 .datahub-schedule { display: flex; align-items: center; gap: 5px; margin: -4px 0 14px; font-size: 9.5px; color: var(--muted); }
+
+.calendar-note { padding: 16px 18px; }
+.calendar-note-head { display: flex; align-items: center; gap: 10px; }
+.calendar-note-icon { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); color: var(--accent); }
+.calendar-note-head > div { flex: 1; }
+.calendar-note-head b { display: block; font-size: 12px; }
+.calendar-note-head span { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
+.calendar-note-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.calendar-note-chips span { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 10px; color: var(--muted); background: var(--surface-2); }
+.calendar-note-chips b { color: var(--ink); font-weight: 600; }

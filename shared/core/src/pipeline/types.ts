@@ -81,6 +81,16 @@ export interface DistributionBin {
   count: number;
 }
 
+export interface CalendarBreakdown {
+  workType: string;
+  effortP50Weeks: number;
+  stageLags: { stage: number; weeks: number }[];
+  lagWeeks: number;
+  pilotWeeks: number;
+  minCalendarWeeks: number;
+  supportTermWeeks?: number;
+}
+
 /** Result of {@link estimateTask}. */
 export interface EstimateTaskResult {
   estimates: {
@@ -98,4 +108,5 @@ export interface EstimateTaskResult {
   distribution: DistributionBin[];
   /** Relative spread `max / min − 1` between methods A/B/C. */
   methodDivergence: number;
+  calendar: CalendarBreakdown;
 }
