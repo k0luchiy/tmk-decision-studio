@@ -87,10 +87,9 @@ export default function Methodology({ goTab }) {
       <section className="method-hero">
         <div>
           <div className="eyebrow light">МЕТОДИКА · ВЕРСИЯ 1.0 · DATASET 47A8FB6B…</div>
-          <h1>Каждая цифра должна иметь объяснение</h1>
+          <h1>Как считается оценка</h1>
           <p>
-            TMK Decision Studio считает три сценария из одной декомпозиции. Показываем формулу, исходные параметры,
-            источники, допущения и границы применимости — чтобы расчёт можно было проверить, а не принять на веру.
+            Три сценария из одной декомпозиции. Формулы, параметры, источники и допущения.
           </p>
         </div>
         <div className="method-hero-mark"><BookOpen size={34} /><span>METHOD</span></div>

@@ -183,7 +183,7 @@ export default function DataPage() {
             description="У каждой цифры — источник, дата и метод"
           />
           <div className="provenance-list">
-            <div><span className="prov-dot good" /><div><b>Подтверждено</b><small>Есть проверяемый источник и дата</small></div></div>
+            <div><span className="prov-dot good" /><div><b>Подтверждено</b><small>Источник и дата указаны</small></div></div>
             <div><span className="prov-dot info" /><div><b>Расчёт</b><small>Получено по формуле из входных данных</small></div></div>
             <div><span className="prov-dot warn" /><div><b>Допущение</b><small>Требует проверки владельцем задачи</small></div></div>
             <div><span className="prov-dot neutral" /><div><b>Демо</b><small>Условное значение для прототипа</small></div></div>

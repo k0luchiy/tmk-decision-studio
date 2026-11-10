@@ -191,7 +191,6 @@
 
 @media (max-width: 1024px) {
   .start-hero { grid-template-columns: 1fr; }
-  .hero-preview { margin: 0 22px 22px; }
   .start-hero-copy { padding-bottom: 28px; }
   .start-grid { grid-template-columns: 1fr; }
   .start-lower { grid-template-columns: 1fr; }
@@ -283,7 +282,6 @@
   .start-hero-copy h1 { font-size: 52px; }
   .hero-stats { gap: 18px; flex-wrap: wrap; }
   .hero-stats b { font-size: 23px; }
-  .hero-preview { margin: 0 12px 12px; padding: 20px; }
   .new-assessment, .start-side, .start-steps, .start-recent { padding: 20px; }
   .dropzone { flex-wrap: wrap; }
   .dropzone-action { margin-left: 0; }
