@@ -41,7 +41,7 @@ npm --prefix backend run typecheck
 OPENCODE_API_KEY='...' JEV_MODEL=jev-1.13-free INTAKE_MODE=live npm --prefix backend run dev
 ```
 
-`.env` в git не коммитится; шаблон — `backend/.env.example`. Если ключа нет,
+`backend/.env` загружается автоматически при старте backend; в git он не коммитится, шаблон — `backend/.env.example`. Если ключа нет,
 `POST /api/intake` вернёт `status: "rules"` или `"jev-cache"`, а расчёт и
 экспорт продолжат работать.
 

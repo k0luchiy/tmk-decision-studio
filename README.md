@@ -113,7 +113,7 @@ Jev (System One) используется **только для классифи
 | `INTAKE_MODE` | `cache` \| `live` | `cache` — коммитнутый кэш ответов; `live` — реальный вызов Jev |
 
 ```bash
-cp backend/.env.example backend/.env        # заполните OPENCODE_API_KEY локально
+cp backend/.env.example backend/.env        # backend загрузит его автоматически; заполните ключ
 OPENCODE_API_KEY='...' JEV_MODEL=jev-1.13-free INTAKE_MODE=live npm run dev:api
 ```
 
