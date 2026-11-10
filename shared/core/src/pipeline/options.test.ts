@@ -127,6 +127,25 @@ describe('estimateTask UI parity options', () => {
     }
   });
 
+  it('reservePct keeps cost lines summing to p50 (±1 ₽)', () => {
+    const variants: EstimateTaskOptions[] = [
+      { reservePct: 0.15 },
+      { reservePct: 0.15, extras: [{ label: 'Лицензии', amountRub: 100_000 }] },
+      { reservePct: 0.15, targetWeeks: 10 },
+    ];
+    for (const options of variants) {
+      const result = run(options);
+      for (const key of ['inhouse', 'contractor', 'hybrid'] as const) {
+        const estimate = result.estimates[key];
+        const lineSum = estimate.cost.lines.reduce((sum, line) => sum + line.valueRub, 0);
+        expect(Math.abs(lineSum - estimate.cost.p50Rub)).toBeLessThanOrEqual(1);
+        expect(
+          estimate.cost.lines.some((line) => line.group === 'risk' && line.label.includes('Резерв')),
+        ).toBe(true);
+      }
+    }
+  });
+
   it('is deterministic with the same seed when extras and deadline are set', () => {
     const options: EstimateTaskOptions = {
       targetWeeks: 12,

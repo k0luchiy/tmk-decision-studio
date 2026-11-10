@@ -51,6 +51,26 @@ function extraLines(extras: readonly EstimateExtra[], scenario: ExtraTarget): Co
     }));
 }
 
+function reserveLine(
+  scenario: ScenarioResult,
+  lines: readonly CostLine[],
+  reservePct: number,
+): CostLine | undefined {
+  if (!(reservePct > 0)) return undefined;
+  const base = sumLines(lines);
+  if (base <= 0) return undefined;
+  const pct = Number((reservePct * 100).toFixed(2));
+  return {
+    id: `risk:reserve:${scenario.code}`,
+    group: 'risk',
+    label: `Резерв (${pct}%)`,
+    formula: `Σ строк × ${pct}%`,
+    inputRefs: [],
+    valueRub: base * reservePct,
+    status: 'assumption',
+  };
+}
+
 function compressionLine(scenario: ScenarioResult, factor: number): CostLine | undefined {
   if (factor <= 1) return undefined;
   return {
@@ -87,10 +107,13 @@ function adjustOne(
   lines: readonly CostLine[],
   factor: number,
   extras: readonly EstimateExtra[],
+  reservePct: number,
 ): { scenario: ScenarioResult; lines: CostLine[] } {
   const additions = extraLines(extras, scenario.code);
   const extrasRub = additions.reduce((sum, line) => sum + line.valueRub, 0);
   const nextLines = [...lines];
+  const reserve = reserveLine(scenario, lines, reservePct);
+  if (reserve !== undefined) nextLines.push(reserve);
   const compressed = compressionLine(scenario, factor);
   if (compressed !== undefined) nextLines.push(compressed);
   nextLines.push(...additions);
@@ -117,14 +140,22 @@ export function adjustScenarios(args: {
   lines: LineSet;
   compressionFactor: number;
   extras: readonly EstimateExtra[];
+  reservePct?: number;
 }): { scenarios: ScenarioSet; lines: LineSet } {
   const factor =
     Number.isFinite(args.compressionFactor) && args.compressionFactor > 0
       ? args.compressionFactor
       : 1;
-  const inhouse = adjustOne(args.scenarios.inhouse, args.lines.inhouse, factor, args.extras);
-  const contractor = adjustOne(args.scenarios.contractor, args.lines.contractor, factor, args.extras);
-  const hybrid = adjustOne(args.scenarios.hybrid, args.lines.hybrid, factor, args.extras);
+  const reservePct = args.reservePct ?? 0;
+  const inhouse = adjustOne(args.scenarios.inhouse, args.lines.inhouse, factor, args.extras, reservePct);
+  const contractor = adjustOne(
+    args.scenarios.contractor,
+    args.lines.contractor,
+    factor,
+    args.extras,
+    reservePct,
+  );
+  const hybrid = adjustOne(args.scenarios.hybrid, args.lines.hybrid, factor, args.extras, reservePct);
   const base = profile(inhouse.scenario);
   return {
     scenarios: {

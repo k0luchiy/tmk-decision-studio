@@ -76,7 +76,11 @@ test('confidence, stage rows and effort are adapted for the UI', () => {
 
 test('mapStateToRequest sends confirmed params and options', () => {
   const state = createCaseState('D1');
-  const request = mapStateToRequest(state);
+  const clean = mapStateToRequest(state);
+  assert.ok(!Object.prototype.hasOwnProperty.call(clean.options, 'teamRate'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(clean.options, 'stageHours'));
+
+  const request = mapStateToRequest(state, { rateDirty: true, stageHoursDirty: true });
 
   assert.equal(request.params.length, 5);
   for (const param of request.params) {
@@ -161,4 +165,58 @@ test('mapContractorStages maps vendor/split stages and falls back to [3]', () =>
     [4, 5],
   );
   assert.deepEqual(mapContractorStages([]), [3]);
+});
+
+test('work type accepts English backend keys and Russian labels', () => {
+  const base = createCaseState('D1');
+  const workType = (type) =>
+    mapStateToRequest({ ...base, type }, { rateDirty: false, stageHoursDirty: false }).params.find(
+      (param) => param.key === 'work_type',
+    ).value;
+
+  assert.equal(workType('integration'), 'integration');
+  assert.equal(workType('support'), 'support');
+  assert.equal(workType('Сопровождение'), 'support');
+  assert.equal(workType('Интеграция систем'), 'integration');
+  assert.equal(workType('Computer Vision'), 'cv');
+  assert.equal(workType('unknown'), 'default');
+});
+
+test('stage 7 hours map onto the handover row for support tasks', () => {
+  const response = apiResponse({
+    effortGrid: { byStage: [{ stage: 7, hours: 1533 }], totalHours: 1533, p10Hours: 1200, p90Hours: 1800 },
+  });
+  const model = buildModelFromApi(response, createCaseState('D3'));
+
+  assert.equal(model.stageRows.length, 7);
+  assert.equal(model.stageRows.at(-1).id, 'handover');
+  assert.equal(model.stageRows.at(-1).hours, 1533);
+  const hours = model.stageRows.reduce((acc, row) => acc + row.hours, 0);
+  assert.equal(Math.round(hours), model.effort);
+});
+
+test('break-even and compression come from API estimates and warnings', () => {
+  const estimates = apiResponse().estimates;
+  const response = apiResponse({
+    estimates: {
+      ...estimates,
+      inhouse: {
+        ...estimates.inhouse,
+        warnings: [
+          { code: 'schedule_compression', severity: 'warning', message: 'Сжатие 30%: трудоёмкость ×2.50' },
+        ],
+      },
+      contractor: { ...estimates.contractor, breakevenMonth: null },
+      hybrid: { ...estimates.hybrid, breakevenMonth: 14 },
+    },
+  });
+  const model = buildModelFromApi(response, createCaseState('D1'));
+
+  assert.equal(model.breakEven, 14);
+  for (const id of ['internal', 'vendor', 'hybrid']) {
+    assert.equal(model.scenarios[id].compressed, true);
+    assert.equal(model.scenarios[id].compressionMultiplier, 2.5);
+    assert.ok(model.scenarios[id].savedWeeks >= 0);
+  }
+  assert.deepEqual(model.deadline.compressedScenarios, ['internal', 'vendor', 'hybrid']);
 });

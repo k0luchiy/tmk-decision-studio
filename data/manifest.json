@@ -3,46 +3,46 @@
     {
       "path": "data/datasets/rate_cards.json",
       "sha256": "3498dfd34fedabebaf6cb63e5452e2956f467916b48d80dbf8ab00cc38100317",
-      "rows": 2,
-      "generatedAt": "2026-11-09T15:22:08.295Z",
+      "rows": 14,
+      "generatedAt": "2026-11-10T06:54:59.167Z",
       "source": "research/data/product/rate_cards.json"
     },
     {
       "path": "data/datasets/contractor_rate_cards.json",
       "sha256": "6477a68e15ad6241c1b5c66713b6df0d7de5e206ba741ba9da7d50e889ed2bad",
-      "rows": 7,
-      "generatedAt": "2026-11-09T15:22:08.295Z",
+      "rows": 224,
+      "generatedAt": "2026-11-10T06:54:59.167Z",
       "source": "research/data/product/contractor_rate_cards.json"
     },
     {
       "path": "data/datasets/work_archetypes.json",
       "sha256": "2d65c1f35ebe6a253f3acb75032d9cd72d495445c10c68e081dab3ccffa9701c",
-      "rows": 5,
-      "generatedAt": "2026-11-09T15:22:08.295Z",
+      "rows": 22,
+      "generatedAt": "2026-11-10T06:54:59.167Z",
       "source": "research/data/product/work_archetypes.json"
     },
     {
       "path": "data/datasets/analogue_corpus.json",
       "sha256": "af14efc789e5d20a1b50138effa968b1b0108b9a51917f51684d33dfdab71f92",
-      "rows": 6,
-      "generatedAt": "2026-11-09T15:22:08.295Z",
+      "rows": 109,
+      "generatedAt": "2026-11-10T06:54:59.167Z",
       "source": "research/data/product/analogue_corpus.json"
     },
     {
       "path": "data/datasets/coefficients.json",
       "sha256": "2047b9ad08d5cd12dbedd553d057da24a9cf4e3422b5a2cb982264d511cd1af5",
-      "rows": 17,
-      "generatedAt": "2026-11-09T15:22:08.295Z",
+      "rows": 16,
+      "generatedAt": "2026-11-10T06:54:59.167Z",
       "source": "research/data/product/coefficients.json"
     },
     {
       "path": "data/datasets/tmk_it_contracts.json",
       "sha256": "19ef510e82cc7a50c2382e3b91512eda303d0b84329d33c1271c7f9458f1faf1",
       "rows": 60,
-      "generatedAt": "2026-11-09T15:22:08.295Z",
+      "generatedAt": "2026-11-10T06:54:59.167Z",
       "source": "research/data/tmk_it_contracts.json"
     }
   ],
   "datasetVersion": "47a8fb6b9e9ed54c08019d8ca66d79e587fb08b7d5f3e4d80a56068c389c39c7",
-  "generatedAt": "2026-11-09T15:22:08.295Z"
+  "generatedAt": "2026-11-10T06:54:59.167Z"
 }

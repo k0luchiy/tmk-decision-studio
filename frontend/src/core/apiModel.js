@@ -41,12 +41,12 @@ async function apiErrorFrom(response) {
   const error = payload?.error ?? {};
   return new ApiError(error.code ?? `http_${response.status}`, error.message ?? `HTTP ${response.status}`, error.details);
 }
-export async function fetchApiModel(state, { signal, seed = 42 } = {}) {
+export async function fetchApiModel(state, dirty = {}, { signal, seed = 42 } = {}) {
   const response = await fetch(`${API_BASE}/api/estimates`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      ...mapStateToRequest(state),
+      ...mapStateToRequest(state, dirty),
       brief: state.description || state.name,
       state,
       seed,
@@ -96,7 +96,8 @@ function buildStageRows(response, state) {
   const totalHours = Number(response.effortGrid?.totalHours) || sum([...byStage.values()], (value) => value);
   const contractor = response.estimates.contractor;
   const rows = BASE_STAGES.map((stage) => {
-    const hours = (byStage.get(STAGE_NUMBER[stage.id]) || 0) * (STAGE_RATIO[stage.id] ?? 1);
+    const stageNumber = stage.id === 'handover' && byStage.has(7) ? 7 : STAGE_NUMBER[stage.id];
+    const hours = (byStage.get(stageNumber) || 0) * (STAGE_RATIO[stage.id] ?? 1);
     const share = totalHours > 0 ? hours / totalHours : 0;
     const external = contractor.cost.p50Rub * share;
     const stateStage = (state.stages ?? []).find((item) => item.id === stage.id) ?? {};
@@ -108,8 +109,17 @@ function buildStageRows(response, state) {
   });
   return { rows, stageDays: sum(rows, (row) => row.days) };
 }
+export function compressionOf(warnings = []) {
+  const warning = warnings.find((item) => item.code === 'schedule_compression');
+  if (!warning) return { compressed: false, multiplier: 1 };
+  const match = /[×x]\s*([\d.,]+)/i.exec(warning.message ?? '');
+  const value = match ? Number(match[1].replace(',', '.')) : NaN;
+  return { compressed: true, multiplier: Number.isFinite(value) && value > 0 ? value : 1 };
+}
+
 export function buildModelFromApi(response, state) {
   const inhouse = response.estimates.inhouse;
+  const compression = compressionOf(inhouse.warnings ?? []);
   const base = {};
   SCENARIO_IDS.forEach((id) => {
     const estimate = response.estimates[SCENARIO_MAP[id]];
@@ -131,7 +141,7 @@ export function buildModelFromApi(response, state) {
     const score = scores.find((entry) => entry.id === id);
     scenarios[id] = {
       id, cost: item.cost, p10: item.p10, p50: item.p50, p90: item.p90, weeks: item.weeks, rawWeeks: item.weeks,
-      compressed: false, compressionMultiplier: 1, savedWeeks: 0, supportMonthly: item.supportMonthly,
+      compressed: compression.compressed, compressionMultiplier: compression.multiplier, savedWeeks: 0, supportMonthly: item.supportMonthly,
       tco1: tcoFor(item.estimate, 1, item.supportMonthly), tco3: tcoFor(item.estimate, 3, item.supportMonthly),
       tco5: tcoFor(item.estimate, 5, item.supportMonthly),
       score: score.total, scoreParts: score.parts, lines: groupLines(item.estimate.cost.lines),
@@ -174,6 +184,21 @@ export function buildModelFromApi(response, state) {
     });
     return point;
   });
+  const crossingMonth = () => {
+    for (let index = 1; index < breakEvenSeries.length; index += 1) {
+      const prev = breakEvenSeries[index - 1];
+      const curr = breakEvenSeries[index];
+      const prevDiff = prev.internal - prev.vendor;
+      const currDiff = curr.internal - curr.vendor;
+      if (prevDiff !== 0 && (prevDiff < 0) !== (currDiff < 0)) return curr.month;
+    }
+    return null;
+  };
+  const breakEven =
+    response.estimates.contractor.breakevenMonth ??
+    response.estimates.hybrid.breakevenMonth ??
+    crossingMonth();
+  const compressedScenarios = SCENARIO_IDS.filter((id) => scenarios[id].compressed);
   const tcoSeries = Array.from({ length: 6 }, (_, year) => ({
     year, label: year === 0 ? 'Старт' : `${year} г.`,
     internal: round3((scenarios.internal.cost + scenarios.internal.supportMonthly * 12 * year) / 1000),
@@ -214,9 +239,9 @@ export function buildModelFromApi(response, state) {
     meta, state, k: 1, effort: Number(response.effortGrid?.totalHours) || 0,
     effortRange: { p10: Number(response.effortGrid?.p10Hours) || 0, p90: Number(response.effortGrid?.p90Hours) || 0 },
     stageRows, stageDays, scenarios, recommended, ranking: [...scores].sort((a, b) => b.total - a.total), scores, confidence,
-    analogMedian, methodDiff, breakEven: inhouse.breakevenMonth ?? null, breakEvenSeries, tcoSeries, sensitivity, distribution,
+    analogMedian, methodDiff, breakEven, breakEvenSeries, tcoSeries, sensitivity, distribution,
     risks, risksTotal: sum(risks, (risk) => risk.expected), warnings, pending: 0,
     rawWeeks: { internal: scenarios.internal.rawWeeks, vendor: scenarios.vendor.rawWeeks, hybrid: scenarios.hybrid.rawWeeks },
-    deadline: { weeks: Number(state.deadlineWeeks) || 0, compressedScenarios: [] }, estimateId: response.id, api: true,
+    deadline: { weeks: Number(state.deadlineWeeks) || 0, compressedScenarios }, estimateId: response.id, api: true,
   };
 }

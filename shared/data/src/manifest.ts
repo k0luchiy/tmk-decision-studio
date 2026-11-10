@@ -46,7 +46,7 @@ export async function computeManifest(baseDir: string): Promise<DatasetManifest>
     files.push({
       path: spec.path,
       sha256: sha256Hex(bytes),
-      rows: rowsOf(parsed),
+      rows: rowsOf(parsed, spec.path),
       generatedAt,
       source: spec.source,
     });

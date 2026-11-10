@@ -152,6 +152,7 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     lines: { inhouse: inhouseLines, contractor: contractorLines, hybrid: hybridLines },
     compressionFactor: scheduleResult.effortMultiplier,
     extras: options.extras ?? [],
+    reservePct: options.reservePct ?? 0,
   });
   const inhouseCost = simulateScenarios(adjusted.scenarios, effortGrid, duration, seed);
   const verdictInputOf = (cost: Quantiles, scenario: ScenarioResult): VerdictScenarioInput => ({

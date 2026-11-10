@@ -85,6 +85,8 @@ export default function App() {
   const [saved, setSaved] = useState([]);
   const [toast, setToast] = useState('');
   const [model, setModel] = useState(() => computeModel(createCaseState(initialCaseId)));
+  const [rateDirty, setRateDirty] = useState(false);
+  const [stageHoursDirty, setStageHoursDirty] = useState(false);
   const [apiStatus, setApiStatus] = useState('idle');
   const [intakeSource, setIntakeSource] = useState(null);
   const [intakeMode, setIntakeMode] = useState(() => import.meta.env?.VITE_INTAKE_MODE ?? 'cache');
@@ -107,19 +109,12 @@ export default function App() {
     const controller = new AbortController();
     const timer = setTimeout(() => {
       setApiStatus('loading');
-      fetchApiModel(state, { signal: controller.signal })
+      fetchApiModel(state, { rateDirty, stageHoursDirty }, { signal: controller.signal })
         .then((response) => {
           const nextModel = buildModelFromApi(response, state);
           setModel(nextModel);
           setApiStatus('api');
           apiErrorNotified.current = false;
-          const row = {
-            id: response.id,
-            name: savedName(state.description) || state.name,
-            date: response.createdAt ?? new Date().toISOString(),
-            cost: nextModel.scenarios[nextModel.recommended].p50,
-          };
-          setSaved((old) => [row, ...old.filter((item) => item.id !== row.id && item.name !== row.name)]);
         })
         .catch((error) => {
           if (error?.name === 'AbortError') return;
@@ -135,7 +130,7 @@ export default function App() {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [state]);
+  }, [state, rateDirty, stageHoursDirty]);
 
   useEffect(() => {
     let alive = true;
@@ -203,6 +198,8 @@ export default function App() {
       const nextModel = buildModelFromApi(stored, nextState);
       skipNextRecalc.current = Boolean(stored.state);
       setState(nextState);
+      setRateDirty(false);
+      setStageHoursDirty(false);
       setParams(buildParams(nextState));
       setParsed(true);
       setModel(nextModel);
@@ -231,6 +228,8 @@ export default function App() {
     const next = createCaseState(id);
     const nextModel = computeModel(next);
     setState(next);
+    setRateDirty(false);
+    setStageHoursDirty(false);
     setParams(buildParams(next));
     setParsed(true);
     setFiles([]);
@@ -254,6 +253,8 @@ export default function App() {
       setParams(buildParams(next));
     }
     setState(next);
+    setRateDirty(false);
+    setStageHoursDirty(false);
     setFiles(incomingFiles || []);
     const nextModel = computeModel(next);
     setActiveScenario(nextModel.recommended);
@@ -272,11 +273,14 @@ export default function App() {
       }
       return next;
     });
+    if (Object.prototype.hasOwnProperty.call(patch, 'teamRate')) setRateDirty(true);
     if (Object.prototype.hasOwnProperty.call(patch, 'description')) setParsed(false);
   };
 
   const updateStage = (id, key, value) => {
     const splitByOwner = { internal: 80, split: 50, vendor: 20 };
+    if (key === 'hours') setStageHoursDirty(true);
+    if (key === 'rate') setRateDirty(true);
     setState((old) => ({
       ...old,
       stages: old.stages.map((stage) => {
@@ -300,6 +304,7 @@ export default function App() {
 
   const addStage = () => {
     const id = `stage-${Date.now()}`;
+    setStageHoursDirty(true);
     setState((old) => ({
       ...old,
       stages: [
@@ -323,6 +328,7 @@ export default function App() {
   };
 
   const removeStage = (id) => {
+    setStageHoursDirty(true);
     setState((old) => ({ ...old, stages: old.stages.filter((stage) => stage.id !== id) }));
     notify('Этап удалён');
   };
@@ -379,10 +385,11 @@ export default function App() {
 
   const removeFile = (name) => setFiles((old) => old.filter((item) => item !== name));
 
-  const rememberSnapshot = () => {
+  const rememberSnapshot = (id) => {
+    if (!id) return;
     setSaved((old) => [
-      { id: state.caseId, name: state.name, date: new Date().toLocaleDateString('ru-RU'), cost: model.scenarios[model.recommended].p50 },
-      ...old.filter((item) => item.id !== state.caseId),
+      { id, name: savedName(state.description) || state.name, date: new Date().toISOString(), cost: model.scenarios[model.recommended].p50 },
+      ...old.filter((item) => item.id !== id),
     ]);
   };
 
@@ -391,7 +398,7 @@ export default function App() {
       try {
         const { blob, filename } = await exportApiEstimate(model.estimateId, 'json');
         download(blob, filename);
-        rememberSnapshot();
+        rememberSnapshot(model.estimateId);
         notify('JSON-снимок получен из API и добавлен в последние оценки');
         return;
       } catch (error) {
@@ -417,8 +424,7 @@ export default function App() {
       },
     };
     download(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `tmk-decision-${state.caseId}-${Date.now()}.json`);
-    rememberSnapshot();
-    notify('JSON-снимок сохранён и добавлен в последние оценки');
+    notify('Локальный JSON-снимок сохранён');
   };
 
   const exportCSV = () => {
@@ -454,6 +460,7 @@ export default function App() {
       try {
         const { blob, filename } = await exportApiEstimate(model.estimateId, 'pdf');
         download(blob, filename);
+        rememberSnapshot(model.estimateId);
         notify('PDF получен из API');
         return;
       } catch (error) {
@@ -468,6 +475,7 @@ export default function App() {
       try {
         const { blob, filename } = await exportApiEstimate(model.estimateId, 'xlsx');
         download(blob, filename);
+        rememberSnapshot(model.estimateId);
         notify('XLSX получен из API');
         return;
       } catch (error) {

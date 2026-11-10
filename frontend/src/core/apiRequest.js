@@ -16,12 +16,38 @@ const EXTRA_TARGETS = [
   ['hybrid', 'hybrid', 'гибрид'],
 ];
 
+const WORK_TYPE_KEYS = new Set([
+  'integration',
+  'development',
+  'migration',
+  'bi',
+  'mes',
+  'security',
+  'support',
+  'rpa',
+  'cv',
+  'infrastructure',
+  'document',
+  'erp',
+  'lowcode',
+  'data',
+  'ai',
+  'api',
+  'portal',
+  'mobile',
+  'sap',
+  'observability',
+  'legacy',
+  'default',
+]);
+
 const workTypeFor = (type) => {
-  const text = String(type ?? '').toLowerCase();
+  const text = String(type ?? '').toLowerCase().trim().replace(/[\s-]+/g, '_');
+  if (WORK_TYPE_KEYS.has(text)) return text;
   if (/интеграц/.test(text)) return 'integration';
-  if (/vision|cv|дефект/.test(text)) return 'cv';
-  if (/сопровожд|поддержк|sla/.test(text)) return 'support';
-  if (/разработ|мобильн/.test(text)) return 'development';
+  if (/vision|cv|дефект|компьютерн|машинн|зрени/.test(text)) return 'cv';
+  if (/сопровожд|поддержк|sla|дежурств/.test(text)) return 'support';
+  if (/разработ|мобильн|приложен/.test(text)) return 'development';
   return 'default';
 };
 
@@ -83,7 +109,20 @@ export function mapExtras(extras = []) {
   return records;
 }
 
-export function mapStateToRequest(state) {
+export function mapStateToRequest(state, dirty = {}) {
+  const options = {
+    hiring: state.hiring,
+    utilization: 0.7,
+    model: state.contractType === 'fixed' ? 'fixed_price' : 't_and_m',
+    vat: false,
+    reservePct: (Number(state.reserve) || 0) / 100,
+    oversightPct: (Number(state.oversight) || 0) / 100,
+    contractorStages: mapContractorStages(state.stages),
+    targetWeeks: state.deadlineWeeks,
+    extras: mapExtras(state.extras),
+  };
+  if (dirty.rateDirty) options.teamRate = weightedTeamRate(state);
+  if (dirty.stageHoursDirty) options.stageHours = mapStageHours(state.stages);
   return {
     params: [
       confirmedParam('work_type', workTypeFor(state.type)),
@@ -92,18 +131,6 @@ export function mapStateToRequest(state) {
       confirmedParam('users', state.users),
       confirmedParam('duration_weeks', state.deadlineWeeks),
     ],
-    options: {
-      hiring: state.hiring,
-      utilization: 0.7,
-      model: state.contractType === 'fixed' ? 'fixed_price' : 't_and_m',
-      vat: false,
-      teamRate: weightedTeamRate(state),
-      reservePct: (Number(state.reserve) || 0) / 100,
-      oversightPct: (Number(state.oversight) || 0) / 100,
-      contractorStages: mapContractorStages(state.stages),
-      stageHours: mapStageHours(state.stages),
-      targetWeeks: state.deadlineWeeks,
-      extras: mapExtras(state.extras),
-    },
+    options,
   };
 }
