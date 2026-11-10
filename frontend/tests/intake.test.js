@@ -29,6 +29,7 @@ test('mapIntakeToParams maps backend keys to review rows', () => {
     id: 'work_type',
     label: 'Тип работы',
     value: 'integration',
+    unit: '',
     source: 'Интеграция 1С:ERP с WMS',
     confidence: 'Высокая',
     status: 'pending',
