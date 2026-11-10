@@ -17,7 +17,6 @@ import type { CostLine, Estimate } from '@app/contract';
 import { costContractor, type ContractModel } from '../cost/contractor.js';
 import { PRODUCTIVE_HOURS_PER_MONTH, costInhouse, type EffortByRole } from '../cost/inhouse.js';
 import { toStageGrid } from '../cost/stageGrid.js';
-import { buildVerdict, type VerdictScenarioInput } from '../decision/verdict.js';
 import type { Quantiles } from '../risk/monteCarlo.js';
 import { buildScenarios } from '../scenarios/scenarios.js';
 import type { ScenarioResult } from '../scenarios/scenarios.js';
@@ -28,12 +27,13 @@ import {
   blendLines,
   buildConfidenceAndWarnings,
   hybridShare,
-  lastCumulative,
   makeEstimate,
 } from './assemble.js';
 import { adjustScenarios, simulateScenarios } from './adjust.js';
 import { buildDistribution, buildSensitivity, winnerKey } from './insights.js';
 import { buildAssumptions, buildRisks, toContractAnalogues } from './dataBridge.js';
+import { scenarioDurations } from './durations.js';
+import { buildScenarioVerdict } from './verdict.js';
 import {
   combineEffort,
   hashInput,
@@ -144,7 +144,7 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     utilization,
     ...(options.targetWeeks === undefined ? {} : { targetWeeks: options.targetWeeks }),
   });
-  const duration = scheduleResult.duration;
+  const durations = scenarioDurations(scheduleResult.duration, options.hiring === true);
 
   const share = hybridShare(effortGrid.byStage, contractorStages);
   const hybridLines = blendLines(inhouseLines, contractorLines, share);
@@ -155,19 +155,8 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     extras: options.extras ?? [],
     reservePct: options.reservePct ?? 0,
   });
-  const inhouseCost = simulateScenarios(adjusted.scenarios, effortGrid, duration, seed);
-  const verdictInputOf = (cost: Quantiles, scenario: ScenarioResult): VerdictScenarioInput => ({
-    p50Rub: cost.p50,
-    p80Rub: cost.p80,
-    tcoRub: lastCumulative(scenario.tco),
-    weeks: duration.p50Weeks,
-    breakevenMonth: scenario.breakevenMonth,
-  });
-  const verdict = buildVerdict({
-    inhouse: verdictInputOf(inhouseCost.inhouse, adjusted.scenarios.inhouse),
-    contractor: verdictInputOf(inhouseCost.contractor, adjusted.scenarios.contractor),
-    hybrid: verdictInputOf(inhouseCost.hybrid, adjusted.scenarios.hybrid),
-  });
+  const inhouseCost = simulateScenarios(adjusted.scenarios, effortGrid, durations, seed);
+  const verdict = buildScenarioVerdict(inhouseCost, adjusted.scenarios, durations);
   const analogueRows = toContractAnalogues(datasets, workType);
   const { confidenceScore, warnings } = buildConfidenceAndWarnings({
     task,
@@ -194,6 +183,7 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     lines: CostLine[],
     scenario: ScenarioResult,
     cost: Quantiles,
+    duration: Estimate['duration'],
   ): Estimate =>
     makeEstimate(
       code,
@@ -217,18 +207,21 @@ export function estimateTask(input: EstimateTaskInput): EstimateTaskResult {
     adjusted.lines.inhouse,
     adjusted.scenarios.inhouse,
     inhouseCost.inhouse,
+    durations.inhouse,
   );
   const contractor = buildEstimate(
     'contractor',
     adjusted.lines.contractor,
     adjusted.scenarios.contractor,
     inhouseCost.contractor,
+    durations.contractor,
   );
   const hybrid = buildEstimate(
     'hybrid',
     adjusted.lines.hybrid,
     adjusted.scenarios.hybrid,
     inhouseCost.hybrid,
+    durations.hybrid,
   );
 
   const winnerCode = winnerKey(verdict.code);

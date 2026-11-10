@@ -5,21 +5,21 @@
   "tasks": [
     {
       "id": "d1",
-      "verdict": "inhouse",
-      "p50Rub": 7678000,
+      "verdict": "hybrid",
+      "p50Rub": 7632335,
       "weeks": 13
     },
     {
       "id": "d2",
       "verdict": "inhouse",
-      "p50Rub": 9540000,
-      "weeks": 12
+      "p50Rub": 9540348,
+      "weeks": 14
     },
     {
       "id": "d3",
-      "verdict": "inhouse",
-      "p50Rub": 9704000,
-      "weeks": 16
+      "verdict": "hybrid",
+      "p50Rub": 16441570,
+      "weeks": 27
     }
   ]
 }

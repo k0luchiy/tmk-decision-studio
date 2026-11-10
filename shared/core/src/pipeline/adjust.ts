@@ -173,7 +173,7 @@ export function adjustScenarios(args: {
 export function simulateScenarios(
   scenarios: ScenarioSet,
   effortGrid: EffortGrid,
-  duration: Duration,
+  durations: Record<keyof ScenarioSet, Duration>,
   seed: number,
 ): { inhouse: SimulatedCost; contractor: SimulatedCost; hybrid: SimulatedCost } {
   const run = (code: keyof ScenarioSet, salt: number): SimulatedCost =>
@@ -181,7 +181,7 @@ export function simulateScenarios(
       scenarios[code].implementationRub,
       effortGrid.totalHours,
       effortGrid,
-      duration,
+      durations[code],
       seed,
       salt,
     );

@@ -60,8 +60,13 @@ describe('buildSensitivity', () => {
     expect(reserve?.high).toBeCloseTo((40_000 / P50) * RESERVE_DELTA, 12);
   });
 
-  it('skips absent groups and handles a non-positive P50', () => {
-    expect(buildSensitivity([line('labor', 'Труд', 10_000)], P50)).toHaveLength(1);
+  it('keeps five factors with zero swing for absent groups', () => {
+    const factors = buildSensitivity([line('labor', 'Труд', 10_000)], P50);
+
+    expect(factors).toHaveLength(5);
+    const nonzero = factors.filter((factor) => factor.high > 0);
+    expect(nonzero).toHaveLength(1);
+    expect(nonzero[0]?.name).toBe('Труд');
     expect(buildSensitivity(FULL_LINES, 0)).toEqual([]);
   });
 });

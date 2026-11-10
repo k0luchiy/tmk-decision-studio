@@ -54,9 +54,10 @@ const FACTOR_SPECS: readonly FactorSpec[] = [
 ];
 
 /**
- * Tornado factors for one scenario: each present cost group moves the P50 by
- * `±delta × groupShare`. Missing groups are skipped; the list is sorted by the
- * absolute swing, widest first.
+ * Tornado factors for one scenario: each cost group moves the P50 by
+ * `±delta × groupShare`. All five factors are always returned so the UI has a
+ * stable panel; groups absent from the scenario keep a zero swing. The list is
+ * sorted by the absolute swing, widest first.
  */
 export function buildSensitivity(
   lines: readonly CostLine[],
@@ -71,10 +72,7 @@ export function buildSensitivity(
       (sum, line) => (spec.match(line) ? sum + line.valueRub : sum),
       0,
     );
-    if (!(groupTotal > 0)) {
-      continue;
-    }
-    const share = groupTotal / p50;
+    const share = groupTotal > 0 ? groupTotal / p50 : 0;
     const low = -share * spec.delta;
     const high = share * spec.delta;
     factors.push({

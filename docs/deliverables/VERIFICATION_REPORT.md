@@ -208,3 +208,129 @@
    - добавить в тело явное поле `hash`;
    - считать `snapshotHash` по неизменяемому содержимому (без `createdAt`/времени экспорта) либо брать стабильный `estimate.inputHash`;
    - использовать этот же хеш в имени файла, чтобы повторный экспорт одного снимка давал идентичный хеш.
+
+---
+
+# v2 после исправлений
+
+- **Дата проверки:** 2026-11-10 (UTC)
+- **База:** рабочая копия поверх `954112a` (`feat(core): real tornado and monte-carlo distribution`); коммит v2 — `feat(core): scenario durations and verification v2`.
+- **Окружение:** Node v22.22.2, npm 10.9.7, Chromium 147 (Playwright), backend `:3001`, Vite `:5180`.
+- **Режим API:** `INTAKE_MODE=cache`, `JEV_MODEL=jev-1.13-free`. Ключ Jev в файлы не записывался.
+
+## v2.1. Что исправлено
+
+| # | Проблема v1 | Исправление v2 | Доказательство |
+|---|---|---|---|
+| 1 | D3 (support): 0 аналогов | Добавлен маппинг `support`/fallback в `ANALOGUE_TYPE_BY_WORK_TYPE`; для D1–D3 по 3 аналога с `sourceId` и `normalizedPriceRub` | `v2-api-check.json` |
+| 2 | JSON-экспорт без `hash` и нестабилен | В тело добавлено поле `hash`; хеш считается по неизменяемому содержимому, повторный экспорт совпадает | `v2-*.json` + `v2-*-repeat.json` |
+| 3 | Override часов по этапам | `stageHours` пересобирает сетку этапов и проверяется тестом суммы/квантилей | `options.test.ts` |
+| 4 | Инвариант резерва | `reservePct` масштабирует все три сценария; сумма строк = P50 (±1 ₽) | `options.test.ts` |
+| 5 | Break-even | Пересчитывается по скорректированным кэшфлоу; покрыт тестами вердикта и сценариев | `verdict.test.ts`, `scenarios.test.ts` |
+| 6 | Этап 7 (support) | WBS/сетка корректно строят единственный этап 7 | `pipeline.test.ts` |
+| 7 | Манифест/датасеты | `data:check` проходит на 6 датасетах, `datasetVersion` совпадает | `data:check` |
+| 8 | Чувствительность/распределение были заглушкой | Реальный tornado из строк сметы (всегда 5 факторов) и гистограмма Монте-Карло (11 бинов, сумма 4000) | `v2-api-check.json` |
+| 9 | Общий срок на все сценарии | Сценарные сроки: in-house +2 нед. при найме, contractor ×0.85, hybrid ×0.92 | `pipeline/durations.ts`, `pipeline.test.ts` |
+
+## v2.2. Статические проверки
+
+| Проверка | Команда | Результат |
+|---|---|---|
+| Typecheck (root) | `npm run typecheck` | `TC=0` |
+| Unit/property (root) | `npm test` | 246/246 passed (39 файлов) |
+| Lint | `npm run lint` | `LINT=0` |
+| Typecheck (backend) | `npm --prefix backend run typecheck` | `BTC=0` |
+| Тесты backend | `npm --prefix backend run test` | 25/25 passed (3 файла) |
+| Тесты frontend | `npm --prefix frontend run test` | 27 pass / 0 fail |
+| Сборка frontend | `npm --prefix frontend run build` | `✓ built`, только warning о chunk >500 kB |
+| Данные | `npm run data:check` | `DATA=0`, errors=0, warnings=123 |
+| Intake eval | `npm run intake:eval` | `EVAL=0`, 100 %/100 %/100 %, 12/12 |
+| HelpDesk | `npm run helpdesk:check` | `HD=0`, rowsTotal 4 / rowsOk 4 / tasks 4 / workItems 4 |
+| E2E | `npm run e2e` | `E2E=0`, 9 файлов экспорта |
+| Отчёт | `npm run report` | `REPORT=0`, mismatch 0 |
+
+## v2.3. Контрольные значения D1–D3
+
+`data/seeds/control.json` обновлён по новым `.artifacts/control.json`; `datasetVersion` не менялся, допуск ±15 %.
+
+| Задача | Вердикт | P50, ₽ | Недель | deviation |
+|---|---|---|---|---|
+| D1 | hybrid | 7 632 335 | 13 | −0.00 % |
+| D2 | inhouse | 9 540 348 | 14 | +0.00 % |
+| D3 | hybrid | 16 441 570 | 27 | +0.00 % |
+
+`docs/deliverables/TEST_REPORT.md` сгенерирован: все три строки `ok`, провалов 0.
+
+## v2.4. Сценарные сроки
+
+Базовый срок `schedule()` → три сценария (`shared/core/src/pipeline/durations.ts`). В прогоне с `hiring: true`:
+
+| Задача | in-house | hybrid | contractor | Порядок |
+|---|---:|---:|---:|---|
+| D1 | 15 | 13 | 12 | contractor < hybrid < in-house |
+| D2 | 14 | 12 | 11 | contractor < hybrid < in-house |
+| D3 | 31 | 27 | 25 | contractor < hybrid < in-house |
+
+Квантили внутри каждого сценария: `p10 ≤ p50 ≤ p80 ≤ p90`. Вердикт использует `weeks` сценария, поэтому правило «подрядчик быстрее» работает: D3 выбран **hybrid** при быстром подрядчике и близком TCO.
+
+## v2.5. Живой API (`POST /api/estimates`, seed 42)
+
+Options: `{ hiring: true, model: "fixed_price", vat: false, extras: [{ label: "Лицензии", amountRub: 100000, appliesTo: "all" }] }`.
+
+| Кейс | Verdict | P50 in-house | P50 contractor | P50 hybrid | Weeks (in/hyb/con) | Divergence |
+|---|---|---:|---:|---:|---|---:|
+| D1 | parity | 7 777 686 | 7 676 905 | 7 732 335 | 15 / 13 / 12 | 10.003 |
+| D2 | inhouse | 9 640 348 | 11 875 276 | 10 646 066 | 14 / 12 / 11 | 2.232 |
+| D3 | hybrid | 16 541 570 | 23 248 095 | 16 541 570 | 31 / 27 / 25 | 2.733 |
+
+Инварианты (D1–D3, все сценарии):
+
+| Проверка | Результат |
+|---|---|
+| `analogues.length >= 3` + `sourceId`/`normalizedPriceRub` | 3 / 3 / 3 — OK |
+| `sensitivity.length = 5` | OK (реальный tornado) |
+| `distribution.length = 11`, Σ counts = 4000 | OK |
+| `methodDivergence` присутствует | OK |
+| `cost.lines` Σ = P50 | OK (Δ ≤ 1 ₽) |
+| `effortGrid.byStage` Σ = `totalHours` | OK (1256.72 / 1618.57 / 2790.61) |
+| confidence | 68 / medium у D1–D3 |
+
+## v2.6. Экспорт PDF / XLSX / JSON
+
+| Кейс | PDF 3 сценария | XLSX листы | XLSX Σ = P50 | JSON `hash` (повтор стабилен) |
+|---|---|---|---|---|
+| D1 | OK (Внутренняя команда / Подрядчик / Гибрид) | 7 | OK | `7acdce720fcd…` |
+| D2 | OK | 7 | OK | `1cdddad4262d…` |
+| D3 | OK | 7 | OK | `caf8fa9e74c0…` |
+
+Повторный экспорт одного снимка даёт идентичный `hash` (D1–D3).
+
+## v2.7. Импорт HelpDesk
+
+`POST /api/import/helpdesk` с `data/import/helpdesk-sample.xlsx` → **200**, `rowsTotal 4 / rowsOk 4 / tasks 4 / workItems 4`.
+
+## v2.8. UI smoke (Playwright, Chromium 147, 1440×900)
+
+| Шаг | Результат |
+|---|---|
+| Стартовый экран, «TMK DECISION STUDIO» | OK |
+| D1 → кокпит, «ТРИ ВАРИАНТА РЕАЛИЗАЦИИ» | OK |
+| API badge `.api-status.api-api` | OK, текст `API` |
+| «Параметры» → «Параметры оценки» | OK |
+| «Аналитика» → 6 вкладок | OK (Стоимость, Сроки, TCO, Break-even, Чувствительность, Распределение) |
+| «Обоснование» → PDF / XLSX / JSON | OK |
+| Console errors / page errors | **0 / 0** |
+
+Скриншоты: `.artifacts/verify/v2-ui-start.png`, `v2-ui-cockpit.png`, `v2-ui-parameters.png`, `v2-ui-analytics.png`, `v2-ui-rationale.png`.
+
+## v2.9. Вывод
+
+**ГОТОВО.** Оба блокера v1 закрыты: D3 получает ≥3 аналога, JSON-экспорт содержит стабильный `hash`. Дополнительно сценарные сроки, реальная чувствительность/распределение и обновлённые контрольные значения проверены статикой, живым API, экспортом и UI.
+
+### Остаточные ограничения (не блокируют приёмку)
+
+- `methodDivergence` высокий на D1 (`10.003`), у D2/D3 — `2.232` / `2.733`; это сигнал расхождения методов A/B/C, а не ошибка расчёта.
+- `frontend/src/App.jsx` — 537 строк (> 250); legacy-файл кокпита, рефакторинг вынесен за рамки задачи.
+- `POST /api/intake/confirm` не валидирует обязательные ключи: помечает подтверждёнными те параметры, что пришли, без проверки минимального набора.
+- CORS настроен как `origin: true`, аутентификации/авторизации нет — демо-стенд.
+- История оценок хранится in-memory с TTL 24 ч и не переживает рестарт backend.

@@ -88,6 +88,29 @@ describe('estimateTask', () => {
     expect(winner.cost.p50Rub).toBeGreaterThan(0);
   });
 
+  it('gives each scenario its own duration with a fast contractor under hiring', async () => {
+    const result = estimateTask({
+      task: d1Task,
+      datasets: await datasets(),
+      seed: 42,
+      datasetVersion,
+      options: { hiring: true, model: 'fixed_price' },
+    });
+
+    const { inhouse, contractor, hybrid } = result.estimates;
+    for (const estimate of [inhouse, contractor, hybrid]) {
+      const { p10Weeks, p50Weeks, p80Weeks, p90Weeks } = estimate.duration;
+      expect(p10Weeks).toBeLessThanOrEqual(p50Weeks);
+      expect(p50Weeks).toBeLessThanOrEqual(p80Weeks);
+      expect(p80Weeks).toBeLessThanOrEqual(p90Weeks);
+      expect(p50Weeks).toBeGreaterThanOrEqual(1);
+    }
+
+    expect(contractor.duration.p50Weeks).toBeLessThan(hybrid.duration.p50Weeks);
+    expect(hybrid.duration.p50Weeks).toBeLessThan(inhouse.duration.p50Weeks);
+    expect(['inhouse', 'contractor', 'hybrid', 'parity']).toContain(result.verdict.code);
+  });
+
   it('is deterministic for the same input and seed', async () => {
     const data = await datasets();
     const first = estimateTask({
