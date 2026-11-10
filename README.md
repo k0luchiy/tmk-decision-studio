@@ -22,14 +22,12 @@ UI **не считает** финансы сам: в режиме `api` моде
 
 ## Скриншоты
 
-| Старт | Обзор |
-|<img src="docs/screenshots/01-start.png" width="420" />|<img src="docs/screenshots/02-overview.png" width="420" />|
-| **Параметры** | **Аналитика** |
-|<img src="docs/screenshots/03-parameters.png" width="420" />|<img src="docs/screenshots/04-analytics.png" width="420" />|
-| **Обоснование** | **Данные и Data Hub** |
-|<img src="docs/screenshots/05-justification.png" width="420" />|<img src="docs/screenshots/06-data.png" width="420" />|
-| **Календарные допущения** | |
-|<img src="docs/screenshots/02b-overview-calendar.png" width="420" />| |
+| | |
+|:---:|:---:|
+| **Старт**<br><img src="docs/screenshots/01-start.png" width="420" alt="Старт" /> | **Обзор**<br><img src="docs/screenshots/02-overview.png" width="420" alt="Обзор" /> |
+| **Параметры**<br><img src="docs/screenshots/03-parameters.png" width="420" alt="Параметры" /> | **Аналитика**<br><img src="docs/screenshots/04-analytics.png" width="420" alt="Аналитика" /> |
+| **Обоснование**<br><img src="docs/screenshots/05-justification.png" width="420" alt="Обоснование" /> | **Данные и Data Hub**<br><img src="docs/screenshots/06-data.png" width="420" alt="Данные и Data Hub" /> |
+| **Календарные допущения**<br><img src="docs/screenshots/02b-overview-calendar.png" width="420" alt="Календарные допущения" /> | |
 
 Все изображения — в [`docs/screenshots/`](docs/screenshots/).
 
