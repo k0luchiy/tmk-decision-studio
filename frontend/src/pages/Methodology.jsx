@@ -108,8 +108,8 @@ export default function Methodology({ goTab }) {
       <section className="panel">
         <SectionHead
           eyebrow="ФОРМУЛЫ"
-          title="Как считается оценка"
-          description="Формулы, которые связывают входные данные и результат из API"
+          title="Расчёт"
+          description="Связь входных данных и результата API"
           actions={<Pill tone="good"><ShieldCheck size={12} /> Проверяемо</Pill>}
         />
         <div className="formula-grid">
@@ -194,7 +194,7 @@ export default function Methodology({ goTab }) {
 
       <div className="method-bottom">
         <section className="panel limitation-panel">
-          <SectionHead eyebrow="ОГРАНИЧЕНИЯ" title="Границы применимости" description="Ограничения прототипа" />
+          <SectionHead eyebrow="ПРОТОТИП" title="Границы применимости" description="Данные и применимость" />
           <ul className="limitation-list">
             <li><AlertTriangle size={14} /> Не заменяет детальную смету, техническое обследование и коммерческое предложение.</li>
             <li><AlertTriangle size={14} /> Ставки, аналоги и риски — демонстрационные, не подтверждённые данные ТМК.</li>

@@ -177,7 +177,6 @@ export function ScenarioStrip({ model, active, setActive, goTab }) {
     <section className="scenario-strip" aria-label="Сравнение трёх вариантов">
       <div className="scenario-strip-head">
         <div>
-          <span className="eyebrow">ТРИ ВАРИАНТА РЕАЛИЗАЦИИ</span>
           <h2>Сценарии</h2>
         </div>
         <span className="scenario-strip-note">Единая декомпозиция работ · диапазон P10–P90</span>

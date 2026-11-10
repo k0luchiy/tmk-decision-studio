@@ -30,8 +30,7 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
       <div className="overview-grid">
         <section className="panel">
           <SectionHead
-            eyebrow="СТРУКТУРА"
-            title="Структура оценки"
+            title="Статьи затрат"
             description={`${selectedMeta.name}: работы, внешние статьи и резерв`}
             actions={<LinkButton onClick={() => goTab('estimate')}>Все этапы</LinkButton>}
           />
@@ -62,7 +61,7 @@ export default function Overview({ model, rationale, goTab, onExport, active, st
           <SectionHead
             eyebrow="ЛОГИКА ВЫБОРА"
             title="Факторы рекомендации"
-            description="Взвешенная оценка по четырём факторам"
+            description="Стоимость, срок, риск, гибкость"
             actions={<Pill tone="good"><Sparkles size={11} /> {recommendedMeta.shortName}</Pill>}
           />
           <div className="factor-table">

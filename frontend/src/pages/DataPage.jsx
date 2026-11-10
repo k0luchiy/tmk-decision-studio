@@ -178,9 +178,8 @@ export default function DataPage() {
 
         <section className="panel">
           <SectionHead
-            eyebrow="ПРОИСХОЖДЕНИЕ"
-            title="Принцип provenance"
-            description="У каждой цифры — источник, дата и метод"
+            title="Источник, дата и метод"
+            description="Для ставок, аналогов и допущений"
           />
           <div className="provenance-list">
             <div><span className="prov-dot good" /><div><b>Подтверждено</b><small>Источник и дата указаны</small></div></div>

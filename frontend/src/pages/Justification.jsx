@@ -21,7 +21,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
     <div className="page-stack">
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ШАГ 04 · ОБОСНОВАНИЕ</div>
+          <div className="eyebrow">ШАГ 04 · ПРОВЕРКА</div>
           <h1>Обоснование оценки</h1>
           <p>Источники цифр, допущения и влияющие факторы.</p>
         </div>
@@ -71,7 +71,7 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
       <div className="justification-grid">
         <section className="panel confidence-panel">
           <SectionHead
-            eyebrow="CONFIDENCE"
+            eyebrow="КАЧЕСТВО ВХОДА"
             title="Факторы уверенности"
             description={`${model.confidence.score}% · ${model.confidence.score >= 75 ? 'средне-высокая' : model.confidence.score >= 60 ? 'средняя' : 'требует уточнения'}`}
             actions={<Ring value={model.confidence.score} size={92} label="score" />}
@@ -106,7 +106,6 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
 
         <section className="panel assumptions-panel">
           <SectionHead
-            eyebrow="ДОПУЩЕНИЯ"
             title="Допущения"
             description="Значение, диапазон, источник и чувствительность"
           />
@@ -134,7 +133,6 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
 
       <section className="panel risks-panel">
         <SectionHead
-          eyebrow="РИСКИ"
           title="Реестр рисков"
           description="Вероятность × влияние в деньгах. Сумма ожидаемых потерь входит в резерв."
           actions={<Pill tone="warn">Ожидаемое влияние: {fmtMoney(model.risksTotal)}</Pill>}
@@ -165,9 +163,8 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
 
       <section className="panel analogs-panel">
         <SectionHead
-          eyebrow="РЫНОЧНЫЕ АНАЛОГИ"
           title="Аналоги"
-          description="≥ 3 аналога с источником, датой и коэффициентом приведения к сопоставимому объёму"
+          description="Источник, дата и коэффициент приведения"
           actions={<Pill tone="info">Медиана: {fmtMoney(model.analogMedian)}</Pill>}
         />
         <div className="analog-table">
@@ -196,7 +193,6 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
       <div className="justification-bottom">
         <section className="panel sources-panel">
           <SectionHead
-            eyebrow="ИСТОЧНИКИ"
             title="Источники"
             description="Версия, дата и метод"
           />
@@ -227,9 +223,8 @@ export default function Justification({ model, goTab, onExportJSON, onExportCSV,
 
         <section className="panel limitation-panel">
           <SectionHead
-            eyebrow="ГРАНИЦЫ"
             title="Ограничения"
-            description="Ограничения прототипа"
+            description="Прототип, данные и применимость"
           />
           <ul className="limitation-list">
             <li><AlertTriangle size={14} /> Не заменяет техническое обследование и коммерческое предложение.</li>
