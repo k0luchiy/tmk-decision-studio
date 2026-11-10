@@ -74,6 +74,19 @@ test('confidence, stage rows and effort are adapted for the UI', () => {
   assert.ok(model.meta.analogs.length > 0);
 });
 
+test('maps the calendar breakdown from the API response', () => {
+  const calendar = {
+    workType: 'integration',
+    effortP50Weeks: 7,
+    stageLags: [{ stage: 1, weeks: 0.5 }],
+    lagWeeks: 3.5,
+    pilotWeeks: 0,
+    minCalendarWeeks: 4,
+  };
+  const model = buildModelFromApi(apiResponse({ calendar }), createCaseState('D1'));
+  assert.deepEqual(model.calendar, calendar);
+});
+
 test('uses API sensitivity and distribution when present', () => {
   const sensitivity = Array.from({ length: 5 }, (_, index) => ({
     name: `Фактор ${index}`, low: -0.1, high: 0.1, lowValue: 900, highValue: 1100,
