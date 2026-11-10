@@ -21,7 +21,7 @@
 | [10_api_contract.md](10_api_contract.md) | Связка frontend ↔ backend: REST API, эндпоинты, dev/prod, ошибки |
 | [11_frontend_integration_analysis.md](11_frontend_integration_analysis.md) | Разбор прототипа фронта, сопоставление моделей, пробелы и план интеграции |
 | [DECISIONS.md](DECISIONS.md) | Журнал решений (требование регламента: ≥ 8 записей, ведётся по ходу) |
-| [deliverables/](deliverables/) | Итоговые документы поставки: `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `DATA_HUB.md`, `BENCHMARK_REPORT.md`, `TEST_REPORT.md` |
+| [deliverables/](deliverables/) | Итоговые документы поставки: `METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md`, `DATA_HUB.md`, `BENCHMARK_REPORT.md`, `BENCHMARK_FAILURES.md`, `TEST_REPORT.md` |
 
 ## Одной фразой
 

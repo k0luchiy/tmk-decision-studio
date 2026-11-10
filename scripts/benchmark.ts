@@ -23,6 +23,7 @@ interface Result {
   id: string;
   level: 'pro' | 'simple';
   type: string;
+  prompt: string;
   inhouseRub: number;
   contractorRub: number;
   inhouseWeeks: number;
@@ -31,6 +32,9 @@ interface Result {
   contractorTargetRub: [number, number];
   inhouseTargetWeeks: [number, number];
   contractorTargetWeeks: [number, number];
+  inhouseTimeline: string;
+  contractorTimeline: string;
+  failures: string[];
   inhouseCostOk: boolean;
   contractorCostOk: boolean;
   inhouseTimeOk: boolean;
@@ -105,6 +109,7 @@ async function main(): Promise<void> {
         id: item.id,
         level,
         type: state.type,
+        prompt,
         inhouseRub: Math.round(inhouse.cost.p50Rub),
         contractorRub: Math.round(contractor.cost.p50Rub),
         inhouseWeeks: inhouse.duration.p50Weeks,
@@ -113,12 +118,22 @@ async function main(): Promise<void> {
         contractorTargetRub: item.target_contractor_rub,
         inhouseTargetWeeks,
         contractorTargetWeeks,
+        inhouseTimeline: item.target_inhouse_timeline,
+        contractorTimeline: item.target_contractor_timeline,
+        failures: [],
         inhouseCostOk: inRange(inhouse.cost.p50Rub, item.target_inhouse_rub),
         contractorCostOk: inRange(contractor.cost.p50Rub, item.target_contractor_rub),
         inhouseTimeOk: inRange(inhouse.duration.p50Weeks, inhouseTargetWeeks),
         contractorTimeOk: inRange(contractor.duration.p50Weeks, contractorTargetWeeks),
       });
     }
+  }
+
+  for (const row of results) {
+    if (!row.inhouseCostOk) row.failures.push('in-house cost');
+    if (!row.contractorCostOk) row.failures.push('contractor cost');
+    if (!row.inhouseTimeOk) row.failures.push('in-house time');
+    if (!row.contractorTimeOk) row.failures.push('contractor time');
   }
 
   const pct = (value: number) => `${Math.round(value * 100)}%`;
@@ -178,6 +193,26 @@ async function main(): Promise<void> {
     '- эталонные диапазоны неоднородны, поэтому strict hit-rate нельзя считать единственным критерием качества.',
   ];
   await writeFile(path.join(root, 'docs', 'deliverables', 'BENCHMARK_REPORT.md'), `${lines.join('\n')}\n`, 'utf8');
+
+  const failed = results.filter((row) => row.failures.length > 0);
+  const failureLines: string[] = [
+    '# Benchmark failures — TEST_PROMPTS.md',
+    '',
+    `Дата: ${new Date().toISOString().slice(0, 10)}; datasetVersion: \`${datasetVersion}\`; режим intake: rules.`,
+    '',
+    `Провалено прогонов: ${failed.length} из ${results.length}.`,
+    '',
+  ];
+  for (const row of failed) {
+    failureLines.push(`## ${row.id} · ${row.level} · ${row.type}`, '', `**Prompt:**`, '', `> ${row.prompt}`, '');
+    failureLines.push('| Метрика | Факт | Цель | Причина |', '|---|---:|---|---|');
+    failureLines.push(`| In-house cost | ${row.inhouseRub.toLocaleString('ru-RU')} ₽ | ${row.inhouseTargetRub[0].toLocaleString('ru-RU')}–${row.inhouseTargetRub[1].toLocaleString('ru-RU')} ₽ | ${row.inhouseCostOk ? 'ok' : 'fail'} |`);
+    failureLines.push(`| Contractor cost | ${row.contractorRub.toLocaleString('ru-RU')} ₽ | ${row.contractorTargetRub[0].toLocaleString('ru-RU')}–${row.contractorTargetRub[1].toLocaleString('ru-RU')} ₽ | ${row.contractorCostOk ? 'ok' : 'fail'} |`);
+    failureLines.push(`| In-house time | ${row.inhouseWeeks} нед. | ${row.inhouseTimeline} | ${row.inhouseTimeOk ? 'ok' : 'fail'} |`);
+    failureLines.push(`| Contractor time | ${row.contractorWeeks} нед. | ${row.contractorTimeline} | ${row.contractorTimeOk ? 'ok' : 'fail'} |`);
+    failureLines.push('', `Провалено: ${row.failures.join(', ')}.`, '');
+  }
+  await writeFile(path.join(root, 'docs', 'deliverables', 'BENCHMARK_FAILURES.md'), `${failureLines.join('\n')}\n`, 'utf8');
   console.log(lines.slice(0, 10).join('\n'));
   console.log(`\nWrote docs/deliverables/BENCHMARK_REPORT.md (${results.length} runs)`);
 }
