@@ -392,3 +392,31 @@
   .chart-panel-actions { width: 100%; justify-content: flex-start; }
   .chart-panel-actions .zoom-control { margin-left: 0; }
 }
+
+.datahub-panel { margin-top: 22px; }
+.datahub-sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+.datahub-source { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.datahub-source b { display: block; font-size: 11px; }
+.datahub-source span { display: block; margin-top: 2px; font-size: 9.5px; color: var(--muted); }
+.datahub-import { border-top: 1px solid var(--line); padding-top: 14px; }
+.datahub-import-controls { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.datahub-import-controls label { display: flex; flex-direction: column; gap: 5px; font-size: 9.5px; color: var(--muted); }
+.datahub-import-controls select { min-width: 160px; }
+.datahub-file input { display: none; }
+.datahub-file b { display: inline-flex; padding: 7px 10px; border: 1px dashed var(--line-strong); border-radius: 6px; font-size: 10px; cursor: pointer; }
+.datahub-report { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 10px; color: var(--muted); }
+.datahub-candidates { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.datahub-subhead { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 10px; color: var(--muted); }
+.datahub-subhead b { color: var(--ink); font-size: 12px; }
+.datahub-candidate { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.datahub-candidate-main { flex: 1; min-width: 0; }
+.datahub-candidate-main b { display: block; font-size: 11px; }
+.datahub-candidate-main span, .datahub-candidate-main small { display: block; margin-top: 2px; font-size: 9.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.datahub-candidate.approved { opacity: .75; }
+.datahub-publish { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+.datahub-publish label { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 5px; font-size: 9.5px; color: var(--muted); }
+.datahub-publish > span { font-size: 9.5px; color: var(--muted); }
+.datahub-releases { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 10px; color: var(--muted); }
+.datahub-releases b { display: block; margin-bottom: 6px; color: var(--ink); font-size: 11px; }
+.datahub-releases > div { display: grid; grid-template-columns: 90px 90px 1fr; gap: 8px; padding: 3px 0; }
+@media (max-width: 700px) { .datahub-sources { grid-template-columns: 1fr; } .datahub-releases > div { grid-template-columns: 1fr; } }

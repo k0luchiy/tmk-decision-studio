@@ -22,3 +22,7 @@ export function loadDatasets(): Promise<Datasets> {
   cached ??= loadFromDisk(repoRoot);
   return cached;
 }
+
+export function reloadDatasets(): void {
+  cached = undefined;
+}

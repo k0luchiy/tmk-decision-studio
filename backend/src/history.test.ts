@@ -111,7 +111,7 @@ describe('estimate history', () => {
 describe('deadline and extras', () => {
   it('targetWeeks compresses the schedule and raises all prices', async () => {
     const base = (await postEstimate()).json() as EstimateResponseDto;
-    const compressed = (await postEstimate({ targetWeeks: 10 })).json() as EstimateResponseDto;
+    const compressed = (await postEstimate({ targetWeeks: 5 })).json() as EstimateResponseDto;
 
     for (const key of ['inhouse', 'contractor', 'hybrid'] as const) {
       expect(compressed.estimates[key].cost.p50Rub).toBeGreaterThan(

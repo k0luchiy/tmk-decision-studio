@@ -1,0 +1,23 @@
+name: data-refresh
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Data Hub refresh
+        env:
+          DATA_HUB_URL: ${{ secrets.DATA_HUB_URL }}
+        run: |
+          if [ -z "$DATA_HUB_URL" ]; then
+            echo "DATA_HUB_URL is not configured; skipping live refresh."
+            exit 0
+          fi
+          curl --fail --silent --show-error \
+            -X POST "$DATA_HUB_URL/api/data/refresh" \
+            -H "content-type: application/json" \
+            -d '{"sourceId":"tmk_etp"}'

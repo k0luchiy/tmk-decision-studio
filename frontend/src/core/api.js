@@ -76,6 +76,41 @@ export function fetchDatasets() {
   return fetch(`${API_BASE}/api/datasets`).then(readJson);
 }
 
+export function fetchDataHub() {
+  return fetch(`${API_BASE}/api/data/hub`).then(readJson);
+}
+
+export function importAnalogueFile(file, sourceId = 'manual') {
+  const form = new FormData();
+  form.append('file', file, file.name);
+  const query = new URLSearchParams({ sourceId });
+  return fetch(`${API_BASE}/api/data/import?${query}`, { method: 'POST', body: form }).then(readJson);
+}
+
+export function approveDataCandidate(id) {
+  return fetch(`${API_BASE}/api/data/candidates/${encodeURIComponent(id)}/approve`, { method: 'POST' }).then(readJson);
+}
+
+export function rejectDataCandidate(id) {
+  return fetch(`${API_BASE}/api/data/candidates/${encodeURIComponent(id)}/reject`, { method: 'POST' }).then(readJson);
+}
+
+export function publishData(changelog) {
+  return fetch(`${API_BASE}/api/data/publish`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ changelog }),
+  }).then(readJson);
+}
+
+export function refreshDataSource(sourceId) {
+  return fetch(`${API_BASE}/api/data/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sourceId }),
+  }).then(readJson);
+}
+
 export function importHelpdesk(file) {
   const form = new FormData();
   form.append('file', file, file.name);

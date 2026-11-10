@@ -1,0 +1,13 @@
+{
+  "current": "2026.11.1",
+  "releases": [
+    {
+      "version": "2026.11.1",
+      "datasetVersion": "47a8fb6b9e9ed54c08019d8ca66d79e587fb08b7d5f3e4d80a56068c389c39c7",
+      "publishedAt": "2026-11-10",
+      "approvedBy": "system",
+      "changelog": "Initial dataset snapshot",
+      "rowsAdded": 0
+    }
+  ]
+}

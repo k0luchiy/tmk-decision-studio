@@ -9,6 +9,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import { registerErrorHandler } from './errors.js';
+import { dataRoutes } from './routes/data.js';
 import { datasetsRoutes } from './routes/datasets.js';
 import { estimatesRoutes } from './routes/estimates.js';
 import { exportRoutes } from './routes/export.js';
@@ -31,6 +32,7 @@ export function buildApp(): FastifyInstance {
   app.register(healthRoutes);
   app.register(metaRoutes);
   app.register(datasetsRoutes);
+  app.register(dataRoutes);
   app.register(intakeRoutes);
   app.register(estimatesRoutes);
   app.register(exportRoutes);

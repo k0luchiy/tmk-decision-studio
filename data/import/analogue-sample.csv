@@ -1,0 +1,4 @@
+id,project_type,title,year,currency,price_low,price_mid,price_high,price_basis,source,source_date,confidence,note
+hub_mes_plant_2026,mes,"Диспетчеризация и контроль аварий на трубном заводе",2026,RUB,18000000,24000000,32000000,contract_price,https://example.com/cases/mes-plant,2026-10-01,Medium,"Демо-строка для проверки Data Hub"
+hub_erp_integration_2026,erp_1c,"Интеграция 1С:ERP с производственным контуром",2026,RUB,9000000,12000000,16000000,contract_price,https://example.com/cases/erp-integration,2026-09-15,Medium,"Демо-строка для проверки Data Hub"
+hub_cv_quality_2026,cv_qc,"Контроль качества металла компьютерным зрением",2026,RUB,6000000,8500000,11000000,contract_price,https://example.com/cases/cv-quality,2026-08-20,Medium,"Демо-строка для проверки Data Hub"

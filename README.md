@@ -170,6 +170,7 @@ npm --prefix frontend run build      # vite build
 - `docs/11_frontend_integration_analysis.md` — статус интеграции и остатки.
 - `docs/deliverables/METHOD.md`, `DATA_MODEL.md`, `ARCHITECTURE.md` — сжатая
   выжимка с ссылками на реальные файлы кода.
+- `docs/deliverables/DATA_HUB.md` — обновление данных, ревью и версионирование.
 - `docs/deliverables/TEST_REPORT.md` — контрольные D1–D3, unit/property, intake.
 - `docs/DECISIONS.md` — журнал решений.
 

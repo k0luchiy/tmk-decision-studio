@@ -6,6 +6,7 @@ import {
 import { Button, Pill, SectionHead } from '../components/ui.jsx';
 import { mapManifest } from '../core/datasets.js';
 import { fetchDatasets, importHelpdesk } from '../core/api.js';
+import DataHub from '../components/DataHub.jsx';
 
 const reasonsText = (report) => {
   const dropped = report?.rowsDropped ?? [];
@@ -23,24 +24,20 @@ export default function DataPage() {
   const [importError, setImportError] = useState('');
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    let alive = true;
+  const loadManifest = async () => {
     setLoading(true);
-    fetchDatasets()
-      .then((data) => {
-        if (!alive) return;
-        setManifest(mapManifest(data));
-        setError('');
-      })
-      .catch((err) => {
-        if (alive) setError(err.message ?? 'API недоступен');
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
+    try {
+      setManifest(mapManifest(await fetchDatasets()));
+      setError('');
+    } catch (err) {
+      setError(err.message ?? 'API недоступен');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadManifest();
   }, []);
 
   const upload = async (file) => {
@@ -90,6 +87,8 @@ export default function DataPage() {
         <div><span>ВЕРСИЯ</span><b className="mono">{manifest?.versionShort ?? '—'}</b><small>TMK Decision Studio · datasetVersion</small></div>
         <div><span>ОБНОВЛЕНО</span><b>{manifest?.date ?? '—'}</b><small>дата манифеста</small></div>
       </div>
+
+      <DataHub onPublished={loadManifest} />
 
       <section className="panel">
         <SectionHead

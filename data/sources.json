@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "tmk_etp",
+      "name": "ETP ТМК",
+      "kind": "procurement",
+      "cadence": "weekly",
+      "mode": "parser",
+      "keywords": ["интеграция", "1С", "WMS", "MES", "АСУ ТП", "сопровождение", "техподдержка"],
+      "okpd2": ["62.01", "62.02"],
+      "trust": "high",
+      "enabled": true
+    },
+    {
+      "id": "eis",
+      "name": "ЕИС / zakupki.gov.ru",
+      "kind": "procurement",
+      "cadence": "weekly",
+      "mode": "parser",
+      "keywords": ["интеграция", "1С", "MES", "АСУ ТП", "датчики", "сопровождение"],
+      "okpd2": ["62.01", "62.02"],
+      "trust": "high",
+      "enabled": true
+    },
+    {
+      "id": "published_cases",
+      "name": "Публичные кейсы",
+      "kind": "published_case",
+      "cadence": "monthly",
+      "mode": "parser",
+      "keywords": ["внедрение", "интеграция", "MES", "BI", "компьютерное зрение"],
+      "trust": "medium",
+      "enabled": true
+    },
+    {
+      "id": "manual",
+      "name": "Ручной импорт",
+      "kind": "manual",
+      "cadence": "on-demand",
+      "mode": "manual",
+      "trust": "medium",
+      "enabled": true
+    }
+  ]
+}
