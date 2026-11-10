@@ -98,7 +98,7 @@ describe('estimateTask UI parity options', () => {
 
   it('compresses the deadline and adds a Putnam risk line to every scenario', () => {
     const base = run();
-    const compressed = run({ targetWeeks: 10 });
+    const compressed = run({ targetWeeks: 5 });
 
     for (const key of ['inhouse', 'contractor', 'hybrid'] as const) {
       expect(compressed.estimates[key].cost.p50Rub).toBeGreaterThan(

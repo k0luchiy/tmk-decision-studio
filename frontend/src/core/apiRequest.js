@@ -48,6 +48,7 @@ const workTypeFor = (type) => {
   if (/vision|cv|дефект|компьютерн|машинн|зрени/.test(text)) return 'cv';
   if (/сопровожд|поддержк|sla|дежурств/.test(text)) return 'support';
   if (/телеграм|telegram|чат-бот|чатбот|искусственн|нейросет|llm|nlp/.test(text)) return 'ai';
+  if (/завод|датчик|аварийн|регулир|диспетчер|асутп|mes|scada|оборудован/.test(text)) return 'mes';
   if (/разработ|мобильн|приложен/.test(text)) return 'development';
   return 'default';
 };

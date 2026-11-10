@@ -5,9 +5,9 @@
   "tasks": [
     {
       "id": "d1",
-      "verdict": "hybrid",
-      "p50Rub": 7632335,
-      "weeks": 13
+      "verdict": "parity",
+      "p50Rub": 4376925,
+      "weeks": 7
     },
     {
       "id": "d2",
@@ -18,8 +18,8 @@
     {
       "id": "d3",
       "verdict": "hybrid",
-      "p50Rub": 16441570,
-      "weeks": 27
+      "p50Rub": 9703516,
+      "weeks": 15
     }
   ]
 }

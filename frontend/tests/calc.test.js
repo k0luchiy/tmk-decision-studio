@@ -32,6 +32,18 @@ test('a short Telegram-bot brief starts from a small scope, not from D1', () => 
   assert.ok(model.scenarios.internal.p50 < 5_000_000, `bot cost ${model.scenarios.internal.p50}`);
 });
 
+test('an industrial control brief gets a large MES scope', () => {
+  const state = createBriefState('Разработка системы регулизации датчиков на заводе', [
+    { id: 'type', value: 'MES / АСУ ТП' },
+  ]);
+  const model = computeModel(state);
+
+  assert.equal(state.type, 'MES / АСУ ТП');
+  assert.ok(model.effort >= 1000, `MES effort ${model.effort}`);
+  assert.ok(model.scenarios.internal.p50 > 4_000_000, `MES cost ${model.scenarios.internal.p50}`);
+  assert.ok(model.scenarios.internal.weeks >= 12, `MES weeks ${model.scenarios.internal.weeks}`);
+});
+
 test('stage owners follow the brief type instead of the D1 template', () => {
   const telegram = createBriefState('Мне нужно разработать телеграм бота', [
     { id: 'type', value: 'Искусственный интеллект' },

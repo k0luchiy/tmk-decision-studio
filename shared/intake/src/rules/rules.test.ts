@@ -17,6 +17,15 @@ describe('classify', () => {
     expect(classify('Мне нужно создать телеграм бота').workType).toBe('ai');
   });
 
+  it('plant control and sensor regulation → MES / АСУ ТП', () => {
+    expect(
+      classify('Разработка приложения для полного контроля за заводом и обнаружением аварийных ситуаций').workType,
+    ).toBe('mes');
+    expect(
+      classify('Разработка системы автоматической регулизации датчиков на трубном заводе').workType,
+    ).toBe('mes');
+  });
+
   it('non-IT text → unknown and low confidence', () => {
     const result = classify('Сделайте что-нибудь');
     expect(result.workType).toBe('unknown');

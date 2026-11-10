@@ -7,6 +7,7 @@ const DEFAULTS = {
   development: { type: 'Разработка ПО', integrations: 0, screens: 3, users: 100, deadlineWeeks: 10, effort: 360 },
   ai: { type: 'Искусственный интеллект', integrations: 0, screens: 0, users: 100, deadlineWeeks: 8, effort: 320 },
   mobile: { type: 'Мобильная разработка', integrations: 0, screens: 8, users: 100, deadlineWeeks: 12, effort: 600 },
+  mes: { type: 'MES / АСУ ТП', integrations: 4, screens: 0, users: 500, deadlineWeeks: 24, effort: 1600 },
   support: { type: 'Сопровождение', integrations: 0, screens: 0, users: 100, deadlineWeeks: 12, effort: 500 },
   default: { type: 'ИТ-инициатива', integrations: 0, screens: 2, users: 100, deadlineWeeks: 10, effort: 320 },
 };

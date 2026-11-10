@@ -9,6 +9,7 @@ const detectType = (text) => {
   if (/(компьютерн|машинн|cv|дефект|видеоаналит|зрени)/.test(lower)) return 'Computer Vision';
   if (/(поддержк|sla|24\/7|дежурств|сопровожд)/.test(lower)) return 'Сопровождение';
   if (/(телеграм|telegram|чат-бот|чатбот|искусственн|нейросет|llm|nlp)/.test(lower)) return 'Искусственный интеллект';
+  if (/(завод|датчик|аварийн|регулир|диспетчер|асутп|mes|scada|оборудован)/.test(lower)) return 'MES / АСУ ТП';
   if (/(интеграц|api|обмен|шлюз|wms|1с)/.test(lower)) return 'Интеграция систем';
   if (/(мобильн|приложен|кабинет|интерфейс)/.test(lower)) return 'Разработка ПО';
   return 'ИТ-инициатива';
@@ -96,6 +97,7 @@ const WORK_TYPE_LABELS = {
   cv: 'Computer Vision',
   support: 'Сопровождение',
   ai: 'Искусственный интеллект',
+  mes: 'MES / АСУ ТП',
   rpa: 'RPA',
   mobile: 'Мобильная разработка',
   bi: 'BI и аналитика',

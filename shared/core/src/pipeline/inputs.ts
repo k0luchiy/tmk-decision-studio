@@ -237,7 +237,9 @@ export function combineEffort(input: {
       ? analogueEstimateResult.medianRub / blendedRate
       : methodA;
 
-  const combined = combineMethods({ a: methodA, b: methodB, c: methodC });
+  const cRatio = methodA > 0 ? methodC / methodA : 1;
+  const comparableC = cRatio >= 0.5 && cRatio <= 2 ? methodC : methodA;
+  const combined = combineMethods({ a: methodA, b: methodB, c: comparableC });
   const scale = methodA > 0 ? combined.effortHours / methodA : 1;
   const workItems = scaleWorkItems(baseItems, scale);
   const effortGrid = toStageGrid(workItems);

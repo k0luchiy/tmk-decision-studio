@@ -27,7 +27,7 @@ const MATRIX = {
   erp: { ...DEFAULT_MATRIX, design: 'internal' },
   migration: { ...DEFAULT_MATRIX, design: 'internal' },
   bi: DEFAULT_MATRIX,
-  mes: DEFAULT_MATRIX,
+  mes: { ...DEFAULT_MATRIX, design: 'internal', testing: 'internal' },
   cv: DEFAULT_MATRIX,
   security: {
     ...DEFAULT_MATRIX,
@@ -49,7 +49,7 @@ export const workTypeKey = (value) => {
   if (/миграц|migration/.test(text)) return 'migration';
   if (/erp|1с|1c/.test(text)) return 'erp';
   if (/bi|аналитик|dwh|данн/.test(text)) return 'bi';
-  if (/mes|асутп/.test(text)) return 'mes';
+  if (/mes|асутп|завод|датчик|аварийн|регулир|диспетчер|scada|оборудован/.test(text)) return 'mes';
   if (/vision|cv|компьютерн/.test(text)) return 'cv';
   if (/безопасн|security|кии/.test(text)) return 'security';
   if (/разработ|development|веб|web|приложен/.test(text)) return 'development';
