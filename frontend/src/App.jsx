@@ -7,7 +7,7 @@ import { CASES } from './data/cases.js';
 import { computeModel, createCaseState, recommendedRationale } from './core/calc.js';
 import { buildModelFromApi, exportApiEstimate, fetchApiModel } from './core/apiModel.js';
 import { fetchIntake, confirmIntake, mapIntakeToParams, fetchEstimates, fetchEstimate } from './core/api.js';
-import { applyParam, parseBrief } from './core/parseBrief.js';
+import { applyAutoParams, applyParam, parseBrief } from './core/parseBrief.js';
 
 const INTAKE_SOURCES = { rules: 'правила', 'jev-cache': 'Jev-кэш', 'jev-live': 'Jev live' };
 const savedName = (brief) => {
@@ -247,6 +247,7 @@ export default function App() {
       next = { ...state, description: text, confirmedParams: 0, rejectedParams: 0 };
       setState(next);
       const parsedParams = await parseViaApi(text);
+      next = applyAutoParams(next, parsedParams);
       setParams(parsedParams.length ? parsedParams : buildParams(next));
       setParsed(true);
     } else {
@@ -373,7 +374,7 @@ export default function App() {
   const reparse = async (mode = intakeMode) => {
     const extracted = state.description?.trim() ? await parseViaApi(state.description, mode) : [];
     setParams(extracted.length ? extracted : buildParams(state));
-    setState((old) => ({ ...old, confirmedParams: 0, rejectedParams: 0 }));
+    setState((old) => applyAutoParams({ ...old, confirmedParams: 0, rejectedParams: 0 }, extracted));
     setParsed(true);
     notify(`Бриф разобран: найдено ${extracted.length || 4} параметров`);
   };

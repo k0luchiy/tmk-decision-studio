@@ -15,6 +15,34 @@ const PARAM_LABELS = {
   complexity: 'Сложность',
   has_scope_numbers: 'Числовые параметры объёма',
   greenfield: 'Проект с нуля',
+  stage_owner_discovery: 'Ответственный: аналитика',
+  stage_owner_design: 'Ответственный: проектирование',
+  stage_owner_development: 'Ответственный: разработка',
+  stage_owner_integration: 'Ответственный: интеграции',
+  stage_owner_testing: 'Ответственный: тестирование',
+  stage_owner_deployment: 'Ответственный: внедрение',
+  stage_owner_handover: 'Ответственный: приёмка',
+};
+
+const AUTO_KEYS = new Set([
+  'work_type', 'platform', 'security_kii', 'mobile', 'has_integrations',
+  'integrations_scale', 'complexity', 'greenfield', 'has_scope_numbers',
+]);
+
+const paramPolicy = (param) => {
+  if (param.policy === 'auto' || param.policy === 'suggest' || param.policy === 'manual') {
+    return param.policy;
+  }
+  if (String(param.key).startsWith('stage_owner_')) return 'suggest';
+  return AUTO_KEYS.has(param.key) ? 'auto' : 'manual';
+};
+
+const isAutoAccepted = (param) => {
+  if (typeof param.autoAccept === 'boolean') return param.autoAccept;
+  const policy = paramPolicy(param);
+  if (policy !== 'auto' || param.conflictGroup !== undefined) return false;
+  const confidence = param.probability ?? param.confidence ?? 0;
+  return (param.source === 'rules' || param.source === 'jev') && confidence >= 0.75;
 };
 
 export class ApiError extends Error {
@@ -90,12 +118,20 @@ const confidenceLabel = (value) => (Number(value) >= 0.75 ? 'Высокая' : '
  * `applyParam` can reconcile values back into the local state.
  */
 export function mapIntakeToParams(apiParams = []) {
-  return apiParams.map((param) => ({
-    id: param.key,
-    label: PARAM_LABELS[param.key] ?? param.key,
-    value: String(param.value),
-    source: param.quote ?? 'Jev/правила',
-    confidence: confidenceLabel(param.confidence),
-    status: 'pending',
-  }));
+  return apiParams.map((param) => {
+    const policy = paramPolicy(param);
+    const autoAccepted = isAutoAccepted(param);
+    const source = param.quote ?? (param.source === 'jev' ? 'Jev' : param.source === 'rules' ? 'Правила' : 'Jev/правила');
+    return {
+      id: param.key,
+      label: PARAM_LABELS[param.key] ?? param.key,
+      value: String(param.value),
+      source,
+      confidence: confidenceLabel(param.probability ?? param.confidence),
+      status: autoAccepted ? 'confirmed' : 'pending',
+      autoAccepted,
+      suggested: policy === 'suggest',
+      policy,
+    };
+  });
 }

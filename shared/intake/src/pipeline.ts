@@ -13,7 +13,8 @@
 import type { JevAnswer } from '@app/contract';
 import { getCached, sha256 } from './cache.js';
 import { classifyWithJev } from './jev/adapter.js';
-import { mergeIntake, type MergedParam, type RuleParamInput } from './merge.js';
+import { mergeIntake, type RuleParamInput } from './merge.js';
+import { applyIntakePolicy, type PolicyParam } from './policy.js';
 import { classify, extract } from './rules/index.js';
 
 /** Default cache file, relative to the process working directory. */
@@ -42,7 +43,7 @@ export interface ClassifyBriefOptions {
 
 /** Result of {@link classifyBrief}. */
 export interface ClassifyBriefResult {
-  params: MergedParam[];
+  params: PolicyParam[];
   status: IntakeStatus;
 }
 
@@ -77,12 +78,14 @@ function rulesParams(brief: string): {
   };
 }
 
-function mergeWith(brief: string, answers: readonly JevAnswer[]): MergedParam[] {
+function mergeWith(brief: string, answers: readonly JevAnswer[]): PolicyParam[] {
   const base = rulesParams(brief);
-  return mergeIntake({
-    rules: { params: base.params, classification: base.classification },
-    jev: answers,
-  });
+  return applyIntakePolicy(
+    mergeIntake({
+      rules: { params: base.params, classification: base.classification },
+      jev: answers,
+    }),
+  );
 }
 
 /**

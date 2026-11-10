@@ -123,14 +123,13 @@ export function mapStateToRequest(state, dirty = {}) {
   };
   if (dirty.rateDirty) options.teamRate = weightedTeamRate(state);
   if (dirty.stageHoursDirty) options.stageHours = mapStageHours(state.stages);
-  return {
-    params: [
-      confirmedParam('work_type', workTypeFor(state.type)),
-      confirmedParam('flows', state.integrations),
-      confirmedParam('screens', state.screens),
-      confirmedParam('users', state.users),
-      confirmedParam('duration_weeks', state.deadlineWeeks),
-    ],
-    options,
-  };
+  const params = [
+    confirmedParam('work_type', workTypeFor(state.type)),
+    confirmedParam('flows', state.integrations),
+    confirmedParam('screens', state.screens),
+    confirmedParam('users', state.users),
+    confirmedParam('duration_weeks', state.deadlineWeeks),
+  ];
+  if (state.platform) params.push(confirmedParam('platform', state.platform));
+  return { params, options };
 }

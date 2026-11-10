@@ -164,7 +164,10 @@ export default function Parameters({
                     <span>{param.label}</span>
                     <b>{param.value}</b>
                   </div>
-                  <Pill tone={param.confidence === 'Высокая' ? 'good' : 'warn'}>{param.confidence}</Pill>
+                  <div className="param-badges">
+                    {param.suggested && <Pill tone="info">Jev: предложение</Pill>}
+                    <Pill tone={param.confidence === 'Высокая' ? 'good' : 'warn'}>{param.confidence}</Pill>
+                  </div>
                 </div>
                 <small>{param.source}</small>
                 {param.status === 'pending' ? (
@@ -175,7 +178,9 @@ export default function Parameters({
                 ) : (
                   <div className={`param-status ${param.status}`}>
                     <CheckCircle2 size={12} />
-                    {param.status === 'rejected' ? 'Отклонено · нужно уточнить' : 'Подтверждено и применено'}
+                    {param.status === 'rejected'
+                      ? 'Отклонено · нужно уточнить'
+                      : param.autoAccepted ? 'Принято автоматически' : 'Подтверждено и применено'}
                   </div>
                 )}
               </article>

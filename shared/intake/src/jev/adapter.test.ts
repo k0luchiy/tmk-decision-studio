@@ -4,7 +4,7 @@ import {
   JEV_MODEL,
   classifyWithJev,
 } from './adapter.js';
-import { JEV_PROMPT_VERSION } from './contract.js';
+import { JEV_PROMPT_VERSION, JEV_QUESTIONS } from './contract.js';
 
 const BRIEF = 'Интеграция 1С:ERP с WMS, 6 интеграционных потоков, срок 3 месяца';
 
@@ -71,7 +71,7 @@ describe('classifyWithJev', () => {
     };
     expect(payload.model).toBe(JEV_MODEL);
     expect(payload.state).toBe(BRIEF);
-    expect(Object.keys(payload.questions ?? {})).toHaveLength(9);
+    expect(Object.keys(payload.questions ?? {})).toHaveLength(JEV_QUESTIONS.length);
   });
 
   it('401 → unavailable without throwing', async () => {

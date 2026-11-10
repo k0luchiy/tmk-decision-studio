@@ -105,6 +105,17 @@ export const applyParam = (state, param) => {
   if (id === 'type' || id === 'work_type') {
     next.type = id === 'work_type' ? (WORK_TYPE_LABELS[String(param.value)] ?? String(param.value)) : param.value;
   }
+  if (id === 'platform') next.platform = String(param.value);
+  if (id.startsWith('stage_owner_')) {
+    const stageId = id.slice('stage_owner_'.length);
+    const owner = String(param.value);
+    const splitByOwner = { internal: 80, split: 50, vendor: 20 };
+    if (splitByOwner[owner] !== undefined) {
+      next.stages = next.stages.map((stage) => (
+        stage.id === stageId ? { ...stage, owner, split: splitByOwner[owner] } : stage
+      ));
+    }
+  }
   if (id === 'integrations' || id === 'flows') next.integrations = toNumber(param.value, state.integrations);
   if (id === 'screens') next.screens = toNumber(param.value, 0);
   if (id === 'users') next.users = toNumber(param.value, state.users);
@@ -116,3 +127,7 @@ export const applyParam = (state, param) => {
   }
   return next;
 };
+
+export const applyAutoParams = (state, params = []) => (
+  params.filter((param) => param.autoAccepted).reduce(applyParam, state)
+);
