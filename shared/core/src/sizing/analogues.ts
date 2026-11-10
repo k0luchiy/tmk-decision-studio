@@ -20,6 +20,7 @@ export const ANALOGUE_TYPE_BY_WORK_TYPE: Record<string, string> = {
   mes: 'mes',
   cv: 'cv_qc',
   security: 'kii_security',
+  support: 'support',
   erp: 'erp_1c',
   data: 'dwh_bi',
   ai: 'predictive_maintenance',

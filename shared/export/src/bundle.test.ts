@@ -6,6 +6,7 @@ import type { Estimate } from '@app/contract';
 import d1ScenariosJson from '../../contract/mock/d1.scenarios.json';
 import { ExportError, buildExportBundle } from './bundle.js';
 import type { BuildExportBundleInput, ExportFormat } from './bundle.js';
+import { fromSnapshot, snapshotHash } from './snapshot.js';
 
 function firstEstimate(): Estimate {
   return EstimateSchema.parse(d1ScenariosJson[0]);
@@ -51,6 +52,20 @@ describe('buildExportBundle', () => {
     expect(pdf.mime).toBe('application/pdf');
     expect(pdf.filename).toBe(`${firstEstimate().id}.pdf`);
     expect(pdf.data.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  });
+
+  it('emits a stable 64-hex hash and byte-identical JSON for the same estimate', async () => {
+    const first = await buildExportBundle(input('json'));
+    const second = await buildExportBundle(input('json'));
+
+    expect(first.filename).toBe(second.filename);
+    expect(first.data.equals(second.data)).toBe(true);
+
+    const payload: unknown = JSON.parse(first.data.toString('utf8'));
+    const snapshot = fromSnapshot(payload);
+    expect(snapshot.hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(snapshotHash(snapshot)).toBe(snapshot.hash);
+    expect(first.filename).toContain((snapshot.hash ?? '').slice(0, 16));
   });
 
   it('renders the three-scenario comparison into the PDF bundle', async () => {

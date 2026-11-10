@@ -15,6 +15,7 @@ import {
 } from '../sizing/analogues.js';
 import { combineMethods, type CombineMethodsResult } from '../sizing/combine.js';
 import { fpLite, type FpComponent } from '../sizing/fpLite.js';
+import { supportAnaloguesFromContracts } from '../sizing/supportAnalogues.js';
 import type { EstimateTaskOptions } from './types.js';
 
 /** Parameter keys that map onto an archetype unit count. */
@@ -179,24 +180,24 @@ export function combineEffort(input: {
   const fp = fpLite({ counts: fpCounts(task), platform: platformPdr(task) });
   const methodB = fp.fp > 0 ? fp.effortHours : methodA;
   const analogueType = ANALOGUE_TYPE_BY_WORK_TYPE[workType];
+  const publishedAnalogues = datasets.analogues.analogues.map((row) => ({
+    id: row.id,
+    project_type: row.project_type,
+    title: row.title,
+    year: row.year,
+    currency: row.currency === 'USD' ? ('USD' as const) : ('RUB' as const),
+    price_low: row.price_low,
+    price_mid: row.price_mid,
+    price_high: row.price_high,
+    source: row.source,
+    price_basis: row.price_basis,
+  }));
+  const analogues =
+    workType === 'support'
+      ? [...publishedAnalogues, ...supportAnaloguesFromContracts(datasets.contracts)]
+      : publishedAnalogues;
   const analogueEstimateResult =
-    analogueType === undefined
-      ? undefined
-      : analogueEstimate({
-          workType,
-          analogues: datasets.analogues.analogues.map((row) => ({
-            id: row.id,
-            project_type: row.project_type,
-            title: row.title,
-            year: row.year,
-            currency: row.currency === 'USD' ? 'USD' : 'RUB',
-            price_low: row.price_low,
-            price_mid: row.price_mid,
-            price_high: row.price_high,
-            source: row.source,
-            price_basis: row.price_basis,
-          })),
-        });
+    analogueType === undefined ? undefined : analogueEstimate({ workType, analogues });
   const blendedRate = blendedInhouseRate(datasets, baseGrid.byRole);
   const methodC =
     analogueEstimateResult?.medianRub !== null &&

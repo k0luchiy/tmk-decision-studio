@@ -6,7 +6,12 @@
 import type { Analogue, Assumption, Risk } from '@app/contract';
 import type { Datasets } from '@app/data';
 import type { ContractModel } from '../cost/contractor.js';
-import { ANALOGUE_AGE_INDEX, ANALOGUE_TYPE_BY_WORK_TYPE } from '../sizing/analogues.js';
+import {
+  ANALOGUE_AGE_INDEX,
+  ANALOGUE_TYPE_BY_WORK_TYPE,
+  DEFAULT_TARGET_YEAR,
+} from '../sizing/analogues.js';
+import { supportAnaloguesFromContracts } from '../sizing/supportAnalogues.js';
 
 function cleanScopeVector(
   raw: Record<string, unknown>,
@@ -20,8 +25,46 @@ function cleanScopeVector(
   return result;
 }
 
+function supportContractAnalogues(datasets: Datasets): Analogue[] {
+  return supportAnaloguesFromContracts(datasets.contracts)
+    .slice(0, 3)
+    .map((row) => ({
+      id: row.id,
+      corpus: 'tmk_eis' as const,
+      type: 'support',
+      title: row.title,
+      year: row.year,
+      currency: 'RUB' as const,
+      price: {
+        low: row.price_mid ?? 0,
+        mid: row.price_mid ?? 0,
+        high: row.price_mid ?? 0,
+        basis: 'contract_price',
+      },
+      vatFlag: false,
+      scopeVector: { contract_price: true },
+      normalization: {
+        kScope: 1,
+        kComplexity: 1,
+        kRegion: 1,
+        kAge: row.year <= DEFAULT_TARGET_YEAR
+          ? Math.pow(ANALOGUE_AGE_INDEX, DEFAULT_TARGET_YEAR - row.year)
+          : 1,
+        kVat: 1,
+      },
+      normalizedPriceRub: row.price_mid ?? 0,
+      included: true,
+      sourceId: `tmk_contracts:${row.id.replace(/^tmk:/, '')}`,
+      ...(typeof row.source === 'string' ? { url: row.source } : {}),
+    }));
+}
+
 /** Maps corpus rows to contract analogues; only matching project types. */
 export function toContractAnalogues(datasets: Datasets, workType: string): Analogue[] {
+  if (workType === 'support') {
+    return supportContractAnalogues(datasets);
+  }
+
   const expectedType = ANALOGUE_TYPE_BY_WORK_TYPE[workType];
   if (expectedType === undefined) return [];
 

@@ -25,6 +25,7 @@ export interface ExportSnapshot {
   estimateId: string;
   estimate: Estimate;
   taskRef?: string;
+  hash?: string;
 }
 
 /** Input of {@link toSnapshot}. */
@@ -33,7 +34,7 @@ export interface ToSnapshotInput {
   datasetVersion: string;
   seed: number;
   taskRef?: string;
-  /** Fixed timestamp for deterministic tests; defaults to now. */
+  /** Fixed timestamp; defaults to the estimate's own `createdAt`. */
   now?: string;
 }
 
@@ -55,6 +56,15 @@ function assertInteger(value: unknown, field: string): number {
   return value;
 }
 
+const HASH_PATTERN = /^[0-9a-f]{64}$/;
+
+function assertHash(value: unknown, field: string): string {
+  if (typeof value !== 'string' || !HASH_PATTERN.test(value)) {
+    throw new Error(`Invalid snapshot: "${field}" must be a 64-character lowercase hex digest`);
+  }
+  return value;
+}
+
 function assertIsoDate(value: unknown, field: string): string {
   const text = assertString(value, field);
   if (Number.isNaN(Date.parse(text))) {
@@ -67,13 +77,14 @@ function assertIsoDate(value: unknown, field: string): string {
  * Builds a snapshot from an estimate and its provenance metadata.
  *
  * The estimate is copied by reference; callers that mutate it afterwards
- * should clone it first. `now` is injectable so tests can pin the timestamp.
+ * should clone it first. Without `now` the timestamp is the estimate's own
+ * `createdAt`, so repeated exports of one estimate stay byte-identical.
  */
 export function toSnapshot(input: ToSnapshotInput): ExportSnapshot {
   const { estimate, datasetVersion, seed } = input;
   const snapshot: ExportSnapshot = {
     schemaVersion: SNAPSHOT_SCHEMA_VERSION,
-    createdAt: input.now ?? new Date().toISOString(),
+    createdAt: input.now ?? estimate.createdAt,
     datasetVersion,
     seed,
     estimateId: estimate.id,
@@ -120,6 +131,9 @@ export function fromSnapshot(json: unknown): ExportSnapshot {
   if (json.taskRef !== undefined) {
     snapshot.taskRef = assertString(json.taskRef, 'taskRef');
   }
+  if (json.hash !== undefined) {
+    snapshot.hash = assertHash(json.hash, 'hash');
+  }
 
   return snapshot;
 }
@@ -143,7 +157,9 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(canonicalise(value));
 }
 
-/** SHA-256 of the canonical JSON, as a lowercase hex digest. */
+/** SHA-256 of the canonical JSON without the `hash` field, as lowercase hex. */
 export function snapshotHash(snapshot: ExportSnapshot): string {
-  return createHash('sha256').update(canonicalJson(snapshot)).digest('hex');
+  const unhashed: ExportSnapshot = { ...snapshot };
+  delete unhashed.hash;
+  return createHash('sha256').update(canonicalJson(unhashed)).digest('hex');
 }

@@ -89,10 +89,11 @@ export async function buildExportBundle(input: BuildExportBundleInput): Promise<
     case 'json': {
       const snapshot = toSnapshot({ estimate, datasetVersion, seed, taskRef: estimate.taskId });
       const hash = snapshotHash(snapshot);
+      const payload = { ...snapshot, hash };
       return {
         filename: `${estimate.id}-snapshot-${hash.slice(0, 16)}.json`,
         mime: MIME.json,
-        data: Buffer.from(`${JSON.stringify(snapshot, null, 2)}\n`, 'utf8'),
+        data: Buffer.from(`${JSON.stringify(payload, null, 2)}\n`, 'utf8'),
       };
     }
     case 'xlsx':

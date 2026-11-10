@@ -45,6 +45,42 @@ describe('toSnapshot / fromSnapshot', () => {
   it('rejects a payload without an estimate', () => {
     expect(() => fromSnapshot({ schemaVersion: '1.0.0' })).toThrow();
   });
+
+  it('defaults createdAt to the estimate createdAt', () => {
+    const estimate = firstEstimate();
+    const snapshot = toSnapshot({
+      estimate,
+      datasetVersion: estimate.datasetVersion,
+      seed: estimate.seed,
+    });
+    expect(snapshot.createdAt).toBe(estimate.createdAt);
+  });
+
+  it('accepts a payload with a 64-hex hash', () => {
+    const estimate = firstEstimate();
+    const snapshot = toSnapshot({
+      estimate,
+      datasetVersion: estimate.datasetVersion,
+      seed: estimate.seed,
+      now: NOW,
+    });
+    const hash = snapshotHash(snapshot);
+    const restored = fromSnapshot({ ...snapshot, hash });
+
+    expect(restored.hash).toBe(hash);
+    expect(snapshotHash(restored)).toBe(hash);
+  });
+
+  it('rejects a malformed hash', () => {
+    const estimate = firstEstimate();
+    const snapshot = toSnapshot({
+      estimate,
+      datasetVersion: estimate.datasetVersion,
+      seed: estimate.seed,
+      now: NOW,
+    });
+    expect(() => fromSnapshot({ ...snapshot, hash: 'not-a-hash' })).toThrow(/hash/i);
+  });
 });
 
 describe('snapshotHash', () => {

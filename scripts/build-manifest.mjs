@@ -3,7 +3,7 @@
 // that module with esbuild so it can run on plain Node without a TS loader.
 
 import { Buffer } from 'node:buffer';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { stdout } from 'node:process';
 import { fileURLToPath, URL } from 'node:url';
@@ -33,13 +33,43 @@ const { computeManifest } = await import(moduleUrl);
 
 const manifest = await computeManifest(root);
 const targetDir = path.join(root, 'data');
+const targetFile = path.join(targetDir, 'manifest.json');
 await mkdir(targetDir, { recursive: true });
-await writeFile(
-  path.join(targetDir, 'manifest.json'),
-  `${JSON.stringify(manifest, null, 2)}\n`,
-  'utf8',
-);
 
-stdout.write(
-  `data/manifest.json: ${manifest.files.length} files, datasetVersion ${manifest.datasetVersion}\n`,
-);
+async function readExisting(file) {
+  try {
+    return JSON.parse(await readFile(file, 'utf8'));
+  } catch {
+    return undefined;
+  }
+}
+
+function sameFileHashes(existing, next) {
+  if (existing === undefined || !Array.isArray(existing.files)) {
+    return false;
+  }
+  if (existing.files.length !== next.files.length) {
+    return false;
+  }
+  return next.files.every((file, index) => {
+    const previous = existing.files[index];
+    return (
+      previous.path === file.path &&
+      previous.sha256 === file.sha256 &&
+      previous.rows === file.rows &&
+      previous.source === file.source
+    );
+  });
+}
+
+const existing = await readExisting(targetFile);
+if (sameFileHashes(existing, manifest)) {
+  stdout.write(
+    `data/manifest.json: ${manifest.files.length} files, datasetVersion ${manifest.datasetVersion} (unchanged, generatedAt preserved)\n`,
+  );
+} else {
+  await writeFile(targetFile, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  stdout.write(
+    `data/manifest.json: ${manifest.files.length} files, datasetVersion ${manifest.datasetVersion}\n`,
+  );
+}
