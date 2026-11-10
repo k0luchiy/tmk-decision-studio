@@ -7,10 +7,22 @@
       "kind": "procurement",
       "cadence": "weekly",
       "mode": "parser",
-      "keywords": ["интеграция", "1С", "WMS", "MES", "АСУ ТП", "сопровождение", "техподдержка"],
-      "okpd2": ["62.01", "62.02"],
+      "keywords": [
+        "интеграция",
+        "1С",
+        "WMS",
+        "MES",
+        "АСУ ТП",
+        "сопровождение",
+        "техподдержка"
+      ],
+      "okpd2": [
+        "62.01",
+        "62.02"
+      ],
       "trust": "high",
-      "enabled": true
+      "enabled": true,
+      "feedUrl": "file:data/inbox/tmk_etp.json"
     },
     {
       "id": "eis",
@@ -18,10 +30,21 @@
       "kind": "procurement",
       "cadence": "weekly",
       "mode": "parser",
-      "keywords": ["интеграция", "1С", "MES", "АСУ ТП", "датчики", "сопровождение"],
-      "okpd2": ["62.01", "62.02"],
+      "keywords": [
+        "интеграция",
+        "1С",
+        "MES",
+        "АСУ ТП",
+        "датчики",
+        "сопровождение"
+      ],
+      "okpd2": [
+        "62.01",
+        "62.02"
+      ],
       "trust": "high",
-      "enabled": true
+      "enabled": true,
+      "feedUrl": "file:data/inbox/eis.json"
     },
     {
       "id": "published_cases",
@@ -29,9 +52,16 @@
       "kind": "published_case",
       "cadence": "monthly",
       "mode": "parser",
-      "keywords": ["внедрение", "интеграция", "MES", "BI", "компьютерное зрение"],
+      "keywords": [
+        "внедрение",
+        "интеграция",
+        "MES",
+        "BI",
+        "компьютерное зрение"
+      ],
       "trust": "medium",
-      "enabled": true
+      "enabled": true,
+      "feedUrl": "file:data/inbox/published_cases.csv"
     },
     {
       "id": "manual",

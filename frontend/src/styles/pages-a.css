@@ -420,3 +420,10 @@
 .datahub-releases b { display: block; margin-bottom: 6px; color: var(--ink); font-size: 11px; }
 .datahub-releases > div { display: grid; grid-template-columns: 90px 90px 1fr; gap: 8px; padding: 3px 0; }
 @media (max-width: 700px) { .datahub-sources { grid-template-columns: 1fr; } .datahub-releases > div { grid-template-columns: 1fr; } }
+
+.datahub-format { margin-top: 10px; font-size: 10px; color: var(--muted); }
+.datahub-format summary { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: var(--accent-ink); }
+.datahub-format div { margin-top: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-2); line-height: 1.55; }
+.datahub-format p { margin: 0 0 4px; }
+.datahub-format code { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink); }
+.datahub-schedule { display: flex; align-items: center; gap: 5px; margin: -4px 0 14px; font-size: 9.5px; color: var(--muted); }

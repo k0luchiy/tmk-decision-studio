@@ -1,0 +1,17 @@
+[
+  {
+    "id": "inbox_eis_cv_2026_01",
+    "project_type": "cv_qc",
+    "title": "Контроль качества металла компьютерным зрением",
+    "year": 2026,
+    "currency": "RUB",
+    "price_low": 6000000,
+    "price_mid": 8500000,
+    "price_high": 11000000,
+    "price_basis": "НМЦК",
+    "source": "https://zakupki.gov.ru/epz/order/notice/ok504/view/common-info.html?regNumber=900003",
+    "source_date": "2026-08-12",
+    "confidence": "medium",
+    "note": "Пример feed-файла ЕИС для Live refresh"
+  }
+]

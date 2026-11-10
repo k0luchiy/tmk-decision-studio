@@ -1,0 +1,3 @@
+id,project_type,title,year,currency,price_low,price_mid,price_high,price_basis,source,source_date,confidence,note
+inbox_case_dwh_2026_01,dwh_bi,"Хранилище данных и управленческая отчётность",2026,RUB,7000000,9500000,13000000,project_price,https://example.com/cases/dwh-reporting,2026-07-10,medium,"Пример feed-файла публичных кейсов"
+inbox_case_portal_2026_02,erp_1c,"Личный кабинет поставщика на базе 1С",2026,RUB,4000000,5500000,7500000,project_price,https://example.com/cases/supplier-portal,2026-06-18,medium,"Пример feed-файла публичных кейсов"

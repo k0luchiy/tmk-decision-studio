@@ -80,6 +80,16 @@ data/releases.json                 версия, changelog, кто утверд�
 
 Пример: `data/import/analogue-sample.csv`.
 
+Локальные примеры live-источников:
+
+- `data/inbox/tmk_etp.json` — 2 строки ETP ТМК;
+- `data/inbox/eis.json` — 1 строка ЕИС;
+- `data/inbox/published_cases.csv` — 2 публичных кейса.
+
+Они подключены в `data/sources.json` через `file:...` и позволяют проверить
+кнопку **Live refresh** без внешней сети. Для production `file:` заменяется на
+`https://...` feed.
+
 После импорта строки попадают в очередь, а не в датасет. Дубликаты
 отсекаются по `id` и по паре `source + title`.
 
@@ -118,6 +128,10 @@ data/releases.json                 версия, changelog, кто утверд�
 - ручной `workflow_dispatch`;
 - вызывает `POST /api/data/refresh`;
 - требует секрет `DATA_HUB_URL` с адресом развёрнутого backend.
+
+Важно: workflow **не запускается локально**. Он начнёт реально обновлять данные
+после деплоя backend, настройки секрета `DATA_HUB_URL` и `feedUrl` у источника.
+Без этого автоматический job завершится с `skipped`.
 
 Парсер ЕИС/ETP — источник-специфичный. В реестре уже есть профиль ключевых
 слов и ОКПД2; для production нужно добавить connector, который забирает выдачу

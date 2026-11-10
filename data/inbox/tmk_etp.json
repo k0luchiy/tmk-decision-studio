@@ -1,0 +1,32 @@
+[
+  {
+    "id": "inbox_tmk_etp_mes_2026_01",
+    "project_type": "mes",
+    "title": "Диспетчеризация трубного завода: контроль аварийных ситуаций",
+    "year": 2026,
+    "currency": "RUB",
+    "price_low": 18000000,
+    "price_mid": 24000000,
+    "price_high": 32000000,
+    "price_basis": "contract_price",
+    "source": "https://zakupki.tmk-group.com/#com/procedure/view/procedure/900001",
+    "source_date": "2026-10-15",
+    "confidence": "high",
+    "note": "Пример feed-файла для Live refresh (локальный источник)"
+  },
+  {
+    "id": "inbox_tmk_etp_erp_2026_02",
+    "project_type": "erp_1c",
+    "title": "Интеграция 1С:ERP с производственным контуром ТМК",
+    "year": 2026,
+    "currency": "RUB",
+    "price_low": 9000000,
+    "price_mid": 12000000,
+    "price_high": 16000000,
+    "price_basis": "contract_price",
+    "source": "https://zakupki.tmk-group.com/#com/procedure/view/procedure/900002",
+    "source_date": "2026-09-20",
+    "confidence": "medium",
+    "note": "Пример feed-файла для Live refresh (локальный источник)"
+  }
+]

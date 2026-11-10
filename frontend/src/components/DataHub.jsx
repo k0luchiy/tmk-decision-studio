@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, Check, FileUp, RefreshCw, Send, X } from 'lucide-react';
+import { AlertTriangle, Check, FileUp, Info, RefreshCw, Send, X } from 'lucide-react';
 import { Button, Pill, SectionHead } from './ui.jsx';
 import { fmtMoney } from '../core/format.js';
 import {
@@ -98,6 +98,7 @@ export default function DataHub({ onPublished }) {
           </div>
         ))}
       </div>
+      <div className="datahub-schedule"><RefreshCw size={13} /> Автообновление: понедельник 03:00 UTC · GitHub Actions · требуется DATA_HUB_URL</div>
 
       <div className="datahub-import">
         <div className="datahub-import-controls">
@@ -124,11 +125,27 @@ export default function DataHub({ onPublished }) {
             variant="secondary"
             icon={RefreshCw}
             disabled={busy === `refresh:${sourceId}` || !sources.find((item) => item.id === sourceId)?.feedUrl}
-            onClick={() => run(`refresh:${sourceId}`, () => refreshDataSource(sourceId))}
+            onClick={() => run(`refresh:${sourceId}`, async () => {
+              const result = await refreshDataSource(sourceId);
+              if (result.skipped) {
+                setMessage('Источник без feedUrl: используйте ручной импорт');
+                return;
+              }
+              setReport(result);
+              setMessage(`Live refresh: ${result.added} новых, ${result.duplicates} дубликатов`);
+            })}
           >
             Live refresh
           </Button>
         </div>
+        <details className="datahub-format">
+          <summary><Info size={13} /> Формат файла</summary>
+          <div>
+            <p><b>Обязательные поля:</b> <code>project_type</code>, <code>title</code>, <code>source</code>, <code>price_mid</code> или <code>price_low</code> + <code>price_high</code>.</p>
+            <p><b>Необязательные:</b> <code>year</code>, <code>currency</code>, <code>price_basis</code>, <code>source_date</code>, <code>confidence</code>, <code>note</code>.</p>
+            <p>CSV, XLSX или JSON. Пример: <code>data/import/analogue-sample.csv</code>.</p>
+          </div>
+        </details>
         {report && (
           <div className="datahub-report">
             <span>Строк: <b>{report.rowsTotal}</b></span>

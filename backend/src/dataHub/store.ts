@@ -201,6 +201,26 @@ export async function publishApproved(
   return { version, datasetVersion: manifest.datasetVersion, rowsAdded: fresh.length, release };
 }
 
+async function readFeed(url: string): Promise<{ buffer: Buffer; filename: string }> {
+  if (/^https?:\/\//i.test(url)) {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new ApiError(502, 'source_unavailable', `Source responded with ${response.status}`);
+    }
+    return {
+      buffer: Buffer.from(await response.arrayBuffer()),
+      filename: new URL(url).pathname,
+    };
+  }
+  const raw = url.replace(/^file:\/\//i, '').replace(/^file:/i, '');
+  const filePath = path.isAbsolute(raw) ? raw : path.join(repoRoot, raw);
+  const resolved = path.resolve(filePath);
+  if (!resolved.startsWith(path.resolve(repoRoot))) {
+    throw new ApiError(400, 'invalid_source', 'Feed path must stay inside the repository');
+  }
+  return { buffer: await readFile(resolved), filename: path.basename(resolved) };
+}
+
 export async function refreshSource(
   sourceId: string,
 ): Promise<ImportReport | { skipped: true; reason: string }> {
@@ -210,14 +230,8 @@ export async function refreshSource(
   if (source.feedUrl === undefined || source.feedUrl.trim() === '') {
     return { skipped: true, reason: 'manual_source' };
   }
-  const url = source.feedUrl;
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new ApiError(502, 'source_unavailable', `Source responded with ${response.status}`);
-  }
-  const buffer = Buffer.from(await response.arrayBuffer());
-  const filename = new URL(url).pathname;
-  return importCandidates(parseRows(buffer, filename), sourceId);
+  const feed = await readFeed(source.feedUrl);
+  return importCandidates(parseRows(feed.buffer, feed.filename), sourceId);
 }
 
 export async function loadHub(): Promise<HubSnapshot> {
